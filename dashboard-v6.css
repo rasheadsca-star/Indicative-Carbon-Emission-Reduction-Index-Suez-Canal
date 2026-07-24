@@ -60,6 +60,10 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
 .single-vessel-page{gap:16px!important}.single-vessel-scope{padding:17px 19px!important;border-radius:15px!important;background:linear-gradient(110deg,rgba(66,217,234,.09),rgba(62,226,173,.045))!important}
 .single-vessel-workspace{grid-template-columns:minmax(390px,.82fr) minmax(580px,1.35fr)!important;gap:16px!important}.single-vessel-inputs,.single-vessel-results{padding:20px!important}.single-vessel-results{top:155px!important}
 .single-vessel-head h2{font-size:16px!important}.single-vessel-form{gap:12px!important}.vessel-field label{font-size:9px!important}.vessel-field input,.vessel-field select{min-height:43px!important;border-radius:10px!important;background:rgba(2,18,15,.72)!important;border-color:rgba(111,180,163,.17)!important;font-size:11px!important}
+.route-confidence{color:#bff8e6!important;border-color:rgba(62,226,173,.35)!important;background:rgba(62,226,173,.08)!important}
+.vessel-waypoint{fill:#e8fff8;stroke:#063b30;stroke-width:1.3;opacity:.9;filter:drop-shadow(0 0 4px rgba(80,255,200,.8))}
+.vessel-waypoint.cape{fill:#ff958e}.vessel-waypoint.suez{fill:#65efc2}
+.vessel-map-badge:after{content:" · V7.1";color:var(--accent);font-weight:800}
 .vessel-field input:focus,.vessel-field select:focus{border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(62,226,173,.08)!important}
 .vessel-visual{border-radius:15px!important}.vessel-visual-canvas{height:390px!important}.vessel-route-card,.vessel-delta,.vessel-quality{border-radius:12px!important;background:rgba(255,255,255,.02)!important}.vessel-route-card{padding:14px!important}.vessel-metric{padding:9px!important}.vessel-verdict{padding:18px!important}.vessel-verdict h4{font-size:21px!important}
 .primary-btn,.secondary-btn,.danger-btn,.vessel-btn{min-height:38px;border-radius:10px!important}.primary-btn,.vessel-btn.primary{background:linear-gradient(135deg,#42e1ae,#16ad83)!important;color:#032119!important;box-shadow:0 10px 28px rgba(45,212,161,.16)}

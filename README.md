@@ -4,6 +4,10 @@
 
 A bilingual, interactive decision-support dashboard for exploring the indicative emissions, fuel, distance, time, and economic effects of routing a single vessel through the Suez Canal versus the Cape of Good Hope.
 
+## Live application
+
+https://rasheadsca-star.github.io/Indicative-Carbon-Emission-Reduction-Index-Suez-Canal/
+
 ## Application modules
 
 - Executive overview and dynamic indicators

@@ -564,6 +564,7 @@ function initVesselSimulatorEvents(){const modal=document.getElementById('vessel
 // This page intentionally does not multiply a sample route by annual traffic.
 // ═══════════════════════════════════════════════════════════════
 const RC_STORE_KEY='cerisc_route_compare_single_vessel_v5';
+const RC_SCENARIOS_KEY='cerisc_saved_scenarios_v73';
 const RC_DEFAULT={shipName:'Example Vessel',imo:'9811000',flag:'Panama',buildYear:2018,enginePower:48000,departure:'SIN',arrival:'RTM',shipType:'container',fuelType:'HFO',dwt:90000,gt:95000,capacity:10000,load:85,speed:18,refSpeed:20,mainFuel:105,auxFuel:8,seaMargin:8,fouling:2,emissionBoundary:'TTW',upstreamFactor:18,methaneSlip:0,transitHours:14,canalFuel:10,fuelPrice:600,charter:45000,toll:500000};
 function rcText(){return lang==='ar'?{
   scopeTitle:'نطاق الحساب الصحيح: سفينة واحدة ورحلة واحدة',scope:'تُحسب المقارنة فقط للسفينة والموانئ والخصائص المختارة أدناه. لا يفترض هذا القسم أن جميع السفن العابرة تبدأ من ميناء واحد أو تصل إلى ميناء واحد، ولا يضرب نتيجة مسار نموذجي في إجمالي حركة القناة.',
@@ -574,6 +575,12 @@ function rcText(){return lang==='ar'?{
 };}
 function rcGetState(){let o={};try{o=JSON.parse(storeGet('localStorage',RC_STORE_KEY,'{}'))||{};}catch(e){}return Object.assign({},RC_DEFAULT,o);}
 function rcV72Text(){return lang==='ar'?{flag:'العَلَم',buildYear:'سنة البناء',enginePower:'قدرة المحرك الرئيسية (kW)',model:'3. حدود نموذج الانبعاثات',boundary:'حدود الحساب',ttw:'Tank-to-Wake — انبعاثات التشغيل المباشرة',wtw:'Well-to-Wake — دورة الوقود الكاملة',upstream:'زيادة الانبعاثات غير المباشرة (%)',methane:'انزلاق الميثان من كتلة الوقود (%)',boundaryTag:'حدود الانبعاثات',profile:'اكتمال الملف الفني'}:{flag:'Flag state',buildYear:'Year built',enginePower:'Main engine power (kW)',model:'3. Emissions-model boundary',boundary:'Accounting boundary',ttw:'Tank-to-Wake — direct operational',wtw:'Well-to-Wake — full fuel lifecycle',upstream:'Upstream emissions uplift (%)',methane:'Methane slip (% of fuel mass)',boundaryTag:'Emissions boundary',profile:'Technical profile completeness'};}
+function rcV73Text(){return lang==='ar'?{save:'حفظ السيناريو',compare:'السيناريوهات المحفوظة',saved:'تم حفظ السيناريو',empty:'لا توجد سيناريوهات محفوظة بعد.',clear:'مسح الكل',sensitivity:'تحليل الحساسية',case:'الحالة',co2:'CO₂e المتجنب',cost:'ميزة تكلفة السويس',base:'الأساس',slow:'سرعة −10%',fast:'سرعة +10%',fuelLow:'سعر الوقود −20%',fuelHigh:'سعر الوقود +20%',tollLow:'رسم القناة −20%',tollHigh:'رسم القناة +20%'}:{save:'Save scenario',compare:'Saved scenarios',saved:'Scenario saved',empty:'No saved scenarios yet.',clear:'Clear all',sensitivity:'Sensitivity analysis',case:'Case',co2:'Avoided CO₂e',cost:'Suez cost advantage',base:'Base case',slow:'Speed −10%',fast:'Speed +10%',fuelLow:'Fuel price −20%',fuelHigh:'Fuel price +20%',tollLow:'Canal toll −20%',tollHigh:'Canal toll +20%'};}
+function rcSavedScenarios(){try{return JSON.parse(storeGet('localStorage',RC_SCENARIOS_KEY,'[]'))||[];}catch(e){return[];}}
+function rcSaveScenario(){if(!window._lastRCScenario)return;const list=rcSavedScenarios();list.unshift({...window._lastRCScenario,id:Date.now(),savedAt:new Date().toISOString()});storeSet('localStorage',RC_SCENARIOS_KEY,JSON.stringify(list.slice(0,8)));rcRenderScenarioPanel();const b=document.getElementById('rcSaveScenarioBtn');if(b){const old=b.textContent;b.textContent='✓ '+rcV73Text().saved;setTimeout(()=>b.textContent=old,1400);}}
+function rcClearScenarios(){storeSet('localStorage',RC_SCENARIOS_KEY,'[]');rcRenderScenarioPanel();}
+function rcRenderScenarioPanel(){const el=document.getElementById('rcScenarioPanel');if(!el)return;const V=rcV73Text(),list=rcSavedScenarios();el.innerHTML=`<div class="scenario-head"><strong>🗂 ${V.compare}</strong>${list.length?`<button type="button" onclick="rcClearScenarios()">${V.clear}</button>`:''}</div>${list.length?`<div class="scenario-grid">${list.map(x=>`<article class="scenario-card"><b>${vsEsc(x.ship)}</b><span>${vsEsc(x.route)}</span><div><strong>${vsFmt(x.co2,0)} tCO₂e</strong><small>${V.co2}</small></div><div><strong>${vsMoney(x.cost)}</strong><small>${V.cost}</small></div><em>${x.boundary} · ${new Date(x.savedAt).toLocaleDateString(lang==='ar'?'ar-EG':'en-GB')}</em></article>`).join('')}</div>`:`<div class="scenario-empty">${V.empty}</div>`}`;}
+function rcSensitivityMarkup(d){const V=rcV73Text(),fuelPrice=rcNum('rcFuelPrice',600),charter=rcNum('rcCharter',45000),toll=rcNum('rcToll',500000);const cost=(fuelScale=1,timeScale=1,priceScale=1,tollScale=1)=>d.dFuel*fuelScale*fuelPrice*priceScale+d.dDays*timeScale*charter-toll*tollScale;const rows=[{n:V.base,e:d.dCO2,c:d.costAdv},{n:V.slow,e:d.dCO2*.81,c:cost(.81,1/.9)},{n:V.fast,e:d.dCO2*1.21,c:cost(1.21,1/1.1)},{n:V.fuelLow,e:d.dCO2,c:cost(1,1,.8)},{n:V.fuelHigh,e:d.dCO2,c:cost(1,1,1.2)},{n:V.tollLow,e:d.dCO2,c:cost(1,1,1,.8)},{n:V.tollHigh,e:d.dCO2,c:cost(1,1,1,1.2)}];return `<div class="sensitivity-box"><div class="scenario-head"><strong>📐 ${V.sensitivity}</strong></div><div class="sensitivity-table"><div class="sensitivity-row head"><span>${V.case}</span><span>${V.co2}</span><span>${V.cost}</span></div>${rows.map(r=>`<div class="sensitivity-row"><b>${r.n}</b><span>${vsFmt(r.e,0)} tCO₂e</span><span class="${r.c<0?'negative':''}">${vsMoney(r.c)}</span></div>`).join('')}</div></div>`;}
 function rcSaveState(){const ids=['shipName','imo','flag','buildYear','enginePower','departure','arrival','shipType','fuelType','dwt','gt','capacity','load','speed','refSpeed','mainFuel','auxFuel','seaMargin','fouling','emissionBoundary','upstreamFactor','methaneSlip','transitHours','canalFuel','fuelPrice','charter','toll'];const o={};ids.forEach(k=>{const el=document.getElementById('rc'+k[0].toUpperCase()+k.slice(1));if(el)o[k]=el.value;});storeSet('localStorage',RC_STORE_KEY,JSON.stringify(o));}
 function rcPortOptions(selected){const labelE=lang==='ar'?'شرق قناة السويس':'East of Suez',labelW=lang==='ar'?'أوروبا والأطلسي':'Europe & Atlantic';const opts=side=>Object.entries(VS_PORTS).filter(([,p])=>p.side===side).map(([id,p])=>`<option value="${id}" ${id===selected?'selected':''}>${vsEsc(lang==='ar'?p.nameAr:p.name)} — ${vsEsc(lang==='ar'?p.countryAr:p.country)}</option>`).join('');return `<optgroup label="${labelE}">${opts('E')}</optgroup><optgroup label="${labelW}">${opts('W')}</optgroup>`;}
 function rcTypeOptions(selected){return Object.entries(VS_SHIP_DEFAULTS).map(([id,s])=>`<option value="${id}" ${id===selected?'selected':''}>${vsEsc(lang==='ar'?s.nameAr:s.name)}</option>`).join('');}
@@ -590,6 +597,7 @@ function vsMidPoint(points,idxFrac=.5,w=960,h=360){if(!points||!points.length)re
 function vsShipGraphic(cls,pathId,dur){return `<g class="vessel-ship ${cls}"><g><path class="wake" d="M -16 0 C -22 -2,-27 -2,-32 0 M -16 4 C -23 4,-27 5,-31 7"/><g><path class="hull" d="M -14 -5 L 9 -5 L 14 0 L 9 5 L -14 5 L -18 0 Z"/><rect class="deck" x="-2" y="-3.2" width="7" height="6.4" rx="1.1"/><circle class="ping" cx="0" cy="0" r="6"/></g></g><animateMotion dur="${dur}" repeatCount="indefinite" rotate="auto"><mpath href="#${pathId}"/></animateMotion></g>`;}
 function vsWaypointDots(points,cls){return (points||[]).slice(1,-1).map((pt,i)=>{const p=vsProjectPoint(pt);return `<circle class="vessel-waypoint ${cls}" cx="${p.x}" cy="${p.y}" r="${i%2?2.2:2.8}"><title>${lang==='ar'?'نقطة ممر بحري':'Maritime corridor waypoint'}</title></circle>`;}).join('');}
 function rcResultsMarkup(data){const R=rcText(),V=rcV72Text(),{s,c,dist,dep,arr,ship,imo,boundary,dNm,dDays,dFuel,dCO2,costAdv,redPct,quality,suezPreferred,capePreferred}=data;const metric=(l,v)=>`<div class="vessel-metric"><span>${l}</span><strong>${v}</strong></div>`;const verdict=suezPreferred?R.suezWins:(capePreferred?R.capeWins:R.sameCost);const dir=`${lang==='ar'?dep.nameAr:dep.name} → ${lang==='ar'?arr.nameAr:arr.name}`;
+window._lastRCScenario={ship,route:dir,boundary,co2:dCO2,cost:costAdv,suezNm:s.nm,capeNm:c.nm};
 const suezPath=vsSvgPath(dist.suezPoints),capePath=vsSvgPath(dist.capePoints);const depXY=vsProjectPoint(dep),arrXY=vsProjectPoint(arr);const suezLabel=vsMidPoint(dist.suezPoints,.43),capeLabel=vsMidPoint(dist.capePoints,.62);const suezNode=vsProjectPoint(VS_WP.PORT_SAID),capeNode=vsProjectPoint(VS_WP.CAPE);
 return `
 <div class="single-vessel-meta"><span class="single-vessel-chip"><b>${vsEsc(ship)}</b></span><span class="single-vessel-chip">IMO: <b>${vsEsc(imo||'—')}</b></span><span class="single-vessel-chip"><b>${vsEsc(dir)}</b></span><span class="single-vessel-chip">${R.routeOnly}</span><span class="single-vessel-chip route-confidence">◎ ${lang==='ar'?'ثقة المسار':'Route confidence'}: <b>${dist.confidence}%</b></span><span class="single-vessel-chip boundary-chip">${V.boundaryTag}: <b>${boundary}</b></span></div>
@@ -599,6 +607,7 @@ return `
 <div class="vessel-route-cards"><div class="vessel-route-card suez"><h5>${R.suez}<span>${dist.exact?(R.exact||'Exact'):(R.estimated||'Estimated')}</span></h5><div class="vessel-metric-grid">${metric(R.distance,`${vsFmt(s.nm)} ${R.nm}`)}${metric(R.time,`${vsFmt(s.totalDays,1)} ${R.days}`)}${metric(R.fuel,`${vsFmt(s.totalFuel,0)} ${R.tonnes}`)}${metric(R.emissions,`${vsFmt(s.co2,0)} tCO₂`)}</div><div class="vessel-cost"><span>${R.cost}</span><strong>${vsMoney(s.cost)}</strong></div></div><div class="vessel-route-card cape"><h5>${R.cape}<span>${dist.exact?(R.exact||'Exact'):(R.estimated||'Estimated')}</span></h5><div class="vessel-metric-grid">${metric(R.distance,`${vsFmt(c.nm)} ${R.nm}`)}${metric(R.time,`${vsFmt(c.totalDays,1)} ${R.days}`)}${metric(R.fuel,`${vsFmt(c.totalFuel,0)} ${R.tonnes}`)}${metric(R.emissions,`${vsFmt(c.co2,0)} tCO₂`)}</div><div class="vessel-cost"><span>${R.cost}</span><strong>${vsMoney(c.cost)}</strong></div></div></div>
 <div class="vessel-delta-grid"><div class="vessel-delta"><span>${R.savedDistance}</span><strong>${vsFmt(dNm)} ${R.nm}</strong></div><div class="vessel-delta"><span>${R.savedTime}</span><strong>${vsFmt(dDays,1)} ${R.days}</strong></div><div class="vessel-delta"><span>${R.savedFuel}</span><strong>${vsFmt(dFuel,0)} ${R.tonnes}</strong></div><div class="vessel-delta"><span>${R.avoided}</span><strong>${vsFmt(dCO2,0)} tCO₂</strong></div><div class="vessel-delta ${costAdv<0?'negative':''}"><span>${R.costAdv}</span><strong>${costAdv>=0?'+':''}${vsMoney(costAdv)}</strong></div><div class="vessel-delta"><span>${R.reduction}</span><strong>${vsFmt(redPct,1)}%</strong></div></div>
 <div class="vessel-quality"><div class="vessel-quality-head"><span>${R.quality}</span><strong>${quality}%</strong></div><div class="vessel-quality-track"><div class="vessel-quality-fill" style="width:${quality}%"></div></div></div>
+${rcSensitivityMarkup(data)}
 <div class="vessel-warning">⚠ ${R.method}</div>`;}
 function rcCalculate(){const R=rcText(),result=document.getElementById('rcResults');if(!result)return;const depId=document.getElementById('rcDeparture')?.value,arrId=document.getElementById('rcArrival')?.value,dist=vsRouteDistances(depId,arrId),fuelId=document.getElementById('rcFuelType')?.value||'HFO',fuelInfo=VS_FUELS[fuelId]||VS_FUELS.HFO,ef=document.getElementById('rcEf');if(ef)ef.value=`${fuelInfo.ef.toFixed(3)} tCO₂/t`;const imo=(document.getElementById('rcImo')?.value||'').replace(/\D/g,''),imoOK=vsValidIMO(imo),help=document.getElementById('rcImoHelp');if(help){help.textContent=imoOK?`✓ ${R.valid}`:`⚠ ${R.invalid}`;help.style.color=imoOK?'var(--accent)':'var(--cape)';}if(!dist){result.innerHTML=`<div class="single-vessel-empty"><div><span>🧭</span>${R.invalidRoute}</div></div>`;rcSaveState();return;}
 const speed=Math.max(.1,rcNum('rcSpeed',18)),refSpeed=Math.max(.1,rcNum('rcRefSpeed',20)),mainBase=Math.max(0,rcNum('rcMainFuel',105)),aux=Math.max(0,rcNum('rcAuxFuel',8)),load=Math.min(100,Math.max(0,rcNum('rcLoad',85))),weather=Math.max(0,rcNum('rcSeaMargin',8)),fouling=Math.min(5,Math.max(0,Math.round(rcNum('rcFouling',2)))),boundary=document.getElementById('rcEmissionBoundary')?.value||'TTW',upstream=Math.max(0,rcNum('rcUpstreamFactor',18)),methaneSlip=fuelId==='LNG'?Math.max(0,rcNum('rcMethaneSlip',0)):0,transitHours=Math.max(0,rcNum('rcTransitHours',14)),canalFuel=Math.max(0,rcNum('rcCanalFuel',10)),fuelPrice=Math.max(0,rcNum('rcFuelPrice',fuelInfo.price)),charter=Math.max(0,rcNum('rcCharter',45000)),toll=Math.max(0,rcNum('rcToll',500000));const foulingFactors=[1,1.02,1.05,1.09,1.14,1.20],loadFactor=.70+.30*(load/100),mainDaily=mainBase*Math.pow(speed/refSpeed,3)*(1+weather/100)*foulingFactors[fouling]*loadFactor;function routeCalc(nm,isSuez){const seaDays=nm/(speed*24),transitDays=isSuez?transitHours/24:0,totalDays=seaDays+transitDays,seaFuel=(mainDaily+aux)*seaDays,transitFuel=isSuez?canalFuel*transitDays:0,totalFuel=seaFuel+transitFuel,ttw=totalFuel*fuelInfo.ef,upstreamCO2=boundary==='WTW'?ttw*(upstream/100):0,methaneCO2e=boundary==='WTW'?totalFuel*(methaneSlip/100)*27.2:0,co2=ttw+upstreamCO2+methaneCO2e,cost=totalFuel*fuelPrice+totalDays*charter+(isSuez?toll:0);return{nm,totalDays,totalFuel,co2,ttw,upstreamCO2,methaneCO2e,cost};}const s=routeCalc(dist.suez,true),c=routeCalc(dist.cape,false),dNm=c.nm-s.nm,dDays=c.totalDays-s.totalDays,dFuel=c.totalFuel-s.totalFuel,dCO2=c.co2-s.co2,costAdv=c.cost-s.cost,redPct=c.co2>0?dCO2/c.co2*100:0;let quality=35;quality+=imoOK?18:0;quality+=(document.getElementById('rcShipName')?.value||'').trim()?8:0;quality+=mainBase>0&&refSpeed>0?15:0;quality+=dist.exact?12:7;quality+=document.getElementById('rcEnginePower')?.value?5:0;quality+=document.getElementById('rcBuildYear')?.value?3:0;quality=Math.min(100,quality);const data={s,c,dist,dep:VS_PORTS[depId],arr:VS_PORTS[arrId],ship:(document.getElementById('rcShipName')?.value||'—').trim(),imo,imoOK,boundary,upstream,methaneSlip,dNm,dDays,dFuel,dCO2,costAdv,redPct,quality,suezPreferred:costAdv>1000,capePreferred:costAdv<-1000};result.innerHTML=rcResultsMarkup(data);const ts=document.getElementById('rcTimestamp');if(ts)ts.textContent=`${R.calculated}: ${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-GB')}`;rcSaveState();}
@@ -609,12 +618,12 @@ function updatePageContextControls(){const single=pg===1;['ySel','rSel','liveBad
 // ═══ TRANSLATIONS ═══
 const LANG = {
   en: {
-    appName: "CERI-SC Intelligence Platform V7.2",
+    appName: "CERI-SC Intelligence Platform V7.3",
     appSub: "Indicative Carbon Emission Reduction Index — Suez Canal",
     live: "● ESTIMATE",
     langBtn: "🇸🇦 AR",
     pages: ["Overview","Single Vessel Compare","Historical Trend","Alt Fuels","Green Projects"],
-    footer: "CERI-SC V7.2 · TTW/WTW scenario modelling · Not navigation-grade or an approved MRV statement",
+    footer: "CERI-SC V7.3 · Saved scenarios & sensitivity analysis · Not navigation-grade or an approved MRV statement",
     liveMode: "Dynamic Estimate Mode",
     histMode: "Historical Estimate Mode",
     infoLive: (yr,total,route,src) => `<b>You're viewing the ${yr} current-year estimate.</b> The counter is a <b>time-adjusted indicative calculation</b> based on the projected annual result (${fmt(total)} tCO₂ ÷ 365), not a live measurement of actual vessel emissions. “Today” and “This Month” are annualised averages.<br><small style="color:var(--dim)">Input/source: ${src} · Illustrative route: ${route} · HFO carbon factor=3.114 tCO₂/t · Not an approved MRV statement</small>`,
@@ -698,12 +707,12 @@ Current-year dynamic estimate: Pro-rata by elapsed seconds
     srcRoute: rk=>`Route: ${RT[rk].n}`,
   },
   ar: {
-    appName: "منصة CERI-SC الذكية — الإصدار V7.2",
+    appName: "منصة CERI-SC الذكية — الإصدار V7.3",
     appSub: "مؤشر تقديري لخفض انبعاثات الكربون — قناة السويس",
     live: "● تقديري",
     langBtn: "🇬🇧 EN",
     pages: ["نظرة عامة","مقارنة سفينة واحدة","الاتجاه التاريخي","وقود بديل","مشروعات خضراء"],
-    footer: "CERI-SC الإصدار V7.2 · نمذجة سيناريو TTW/WTW · ليست للتوجيه الملاحي أو بيان MRV معتمدًا",
+    footer: "CERI-SC الإصدار V7.3 · حفظ السيناريوهات وتحليل الحساسية · ليست للتوجيه الملاحي أو بيان MRV معتمدًا",
     liveMode: "وضع التقدير المتجدد",
     histMode: "وضع التقدير التاريخي",
     infoLive: (yr,total,route,src) => `<b>تشاهد تقدير عام ${yr}.</b> العداد يمثل <b>حسابًا تقديريًا متجددًا زمنيًا</b> مبنيًا على النتيجة السنوية المتوقعة (${fmt(total)} طن CO₂ ÷ 365)، ولا يمثل قياسًا حيًا لانبعاثات السفن الفعلية. قيمتا «اليوم» و«الشهر» متوسطات سنوية حسابية.<br><small style="color:var(--dim)">المدخل/المصدر: ${src} · المسار التوضيحي: ${route} · معامل كربون HFO=3.114 طن CO₂/طن · ليست نتيجة MRV معتمدة</small>`,
@@ -1166,6 +1175,11 @@ function renderP0(M,res,yr,rk){
   const cumForYear=cumData.find(d=>d.yr===yr)?.cum||0;
   const rName=lang==='ar'?RT[rk].nAr:RT[rk].n;
 
+  // Executive opening — first-view narrative and direct actions
+  const hero=document.createElement('section');hero.className='opening-hero';
+  hero.innerHTML=`<div class="opening-copy"><div class="opening-eyebrow">${lang==='ar'?'الممر البحري الأقصر · القيمة المناخية الأكبر':'THE SHORTEST CORRIDOR · THE STRONGEST CLIMATE VALUE'}</div><h2>${lang==='ar'?'قناة السويس كممر عالمي مستدام':'Suez Canal as a Global Sustainable Maritime Corridor'}</h2><p>${lang==='ar'?'حوّل المسافة والوقت والوقود إلى أثر تجاري وبيئي مفهوم—مع افتراضات واضحة ونتائج تقديرية قابلة للفحص.':'Translate distance, time and fuel savings into clear commercial and environmental value—with transparent assumptions and auditable indicative results.'}</p><div class="opening-actions"><button type="button" class="opening-primary" onclick="pg=1;render()">🚢 ${lang==='ar'?'قارن رحلة سفينة':'Compare one voyage'}</button><button type="button" class="opening-secondary" onclick="pg=2;render()">📈 ${lang==='ar'?'استكشف الاتجاه التاريخي':'Explore historical intelligence'}</button></div></div><div class="opening-visual"><div class="orbit o1"></div><div class="orbit o2"></div><div class="opening-route cape"></div><div class="opening-route suez"></div><div class="opening-ship s1">➤</div><div class="opening-ship s2">➤</div><div class="opening-impact"><span>${lang==='ar'?'الأثر التراكمي التقديري حتى':'Indicative cumulative impact through'} ${yr}</span><strong>${(cumForYear/1e6).toFixed(2)}M</strong><small>tCO₂</small></div><div class="opening-badge">CERI‑SC V7.3</div></div>`;
+  M.appendChild(hero);
+
   // Info box
   const ib=document.createElement('div');ib.className='info-box';
   ib.innerHTML=`<h3>📊 ${isCurrentYr?T.liveMode:`${T.histMode} (${yr})`}${res.manual?` <span class="manual-indicator">${lang==='ar'?'بيانات يدوية':'MANUAL DATA'}</span>`:''}</h3>
@@ -1245,7 +1259,7 @@ function renderP0(M,res,yr,rk){
         '<circle cx="160" cy="182" r="100" fill="none" stroke="#1a2535" stroke-width="1" stroke-dasharray="4,10"/>' +
         ''  + /* no background track for cumulative — avoids misleading 'empty future' arc */
         '' +  /* glow halo removed to avoid right-side artifact */
-        '<path id="cum-arc" d="M 32,182 A 128,128 0 0,1 288,182" fill="none" stroke="url(#cg1)" stroke-width="18" stroke-linecap="round" stroke-dasharray="310" stroke-dashoffset="310" filter="url(#glow-c1)" style="transition:stroke-dashoffset 2s cubic-bezier(.4,0,.2,1)"/>' +
+        '<path id="cum-arc" d="M 32,182 A 128,128 0 0,1 288,182" pathLength="100" fill="none" stroke="url(#cg1)" stroke-width="18" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100" filter="url(#glow-c1)" style="transition:stroke-dashoffset 2s cubic-bezier(.4,0,.2,1)"/>' +
         '<circle id="cum-dot" cx="32" cy="182" r="8" fill="#10b981" filter="url(#glow-c1)" style="transition:cx 2s,cy 2s"/>' +
         '<circle id="cum-dot2" cx="32" cy="182" r="4" fill="#fff" opacity=".9" style="transition:cx 2s,cy 2s"/>' +
         '<circle id="pulse-ring" cx="32" cy="182" r="12" fill="none" stroke="#10b981" stroke-width="1.5" opacity="0" style="transition:cx 2s,cy 2s"/>' +
@@ -1394,8 +1408,7 @@ function renderP0(M,res,yr,rk){
 
     // Arc fill: show as 82% of arc (proportional to years elapsed / max span)
     const arcFill = Math.min(0.95, (Object.keys(Y).filter(y=>+y<=yr).length / Object.keys(Y).length));
-    const arcLen  = 310;
-    if(cumArc) cumArc.style.strokeDashoffset = (arcLen*(1-arcFill)).toFixed(1);
+    if(cumArc) cumArc.style.strokeDashoffset = (100*(1-arcFill)).toFixed(2);
 
     // Dot position on arc
     function setDot(frac){
@@ -1582,11 +1595,12 @@ function renderP1(M){
           <div class="vessel-field"><label>${R.ef}</label><input id="rcEf" readonly value="${f.ef.toFixed(3)} tCO₂/t"></div>
         </div>
         <div class="single-vessel-inline-note">${R.method}</div>
-        <div class="single-vessel-toolbar"><button class="vessel-btn secondary" onclick="rcReset()">${R.reset}</button><div class="right"><button class="vessel-btn secondary" onclick="window.print()">${R.print}</button><button class="vessel-btn primary" onclick="rcCalculate()">${R.recalc}</button></div></div>
+        <div class="single-vessel-toolbar"><button class="vessel-btn secondary" onclick="rcReset()">${R.reset}</button><div class="right"><button id="rcSaveScenarioBtn" class="vessel-btn secondary" onclick="rcSaveScenario()">💾 ${rcV73Text().save}</button><button class="vessel-btn secondary" onclick="window.print()">${R.print}</button><button class="vessel-btn primary" onclick="rcCalculate()">${R.recalc}</button></div></div>
+        <div id="rcScenarioPanel" class="scenario-panel"></div>
       </section>
       <section class="single-vessel-results"><div class="single-vessel-head"><div><h2>📊 ${R.results}</h2><p>${R.routeOnly}</p></div><span id="rcTimestamp" class="tag"></span></div><div id="rcResults"></div></section>
     </div>`;
-  M.appendChild(page);initRouteCompareSingleVessel();
+  M.appendChild(page);initRouteCompareSingleVessel();rcRenderScenarioPanel();
 }
 
 function renderP2(M,rk){

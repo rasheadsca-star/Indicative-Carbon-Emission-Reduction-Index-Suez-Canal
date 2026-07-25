@@ -320,7 +320,7 @@ footer{text-align:center;padding:16px 20px;margin-top:24px;border-top:1px solid 
   <div class="logo">
     <div class="logo-i">SC</div>
     <div>
-      <h1 id="appName">CERI-SC Intelligence Platform v6</h1>
+      <h1 id="appName">CERI-SC Intelligence Platform V7.5.1</h1>
       <p id="appSub">Indicative Carbon Emission Reduction Index — Suez Canal</p>
     </div>
   </div>
@@ -584,7 +584,7 @@ function rcRenderScenarioPanel(){const el=document.getElementById('rcScenarioPan
 function rcSensitivityMarkup(d){const V=rcV73Text(),fuelPrice=rcNum('rcFuelPrice',600),charter=rcNum('rcCharter',45000),toll=rcNum('rcToll',500000);const cost=(fuelScale=1,timeScale=1,priceScale=1,tollScale=1)=>d.dFuel*fuelScale*fuelPrice*priceScale+d.dDays*timeScale*charter-toll*tollScale;const rows=[{n:V.base,e:d.dCO2,c:d.costAdv},{n:V.slow,e:d.dCO2*.81,c:cost(.81,1/.9)},{n:V.fast,e:d.dCO2*1.21,c:cost(1.21,1/1.1)},{n:V.fuelLow,e:d.dCO2,c:cost(1,1,.8)},{n:V.fuelHigh,e:d.dCO2,c:cost(1,1,1.2)},{n:V.tollLow,e:d.dCO2,c:cost(1,1,1,.8)},{n:V.tollHigh,e:d.dCO2,c:cost(1,1,1,1.2)}];return `<div class="sensitivity-box"><div class="scenario-head"><strong>📐 ${V.sensitivity}</strong></div><div class="sensitivity-table"><div class="sensitivity-row head"><span>${V.case}</span><span>${V.co2}</span><span>${V.cost}</span></div>${rows.map(r=>`<div class="sensitivity-row"><b>${r.n}</b><span>${vsFmt(r.e,0)} tCO₂e</span><span class="${r.c<0?'negative':''}">${vsMoney(r.c)}</span></div>`).join('')}</div></div>`;}
 function rcEconomicMarkup(d){const V=rcV75Text(),toll=rcNum('rcToll',500000),carbonPrice=rcNum('rcCarbonPrice',80),capacity=Math.max(1,rcNum('rcCapacity',1)),breakEven=Math.max(0,toll+d.costAdv),headroom=breakEven-toll,carbonValue=Math.max(0,d.dCO2*carbonPrice),total=d.costAdv+carbonValue,perCapacity=total/capacity;return `<section class="economic-box"><div class="scenario-head"><strong>⚖️ ${V.economics}</strong><span>${V.indicative}</span></div><div class="economic-grid"><div><span>${V.breakEven}</span><strong>${vsMoney(breakEven)}</strong></div><div><span>${V.headroom}</span><strong class="${headroom<0?'negative':''}">${vsMoney(headroom)}</strong></div><div><span>${V.carbonValue}</span><strong>${vsMoney(carbonValue)}</strong></div><div class="featured"><span>${V.totalValue}</span><strong class="${total<0?'negative':''}">${vsMoney(total)}</strong></div><div><span>${V.perCapacity}</span><strong>${vsMoney(perCapacity)}</strong></div></div><p>${lang==='ar'?'رسم التعادل هو الحد النظري الذي تتساوى عنده تكلفة المسارين وفق مدخلات الوقود والزمن الحالية. سعر الكربون افتراض تحليلي قابل للتعديل ولا يمثل سعراً أو إيراداً مضموناً.':'Break-even toll is the theoretical point at which both route costs are equal under current fuel and time inputs. Carbon price is an editable analytical assumption—not a guaranteed price or revenue.'}</p></section>`;}
 function rcSourcesMarkup(d){const V=rcV75Text(),rows=lang==='ar'?[['الموانئ والإحداثيات','بناء مسارات المقارنة','مرجع نموذجي'],['المسافات البحرية','مسافات مرجعية أو نقاط ممر جغرافية','تقديري'],['استهلاك الوقود والسرعة والحمولة','حساب وقود الرحلة','إدخال المستخدم'],['معامل CO₂ ونطاق TTW/WTW','حساب الانبعاثات/CO₂e','مرجع نموذجي + إدخال المستخدم'],['الرسم وسعر الوقود والإيجار والكربون','تحليل التكلفة ونقطة التعادل','إدخال المستخدم']]:[['Ports and coordinates','Route-corridor construction','Model reference'],['Maritime distance','Reference pairs or geodesic waypoints','Indicative'],['Fuel, speed and load','Voyage-fuel calculation','User input'],['CO₂ factor and TTW/WTW boundary','Emissions / CO₂e calculation','Model reference + user input'],['Toll, fuel, charter and carbon prices','Cost and break-even analysis','User input']];return `<details class="sources-register"><summary>📚 ${V.sources}</summary><div class="source-table"><div class="source-row head"><b>${V.source}</b><b>${V.use}</b><b>${V.status}</b></div>${rows.map(r=>`<div class="source-row"><span>${r[0]}</span><span>${r[1]}</span><em>${r[2]}</em></div>`).join('')}</div><p>${lang==='ar'?'يجب استبدال الافتراضات ببيانات السفينة الفعلية وعروض الرسوم والتحقق المستقل قبل أي استخدام تشغيلي أو مالي أو MRV.':'Replace assumptions with actual vessel data, official toll quotations and independent verification before operational, financial or MRV use.'}</p></details>`;}
-function rcPrintReport(){rcCalculate();const V=rcV75Text(),src=document.getElementById('rcResults');if(!src)return;const sheet=document.createElement('div');sheet.id='rcReportSheet';sheet.innerHTML=`<header><div><b>CERI‑SC V7.5</b><h1>${V.reportTitle}</h1></div><span>${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-GB')}</span></header><div class="report-disclaimer">${lang==='ar'?'تقرير سيناريو تقديري غير معتمد للملاحة أو MRV أو التسعير الرسمي.':'Indicative scenario report—not approved for navigation, MRV or official pricing.'}</div>${src.innerHTML}<footer>CERI‑SC · ${lang==='ar'?'تم إنشاؤه من المدخلات المختارة':'Generated from selected user inputs'}</footer>`;document.body.appendChild(sheet);document.body.classList.add('rc-report-print');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('rc-report-print');sheet.remove();},400);},120);}
+function rcPrintReport(){rcCalculate();const V=rcV75Text(),src=document.getElementById('rcResults');if(!src)return;const sheet=document.createElement('div');sheet.id='rcReportSheet';sheet.innerHTML=`<header><div><b>CERI‑SC V7.5.1</b><h1>${V.reportTitle}</h1></div><span>${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-GB')}</span></header><div class="report-disclaimer">${lang==='ar'?'تقرير سيناريو تقديري غير معتمد للملاحة أو MRV أو التسعير الرسمي.':'Indicative scenario report—not approved for navigation, MRV or official pricing.'}</div>${src.innerHTML}<footer>CERI‑SC · ${lang==='ar'?'تم إنشاؤه من المدخلات المختارة':'Generated from selected user inputs'}</footer>`;document.body.appendChild(sheet);document.body.classList.add('rc-report-print');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('rc-report-print');sheet.remove();},400);},120);}
 function rcSaveState(){const ids=['shipName','imo','flag','buildYear','enginePower','departure','arrival','shipType','fuelType','dwt','gt','capacity','load','speed','refSpeed','mainFuel','auxFuel','seaMargin','fouling','emissionBoundary','upstreamFactor','methaneSlip','transitHours','canalFuel','fuelPrice','charter','toll','carbonPrice'];const o={};ids.forEach(k=>{const el=document.getElementById('rc'+k[0].toUpperCase()+k.slice(1));if(el)o[k]=el.value;});storeSet('localStorage',RC_STORE_KEY,JSON.stringify(o));}
 function rcPortOptions(selected){const labelE=lang==='ar'?'شرق قناة السويس':'East of Suez',labelW=lang==='ar'?'أوروبا والأطلسي':'Europe & Atlantic';const opts=side=>Object.entries(VS_PORTS).filter(([,p])=>p.side===side).map(([id,p])=>`<option value="${id}" ${id===selected?'selected':''}>${vsEsc(lang==='ar'?p.nameAr:p.name)} — ${vsEsc(lang==='ar'?p.countryAr:p.country)}</option>`).join('');return `<optgroup label="${labelE}">${opts('E')}</optgroup><optgroup label="${labelW}">${opts('W')}</optgroup>`;}
 function rcTypeOptions(selected){return Object.entries(VS_SHIP_DEFAULTS).map(([id,s])=>`<option value="${id}" ${id===selected?'selected':''}>${vsEsc(lang==='ar'?s.nameAr:s.name)}</option>`).join('');}
@@ -618,22 +618,26 @@ ${rcSourcesMarkup(data)}
 function rcCalculate(){const R=rcText(),result=document.getElementById('rcResults');if(!result)return;const depId=document.getElementById('rcDeparture')?.value,arrId=document.getElementById('rcArrival')?.value,dist=vsRouteDistances(depId,arrId),fuelId=document.getElementById('rcFuelType')?.value||'HFO',fuelInfo=VS_FUELS[fuelId]||VS_FUELS.HFO,ef=document.getElementById('rcEf');if(ef)ef.value=`${fuelInfo.ef.toFixed(3)} tCO₂/t`;const imo=(document.getElementById('rcImo')?.value||'').replace(/\D/g,''),imoOK=vsValidIMO(imo),help=document.getElementById('rcImoHelp');if(help){help.textContent=imoOK?`✓ ${R.valid}`:`⚠ ${R.invalid}`;help.style.color=imoOK?'var(--accent)':'var(--cape)';}if(!dist){result.innerHTML=`<div class="single-vessel-empty"><div><span>🧭</span>${R.invalidRoute}</div></div>`;rcSaveState();return;}
 const speed=Math.max(.1,rcNum('rcSpeed',18)),refSpeed=Math.max(.1,rcNum('rcRefSpeed',20)),mainBase=Math.max(0,rcNum('rcMainFuel',105)),aux=Math.max(0,rcNum('rcAuxFuel',8)),load=Math.min(100,Math.max(0,rcNum('rcLoad',85))),weather=Math.max(0,rcNum('rcSeaMargin',8)),fouling=Math.min(5,Math.max(0,Math.round(rcNum('rcFouling',2)))),boundary=document.getElementById('rcEmissionBoundary')?.value||'TTW',upstream=Math.max(0,rcNum('rcUpstreamFactor',18)),methaneSlip=fuelId==='LNG'?Math.max(0,rcNum('rcMethaneSlip',0)):0,transitHours=Math.max(0,rcNum('rcTransitHours',14)),canalFuel=Math.max(0,rcNum('rcCanalFuel',10)),fuelPrice=Math.max(0,rcNum('rcFuelPrice',fuelInfo.price)),charter=Math.max(0,rcNum('rcCharter',45000)),toll=Math.max(0,rcNum('rcToll',500000));const foulingFactors=[1,1.02,1.05,1.09,1.14,1.20],loadFactor=.70+.30*(load/100),mainDaily=mainBase*Math.pow(speed/refSpeed,3)*(1+weather/100)*foulingFactors[fouling]*loadFactor;function routeCalc(nm,isSuez){const seaDays=nm/(speed*24),transitDays=isSuez?transitHours/24:0,totalDays=seaDays+transitDays,seaFuel=(mainDaily+aux)*seaDays,transitFuel=isSuez?canalFuel*transitDays:0,totalFuel=seaFuel+transitFuel,ttw=totalFuel*fuelInfo.ef,upstreamCO2=boundary==='WTW'?ttw*(upstream/100):0,methaneCO2e=boundary==='WTW'?totalFuel*(methaneSlip/100)*27.2:0,co2=ttw+upstreamCO2+methaneCO2e,cost=totalFuel*fuelPrice+totalDays*charter+(isSuez?toll:0);return{nm,totalDays,totalFuel,co2,ttw,upstreamCO2,methaneCO2e,cost};}const s=routeCalc(dist.suez,true),c=routeCalc(dist.cape,false),dNm=c.nm-s.nm,dDays=c.totalDays-s.totalDays,dFuel=c.totalFuel-s.totalFuel,dCO2=c.co2-s.co2,costAdv=c.cost-s.cost,redPct=c.co2>0?dCO2/c.co2*100:0;let quality=35;quality+=imoOK?18:0;quality+=(document.getElementById('rcShipName')?.value||'').trim()?8:0;quality+=mainBase>0&&refSpeed>0?15:0;quality+=dist.exact?12:7;quality+=document.getElementById('rcEnginePower')?.value?5:0;quality+=document.getElementById('rcBuildYear')?.value?3:0;quality=Math.min(100,quality);const data={s,c,dist,dep:VS_PORTS[depId],arr:VS_PORTS[arrId],ship:(document.getElementById('rcShipName')?.value||'—').trim(),imo,imoOK,boundary,upstream,methaneSlip,dNm,dDays,dFuel,dCO2,costAdv,redPct,quality,suezPreferred:costAdv>1000,capePreferred:costAdv<-1000};result.innerHTML=rcResultsMarkup(data);const ts=document.getElementById('rcTimestamp');if(ts)ts.textContent=`${R.calculated}: ${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-GB')}`;rcSaveState();}
 function initRouteCompareSingleVessel(){document.querySelectorAll('#singleVesselPage input,#singleVesselPage select').forEach(el=>{el.addEventListener('input',rcCalculate);el.addEventListener('change',rcCalculate);});document.getElementById('rcShipType')?.addEventListener('change',rcApplyShipDefaults);document.getElementById('rcFuelType')?.addEventListener('change',rcFuelChanged);rcCalculate();}
-function updatePageContextControls(){const single=pg===1;['ySel','rSel','liveBadge','manualBtn','vesselSimBtn'].forEach(id=>document.getElementById(id)?.classList.toggle('context-hidden',single));}
+function updatePageContextControls(){
+  const single=pg===1;
+  ['ySel','liveBadge','manualBtn','vesselSimBtn'].forEach(id=>document.getElementById(id)?.classList.toggle('context-hidden',single));
+  document.getElementById('rSel')?.classList.add('context-hidden');
+}
 
 
 // ═══ TRANSLATIONS ═══
 const LANG = {
   en: {
-    appName: "CERI-SC Intelligence Platform V7.5",
+    appName: "CERI-SC Intelligence Platform V7.5.1",
     appSub: "Indicative Carbon Emission Reduction Index — Suez Canal",
     live: "● ESTIMATE",
     langBtn: "🇸🇦 AR",
     pages: ["Overview","Single Vessel Compare","Historical Trend","Alt Fuels","Green Projects"],
-    footer: "CERI-SC V7.5 · Break-even economics, PDF reporting & source register · Not navigation-grade or an approved MRV statement",
+    footer: "CERI-SC V7.5.1 · Official-average annual indicator · Not a measured inventory or approved MRV statement",
     liveMode: "Dynamic Estimate Mode",
     histMode: "Historical Estimate Mode",
-    infoLive: (yr,total,route,src) => `<b>You're viewing the ${yr} current-year estimate.</b> The counter is a <b>time-adjusted indicative calculation</b> based on the projected annual result (${fmt(total)} tCO₂ ÷ 365), not a live measurement of actual vessel emissions. “Today” and “This Month” are annualised averages.<br><small style="color:var(--dim)">Input/source: ${src} · Illustrative route: ${route} · HFO carbon factor=3.114 tCO₂/t · Not an approved MRV statement</small>`,
-    infoHist: (yr,total,route,src,curYr) => `<b>Viewing ${yr}.</b> The displayed reduction is a <b>retrospective modelled estimate</b>, not a measured emissions inventory. Daily/monthly values are averages: ${fmt(total)} tCO₂ ÷ 365 or ÷ 12. Switch to ${curYr} for the current-year projection.<br><small style="color:var(--dim)">Traffic source: ${src} · Illustrative route: ${route} · HFO carbon factor=3.114 tCO₂/t · Subject to MRV verification</small>`,
+    infoLive: (yr,total,route,src) => `<b>You're viewing the ${yr} illustrative annual indicator.</b> Unannounced years equal vessel transits × the simple mean of the officially announced per-vessel values for 2021 and 2023. “Today” and “This Month” are arithmetic annual averages, not live measurements.<br><small style="color:var(--dim)">Status/source: ${src} · Route-independent annual series · Not a measured inventory or approved MRV statement</small>`,
+    infoHist: (yr,total,route,src,curYr) => `<b>Viewing ${yr}.</b> Officially announced years retain the announced total; other years equal vessel transits × the official-reference arithmetic mean. Daily/monthly values are ${fmt(total)} tCO₂ ÷ 365 or ÷ 12.<br><small style="color:var(--dim)">Status/source: ${src} · Route-independent annual series · The single-vessel module alone uses selected ports and routes</small>`,
     liveLabel: yr => `⚡ DYNAMIC ESTIMATE — Indicative CO₂ Reduction (${yr})`,
     histLabel: yr => `📅 Year ${yr} — Estimated CO₂ Reduction`,
     liveSub: (yr,cum) => `Time-adjusted projection; not a live emissions measurement | Modelled cumulative 2015–${yr}: <b>${fmt(cum)} tCO₂</b>`,
@@ -641,11 +645,11 @@ const LANG = {
     k1live: "📉 CO₂ Reduced Today (est.)", k1hist: yr=>`📉 Daily Average (${yr})`,
     k2live: "📊 This Month (est.)", k2hist: yr=>`📊 Monthly Average (${yr})`,
     k3: yr=>`🌍 Estimated ${yr} Total`,
-    k4: "⚡ Estimated Avg Reduction %",
+    k4: "⚓ Indicative Reduction / Vessel",
     kn1: total=>`= ${fmt(total)} ÷ 365 days`,
     kn2: total=>`= ${fmt(total)} ÷ 12 months`,
     kn3: v=>`${fmt(v)} vessels × avg reduction`,
-    kn4: nm=>`Distance saved: ${fmt(nm)} nm`,
+    kn4: nm=>`Official-reference arithmetic mean`,
     greenScore: "Indicative Green Impact Score (CERI-SC)",
     equiv: yr=>`Estimated equivalence — Year ${yr}`,
     eq1l:"Cars off road/yr", eq1f:"4.6 tCO₂/car (EPA)",
@@ -664,14 +668,14 @@ const LANG = {
     capeLg:"■ Cape",suezLg:"■ Suez",
     // P2
     histTitle:"📈 Estimated Multi-Year Emission Reduction Trend (2015–2026)",
-    histDesc:"Indicative CO₂ reduction modelled from official SCA vessel counts for 2015–2025. The 2024–2025 traffic decline reflects the Red Sea disruption. The 2026 value is an annualised projection based on the latest verified SCA figure available to this version, not a final annual total.",
+    histDesc:"Route-independent illustrative index. Officially announced avoided-CO₂ values are retained for 2021 and 2023. Every other year equals its SCA vessel count multiplied by the simple arithmetic mean of the two official per-vessel references. The 2026 vessel count is an annualised projection, not a final total.",
     cumLabel:"🌍 ESTIMATED CUMULATIVE CO₂ REDUCTION (2015–2026)",
-    cumSub:"Modelled emissions difference under an illustrative Suez-versus-Cape scenario; not measured avoided emissions",
+    cumSub:"Sum of official announced estimates and official-average-derived illustrative values; not measured avoided emissions",
     annualChart:"Estimated Annual CO₂ Reduction (tCO₂) + Vessel Count",
     annualLg:["■ Estimated CO₂ reduction","■ Vessels","← Houthi crisis"],
     cumChart:"Estimated Cumulative CO₂ Reduction (2015–2026)",
     yearTable:"Year-by-Year Data",
-    yH:"Year",vH:"Vessels",co2H:"Estimated CO₂ Reduction",cuH:"Estimated Cumulative",avH:"Estimated Avg %",srcH:"Source",
+    yH:"Year",vH:"Vessels",co2H:"Indicative CO₂ Reduction",cuH:"Indicative Cumulative",avH:"tCO₂ / vessel",srcH:"Method status",
     // P3
     fuelMix:"Fleet Fuel Mix (Editable %)",
     fuelTotal:"Total",
@@ -688,10 +692,18 @@ const LANG = {
     p4note:"⚠ Indicative estimates only — require validated SCA operational data and approved MRV",
     // P5
     methTitle:"CERI-SC Full Methodology",
-    methText:`CERI-SC = w₁·RouteSavings + w₂·AltFuelSavings + w₃·GreenTransition
+    methText:`ANNUAL ILLUSTRATIVE INDICATOR (route-independent)
+Official 2021 rate = 31,000,000 ÷ 20,694 = 1,498.02 tCO₂/vessel
+Official 2023 rate = 55,400,000 ÷ 26,434 = 2,095.79 tCO₂/vessel
+Arithmetic mean = (1,498.02 + 2,095.79) ÷ 2 = 1,796.90 tCO₂/vessel
+Announced year: display its announced estimate
+Unannounced year: vessel transits × 1,796.90
+The announced values are counterfactual estimates, not measured MRV inventories.
+
+CERI-SC supporting modules = w₁·RouteSavings + w₂·AltFuelSavings + w₃·GreenTransition
 Weights: w₁=0.60  w₂=0.25  w₃=0.15
 
-═ AXIS 1: ROUTE ═
+═ SINGLE-VESSEL ROUTE MODULE ONLY ═
 AnnualDist = at_sea_days × 24 × speed → FuelPerNm = AnnualFuel / AnnualDist
 CO₂PerNm = FuelPerNm × 3.114 → Em = CO₂PerNm × Route_nm
 Reduction = Em_Cape − Em_Suez
@@ -706,23 +718,23 @@ Current-year dynamic estimate: Pro-rata by elapsed seconds
 ═ DATA: SCA (suezcanal.gov.eg) · IMO GHG Studies · Sea-Distances.org
 ═ SHIP MIX: Official 2025 SCA counts for nine ship types are applied illustratively to all years; Ro/Ro and passenger ships use the vehicle-carrier proxy, while “Other” uses the general-cargo proxy
 ═ EF_HFO=3.114 · Transit time excluded · Tank-to-wake CO₂ only
-═ DISCLAIMER: All outputs are indicative modelled estimates, not measured emissions, certified credits, or an approved MRV statement`,
+═ DISCLAIMER: Port and route selection affects only the single-vessel simulator. Annual outputs are illustrative, not measured emissions, certified credits, or an approved MRV statement`,
     exTitle: (rk) => `Worked Example: Container 8K-12K TEU — ${RT[rk].n}`,
     scaTable:"SCA Data — All Years",
     yrH:"Year",vsH:"Vessels",srcH2:"Source",
     srcRoute: rk=>`Route: ${RT[rk].n}`,
   },
   ar: {
-    appName: "منصة CERI-SC الذكية — الإصدار V7.5",
+    appName: "منصة CERI-SC الذكية — الإصدار V7.5.1",
     appSub: "مؤشر تقديري لخفض انبعاثات الكربون — قناة السويس",
     live: "● تقديري",
     langBtn: "🇬🇧 EN",
     pages: ["نظرة عامة","مقارنة سفينة واحدة","الاتجاه التاريخي","وقود بديل","مشروعات خضراء"],
-    footer: "CERI-SC الإصدار V7.5 · اقتصاديات التعادل وتقارير PDF وسجل المصادر · ليست للتوجيه الملاحي أو بيان MRV معتمدًا",
+    footer: "CERI-SC الإصدار V7.5.1 · مؤشر سنوي بمتوسط المراجع الرسمية · ليس جردًا مقاسًا أو بيان MRV معتمدًا",
     liveMode: "وضع التقدير المتجدد",
     histMode: "وضع التقدير التاريخي",
-    infoLive: (yr,total,route,src) => `<b>تشاهد تقدير عام ${yr}.</b> العداد يمثل <b>حسابًا تقديريًا متجددًا زمنيًا</b> مبنيًا على النتيجة السنوية المتوقعة (${fmt(total)} طن CO₂ ÷ 365)، ولا يمثل قياسًا حيًا لانبعاثات السفن الفعلية. قيمتا «اليوم» و«الشهر» متوسطات سنوية حسابية.<br><small style="color:var(--dim)">المدخل/المصدر: ${src} · المسار التوضيحي: ${route} · معامل كربون HFO=3.114 طن CO₂/طن · ليست نتيجة MRV معتمدة</small>`,
-    infoHist: (yr,total,route,src,curYr) => `<b>تشاهد عام ${yr}.</b> قيمة الخفض المعروضة <b>تقدير حسابي بأثر رجعي</b> وليست جردًا مقاسًا للانبعاثات. «اليوم» و«الشهر» متوسطات حسابية: ${fmt(total)} طن CO₂ ÷ 365 أو ÷ 12. انتقل إلى ${curYr} لعرض الإسقاط التقديري للعام الحالي.<br><small style="color:var(--dim)">مصدر الحركة: ${src} · المسار التوضيحي: ${route} · معامل كربون HFO=3.114 طن CO₂/طن · خاضع للتحقق وفق MRV</small>`,
+    infoLive: (yr,total,route,src) => `<b>تشاهد المؤشر التوضيحي السنوي لعام ${yr}.</b> السنوات غير المعلنة = عدد السفن × المتوسط الحسابي البسيط للقيم الرسمية المعلنة لكل سفينة في 2021 و2023. «اليوم» و«الشهر» متوسطات حسابية وليسا قياسًا حيًا.<br><small style="color:var(--dim)">الحالة/المصدر: ${src} · السلسلة السنوية مستقلة عن المسار · ليست جردًا مقاسًا أو بيان MRV معتمدًا</small>`,
+    infoHist: (yr,total,route,src,curYr) => `<b>تشاهد عام ${yr}.</b> تحتفظ السنوات المعلنة رسميًا بقيمتها المعلنة، وبقية السنوات = عدد السفن × المتوسط الحسابي المرجعي الرسمي. المتوسطان اليومي والشهري = ${fmt(total)} طن CO₂ ÷ 365 أو ÷ 12.<br><small style="color:var(--dim)">الحالة/المصدر: ${src} · السلسلة السنوية مستقلة عن المسار · اختيار الموانئ والمسار يؤثر فقط في محاكي السفينة الواحدة</small>`,
     liveLabel: yr => `⚡ تقدير متجدد — خفض CO₂ التقديري (${yr})`,
     histLabel: yr => `📅 عام ${yr} — خفض CO₂ التقديري`,
     liveSub: (yr,cum) => `إسقاط زمني تقديري وليس قياسًا مباشرًا | التراكمي المحسوب 2015–${yr}: <b>${fmt(cum)} طن CO₂</b>`,
@@ -730,11 +742,11 @@ Current-year dynamic estimate: Pro-rata by elapsed seconds
     k1live: "📉 CO₂ المخفَّض اليوم (تقدير)", k1hist: yr=>`📉 المتوسط اليومي (${yr})`,
     k2live: "📊 هذا الشهر (تقدير)", k2hist: yr=>`📊 المتوسط الشهري (${yr})`,
     k3: yr=>`🌍 الإجمالي التقديري لعام ${yr}`,
-    k4: "⚡ متوسط نسبة التخفيض التقديرية",
+    k4: "⚓ الخفض التوضيحي / سفينة",
     kn1: total=>`= ${fmt(total)} ÷ 365 يوم`,
     kn2: total=>`= ${fmt(total)} ÷ 12 شهراً`,
     kn3: v=>`${fmt(v)} سفينة × متوسط التخفيض`,
-    kn4: nm=>`المسافة الموفَّرة: ${fmt(nm)} ميل بحري`,
+    kn4: nm=>`المتوسط الحسابي للمراجع الرسمية`,
     greenScore: "درجة الأثر الأخضر التقديرية (CERI-SC)",
     equiv: yr=>`المكافئات التقديرية — عام ${yr}`,
     eq1l:"سيارة مزالة/سنة", eq1f:"4.6 tCO₂/سيارة",
@@ -753,14 +765,14 @@ Current-year dynamic estimate: Pro-rata by elapsed seconds
     capeLg:"■ رأس الرجاء",suezLg:"■ السويس",
     // P2
     histTitle:"📈 اتجاه خفض الانبعاثات التقديري متعدد السنوات (2015–2026)",
-    histDesc:"تقدير حسابي لخفض CO₂ اعتمادًا على أعداد السفن الرسمية المنشورة من هيئة قناة السويس للأعوام 2015–2025. يعكس تراجع حركة 2024–2025 اضطرابات البحر الأحمر. قيمة 2026 إسقاط سنوي مبني على أحدث رقم رسمي متاح لهذه النسخة وليست إجماليًا سنويًا نهائيًا.",
+    histDesc:"مؤشر توضيحي مستقل عن المسار. تُثبت قيم خفض CO₂ المعلنة رسميًا لعامي 2021 و2023، وتساوي قيمة كل سنة أخرى عدد سفنها المنشور مضروبًا في المتوسط الحسابي البسيط للقيمتين الرسميتين لكل سفينة. عدد سفن 2026 إسقاط سنوي وليس إجماليًا نهائيًا.",
     cumLabel:"🌍 خفض CO₂ التراكمي التقديري (2015–2026)",
-    cumSub:"فرق انبعاثات محسوب وفق سيناريو توضيحي للمقارنة بين السويس ورأس الرجاء، وليس انبعاثات مقاسة فعليًا",
+    cumSub:"مجموع التقديرات الرسمية المعلنة والقيم التوضيحية المشتقة من متوسطها؛ وليس انبعاثات مقاسة فعليًا",
     annualChart:"خفض CO₂ السنوي التقديري + عدد السفن",
     annualLg:["■ خفض CO₂ التقديري","■ السفن","← أزمة الحوثيين"],
     cumChart:"خفض CO₂ التراكمي التقديري (2015–2026)",
     yearTable:"البيانات السنوية",
-    yH:"السنة",vH:"السفن",co2H:"خفض CO₂ التقديري",cuH:"التراكمي التقديري",avH:"متوسط تقديري %",srcH:"المصدر",
+    yH:"السنة",vH:"السفن",co2H:"خفض CO₂ التوضيحي",cuH:"التراكمي التوضيحي",avH:"طن CO₂ / سفينة",srcH:"حالة المنهج",
     // P3
     fuelMix:"مزيج وقود الأسطول (قابل للتعديل %)",
     fuelTotal:"الإجمالي",
@@ -777,10 +789,18 @@ Current-year dynamic estimate: Pro-rata by elapsed seconds
     p4note:"⚠ جميع القيم تقديرية توضيحية — تتطلب بيانات تشغيلية موثقة وتحقق MRV معتمد",
     // P5
     methTitle:"منهجية CERI-SC الكاملة",
-    methText:`CERI-SC = w₁·وفورات المسار + w₂·وفورات الوقود البديل + w₃·التحول الأخضر
+    methText:`المؤشر السنوي التوضيحي (مستقل عن المسار)
+معدل 2021 الرسمي = 31,000,000 ÷ 20,694 = 1,498.02 طن CO₂/سفينة
+معدل 2023 الرسمي = 55,400,000 ÷ 26,434 = 2,095.79 طن CO₂/سفينة
+المتوسط الحسابي = (1,498.02 + 2,095.79) ÷ 2 = 1,796.90 طن CO₂/سفينة
+السنة المعلنة: تُعرض قيمتها الرسمية المعلنة
+السنة غير المعلنة: عدد السفن × 1,796.90
+القيم المعلنة تقديرات مضادة للواقع وليست جرد انبعاثات مقاسًا وفق MRV.
+
+وحدات CERI-SC المساندة = w₁·وفورات المسار + w₂·وفورات الوقود البديل + w₃·التحول الأخضر
 الأوزان: w₁=0.60  w₂=0.25  w₃=0.15
 
-═ المحور 1: المسار ═
+═ وحدة مسار السفينة الواحدة فقط ═
 المسافة السنوية = أيام_البحر × 24 × السرعة
 الوقود/ميل = الوقود السنوي / المسافة السنوية
 CO₂/ميل = الوقود/ميل × 3.114
@@ -794,7 +814,7 @@ CO₂/ميل = الوقود/ميل × 3.114
 ═ البيانات: هيئة قناة السويس · دراسات الغازات الدفيئة للمنظمة البحرية الدولية
 ═ مزيج السفن: تُستخدم أعداد الأنواع التسعة الرسمية لعام 2025 توضيحيًا لجميع السنوات؛ ويُستخدم بديل ناقلة المركبات لسفن Ro/Ro والركاب، وبديل البضائع العامة لفئة «أخرى»
 ═ EF_HFO=3.114 · وقت العبور مستثنى · CO₂ على أساس Tank-to-Wake فقط
-═ تنبيه: جميع النتائج تقديرات حسابية توضيحية وليست قياسًا فعليًا أو أرصدة معتمدة أو بيان MRV رسميًا`,
+═ تنبيه: يؤثر اختيار الموانئ والمسار فقط في محاكي السفينة الواحدة. النتائج السنوية توضيحية وليست قياسًا فعليًا أو أرصدة معتمدة أو بيان MRV رسميًا`,
     exTitle: (rk) => `مثال تطبيقي: حاوية 8K-12K TEU — ${RT[rk].nAr}`,
     scaTable:"بيانات هيئة قناة السويس — جميع السنوات",
     yrH:"السنة",vsH:"السفن",srcH2:"المصدر",
@@ -820,6 +840,27 @@ const Y={
   2025:{t:12758,src:"SCA Annual Report 2025"},
   2026:{t:12300,src:"Indicative annualised projection from 1,315 SCA-reported transits through 8 Feb 2026"}
 };
+const OFFICIAL_AVOIDED_CO2={
+  2021:{value:31000000,label:"Official announced SCA estimate (2021)"},
+  2023:{value:55400000,label:"Official announced SCA estimate (2023)"}
+};
+const OFFICIAL_PER_VESSEL_RATES=Object.entries(OFFICIAL_AVOIDED_CO2)
+  .map(([yr,d])=>d.value/Y[yr].t);
+const ILLUSTRATIVE_AVG_PER_VESSEL=OFFICIAL_PER_VESSEL_RATES
+  .reduce((sum,value)=>sum+value,0)/OFFICIAL_PER_VESSEL_RATES.length;
+function annualIllustrativeReduction(yr){
+  const official=OFFICIAL_AVOIDED_CO2[yr];
+  if(official)return{value:official.value,official:true,rate:official.value/getYearTransit(yr),label:official.label};
+  const projected=+yr===2026;
+  return{
+    value:Math.round(getYearTransit(yr)*ILLUSTRATIVE_AVG_PER_VESSEL),
+    official:false,
+    rate:ILLUSTRATIVE_AVG_PER_VESSEL,
+    label:projected
+      ?"Illustrative derived index; projected vessel count × official-reference arithmetic mean"
+      :"Illustrative derived index; vessel count × official-reference arithmetic mean"
+  };
+}
 const TD={
   // Official 2025 SCA vessel counts by ship type. The 2025 distribution is applied illustratively to other years.
   "Bulk Carrier":{pct:3423/12758,sz:"60,000-99,999 DWT",szAr:"60K-100K DWT",nameAr:"ناقلة بضائع سائبة"},
@@ -1049,7 +1090,7 @@ function calcShip(type,rk){
   return{eS:Math.round(eS),eC:Math.round(eC),red:Math.round(eC-eS),pct:((eC-eS)/eC*100).toFixed(1),fNm:fNm.toFixed(4),co2Nm:co2Nm.toFixed(4),dist,dS:r.c-r.z};
 }
 function calcYr(yr,rk){
-  const tot=Math.round(getYearTransit(yr)); let tR=0,tS=0,tC=0;const bt=[];
+  const tot=Math.round(getYearTransit(yr));const annual=annualIllustrativeReduction(yr);let tR=annual.value,tS=0,tC=tR;const bt=[];
   // Largest-remainder allocation keeps the six displayed ship-type counts equal to the annual total.
   const typeEntries=Object.entries(TD);
   const rawCounts=typeEntries.map(([type,info])=>({type,info,raw:tot*info.pct}));
@@ -1060,20 +1101,23 @@ function calcYr(yr,rk){
     .slice(0,Math.max(0,remainder))
     .forEach(x=>allocated[x.i]++);
   typeEntries.forEach(([type,info],i)=>{
-    const n=allocated[i], r=calcShip(type,rk);
-    const tr=r.red*n; tR+=tr; tS+=r.eS*n; tC+=r.eC*n;
+    const n=allocated[i], r=calcShip(type,'SG-RTM');
+    const tr=r.red*n;
     bt.push({type,n,sz:info.sz,ps:r.red,tot:tr,pct:r.pct});
   });
+  const proxyTotal=bt.reduce((sum,x)=>sum+x.tot,0);
+  if(proxyTotal>0){
+    const scale=tR/proxyTotal;
+    bt.forEach(x=>{x.tot=Math.round(x.tot*scale);x.ps=x.n?Math.round(x.tot/x.n):0;});
+  }
   bt.sort((a,b)=>b.tot-a.tot);
   const o=manualOverrides[String(yr)]||{};
   if(Number.isFinite(+o.reduction)&&+o.reduction>=0&&tR>0){
-    const target=+o.reduction,scale=target/tR,diffRatio=tC>0?tR/tC:0;
+    const target=+o.reduction,scale=target/tR;
     bt.forEach(x=>{x.tot=Math.round(x.tot*scale);x.ps=Math.round(x.ps*scale);});
-    if(diffRatio>0){tC=Math.round(target/diffRatio);tS=Math.max(0,tC-Math.round(target));}
-    else{tC=Math.round(target);tS=0;}
-    tR=Math.round(target);
+    tR=Math.round(target);tC=tR;
   }
-  return{tR:Math.round(tR),tS:Math.round(tS),tC:Math.round(tC),ap:tC>0?((tC-tS)/tC*100).toFixed(1):'0',bt,tot,src:getYearSource(yr),manual:hasManualOverride(yr)};
+  return{tR:Math.round(tR),tS:0,tC:Math.round(tC),ap:tot>0?(tR/tot).toFixed(1):'0',bt,tot,src:annual.label,trafficSrc:getYearSource(yr),official:annual.official,rate:annual.rate,routeIndependent:true,manual:hasManualOverride(yr)};
 }
 function allYears(rk){return Object.keys(Y).map(yr=>({yr:+yr,res:calcYr(yr,rk)}));}
 function cumulative(rk){let c=0;return Object.keys(Y).map(yr=>{c+=calcYr(yr,rk).tR;return{yr:+yr,cum:c};});}
@@ -1179,11 +1223,11 @@ function renderP0(M,res,yr,rk){
   const isCurrentYr=(yr===new Date().getFullYear());
   const cumData=cumulative(rk), totalCum=cumData[cumData.length-1].cum;
   const cumForYear=cumData.find(d=>d.yr===yr)?.cum||0;
-  const rName=lang==='ar'?RT[rk].nAr:RT[rk].n;
+  const rName=lang==='ar'?'مستقل عن المسار':'Route-independent';
 
   // Executive opening — first-view narrative and direct actions
   const hero=document.createElement('section');hero.className='opening-hero';
-  hero.innerHTML=`<div class="opening-copy"><div class="opening-eyebrow">${lang==='ar'?'الممر البحري الأقصر · القيمة المناخية الأكبر':'THE SHORTEST CORRIDOR · THE STRONGEST CLIMATE VALUE'}</div><h2>${lang==='ar'?'قناة السويس كممر عالمي مستدام':'Suez Canal as a Global Sustainable Maritime Corridor'}</h2><p>${lang==='ar'?'حوّل المسافة والوقت والوقود إلى أثر تجاري وبيئي مفهوم—مع افتراضات واضحة ونتائج تقديرية قابلة للفحص.':'Translate distance, time and fuel savings into clear commercial and environmental value—with transparent assumptions and auditable indicative results.'}</p><div class="opening-actions"><button type="button" class="opening-primary" onclick="pg=1;render()">🚢 ${lang==='ar'?'قارن رحلة سفينة':'Compare one voyage'}</button><button type="button" class="opening-secondary" onclick="pg=2;render()">📈 ${lang==='ar'?'استكشف الاتجاه التاريخي':'Explore historical intelligence'}</button></div></div><div class="opening-visual"><div class="orbit o1"></div><div class="orbit o2"></div><div class="opening-route cape"></div><div class="opening-route suez"></div><div class="opening-ship s1">➤</div><div class="opening-ship s2">➤</div><div class="opening-impact"><span>${lang==='ar'?'الأثر التراكمي التقديري حتى':'Indicative cumulative impact through'} ${yr}</span><strong>${(cumForYear/1e6).toFixed(2)}M</strong><small>tCO₂</small></div><div class="opening-badge">CERI‑SC V7.3</div></div>`;
+  hero.innerHTML=`<div class="opening-copy"><div class="opening-eyebrow">${lang==='ar'?'الممر البحري الأقصر · قيمة مناخية موضحة بشفافية':'THE SHORTEST CORRIDOR · TRANSPARENT CLIMATE VALUE'}</div><h2>${lang==='ar'?'قناة السويس كممر عالمي مستدام':'Suez Canal as a Global Sustainable Maritime Corridor'}</h2><p>${lang==='ar'?'مؤشر سنوي توضيحي مبني على القيم الرسمية المعلنة وأعداد السفن—مع فصل كامل بين السلسلة السنوية ومحاكاة رحلة السفينة الواحدة.':'A route-independent annual indicator anchored to officially announced values and vessel counts—separate from the single-vessel voyage simulator.'}</p><div class="opening-actions"><button type="button" class="opening-primary" onclick="pg=1;render()">🚢 ${lang==='ar'?'قارن رحلة سفينة':'Compare one voyage'}</button><button type="button" class="opening-secondary" onclick="pg=2;render()">📈 ${lang==='ar'?'استكشف الاتجاه التاريخي':'Explore historical intelligence'}</button></div></div><div class="opening-visual"><div class="orbit o1"></div><div class="orbit o2"></div><div class="opening-route cape"></div><div class="opening-route suez"></div><div class="opening-ship s1">➤</div><div class="opening-ship s2">➤</div><div class="opening-impact"><span>${lang==='ar'?'الأثر التراكمي التوضيحي حتى':'Illustrative cumulative impact through'} ${yr}</span><strong>${(cumForYear/1e6).toFixed(2)}M</strong><small>tCO₂</small></div><div class="opening-badge">CERI‑SC V7.5.1</div></div>`;
   M.appendChild(hero);
 
   // Info box
@@ -1207,7 +1251,7 @@ function renderP0(M,res,yr,rk){
   <div class="cd kpi"><div class="gw" style="background:var(--accent)"></div><div class="kl">${isCurrentYr?T.k1live:T.k1hist(yr)}</div><div class="kv" style="color:var(--accent)" id="k1">—</div><div class="ku">tCO₂/day</div><div class="kn">${T.kn1(res.tR)}</div></div>
   <div class="cd kpi"><div class="gw" style="background:var(--blue)"></div><div class="kl">${isCurrentYr?T.k2live:T.k2hist(yr)}</div><div class="kv" style="color:var(--blue)" id="k2">—</div><div class="ku">tCO₂/month</div><div class="kn">${T.kn2(res.tR)}</div></div>
   <div class="cd kpi"><div class="gw" style="background:var(--gold)"></div><div class="kl">${T.k3(yr)}</div><div class="kv" style="color:var(--gold)" id="k3">—</div><div class="ku">tCO₂</div><div class="kn">${T.kn3(res.tot)}</div></div>
-  <div class="cd kpi"><div class="gw" style="background:var(--purple)"></div><div class="kl">${T.k4}</div><div class="kv" style="color:var(--purple)">${res.ap}%</div><div class="ku">Suez vs Cape</div><div class="kn">${T.kn4(RT[rk].c-RT[rk].z)}</div></div>`;
+  <div class="cd kpi"><div class="gw" style="background:var(--purple)"></div><div class="kl">${T.k4}</div><div class="kv" style="color:var(--purple)">${res.ap}</div><div class="ku">tCO₂ / vessel</div><div class="kn">${T.kn4()}</div></div>`;
   M.appendChild(g4);
   setTimeout(()=>{anim(g4.querySelector('#k1'),daily);anim(g4.querySelector('#k2'),monthly);anim(g4.querySelector('#k3'),res.tR);},50);
 
@@ -1328,8 +1372,8 @@ function renderP0(M,res,yr,rk){
     ? '\u{1F6F3}\uFE0F \u062e\u0641\u0636 CO\u2082 \u0627\u0644\u062a\u0642\u062f\u064a\u0631\u064a \u2014 \u0639\u0627\u0645 ' + yr + ' (\u0646\u0633\u0628\u0629 \u0645\u0646 2023)'
     : '\u{1F6F3}\uFE0F Estimated CO\u2082 Reduction \u2014 ' + yr + ' vs 2023';
   const maxLbl = lang==='ar'
-    ? 'المرجع = تقدير 2023 للمسار المختار: ' + fmtCompact(MAX_2023) + ' طن CO₂'
-    : 'Reference = modelled 2023 value for selected route: ' + fmtCompact(MAX_2023) + ' tCO₂';
+    ? 'المرجع = التقدير الرسمي المعلن لعام 2023: ' + fmtCompact(MAX_2023) + ' طن CO₂'
+    : 'Reference = officially announced 2023 estimate: ' + fmtCompact(MAX_2023) + ' tCO₂';
   const gpLbl = lang==='ar' ? 'مؤشر المشروعات الخضراء — الأثر المناخي التراكمي التقديري' : 'Green Projects Indicator — Indicative Cumulative Climate Impact';
   const gpPot = lang==='ar'
     ? 'يتكون المؤشر من 1,624 طن CO₂ متجنبة نتيجة استخدام B20 حتى 24 يونيو 2026، مضافًا إليها 340 طن CO₂ امتصاصًا تقديريًا للمرحلة الأولى من مبادرة التشجير. تزيد القيمتان تراكميًا مع الوقت. الحد الأعلى مرجع توضيحي يجمع هدف B20 والقيمة التراكمية للتشجير خلال 25 سنة، ولا يمثل قياسًا فعليًا أو نتيجة MRV معتمدة.'
@@ -1651,9 +1695,9 @@ function renderP2(M,rk){
   M.appendChild(cc);
 
   const tb=document.createElement('div');tb.className='cd';
-  tb.innerHTML=`<div class="ct">${T.yearTable}</div><table><thead><tr><th>${T.yH}</th><th>${T.vH}</th><th>${T.co2H}</th><th>${T.cuH}</th><th>${T.avH}</th><th>${T.srcH}</th></tr></thead><tbody>${all.map((a,i)=>`<tr><td style="font-weight:700">${a.yr}${a.yr>=2024?' ⚠':''}</td><td>${fmt(a.res.tot)}</td><td class="ta">${(a.res.tR/1e6).toFixed(2)}M tCO₂</td><td>${(cum[i].cum/1e6).toFixed(1)}M</td><td>${a.res.ap}%</td><td style="font-size:8px;color:var(--dim)">${a.res.src}${a.res.manual?` <span class="manual-indicator">${lang==='ar'?'يدوي':'Manual'}</span>`:''}</td></tr>`).join('')}</tbody></table>`;
+  tb.innerHTML=`<div class="ct">${T.yearTable}</div><table><thead><tr><th>${T.yH}</th><th>${T.vH}</th><th>${T.co2H}</th><th>${T.cuH}</th><th>${T.avH}</th><th>${T.srcH}</th></tr></thead><tbody>${all.map((a,i)=>`<tr><td style="font-weight:700">${a.yr}${a.yr>=2024?' ⚠':''}</td><td>${fmt(a.res.tot)}</td><td class="ta">${(a.res.tR/1e6).toFixed(2)}M tCO₂</td><td>${(cum[i].cum/1e6).toFixed(1)}M</td><td>${a.res.ap}</td><td style="font-size:8px;color:var(--dim)">${a.res.official?(lang==='ar'?'تقدير رسمي معلن':'OFFICIAL ANNOUNCED ESTIMATE'):(lang==='ar'?'مؤشر توضيحي مشتق':'ILLUSTRATIVE DERIVED INDEX')}${a.res.manual?` <span class="manual-indicator">${lang==='ar'?'يدوي':'Manual'}</span>`:''}</td></tr>`).join('')}</tbody></table>`;
   M.appendChild(tb);
-  M.appendChild(srcTag('SCA Annual Reports 2015–2025 + 2026 indicative annualisation','2015–2026',T.srcRoute(rk)));
+  M.appendChild(srcTag('SCA annual vessel counts + announced avoided-CO₂ estimates for 2021 and 2023','2015–2026',lang==='ar'?`المتوسط الحسابي المرجعي = ${ILLUSTRATIVE_AVG_PER_VESSEL.toFixed(2)} طن CO₂/سفينة؛ مستقل عن المسار`:`Reference arithmetic mean = ${ILLUSTRATIVE_AVG_PER_VESSEL.toFixed(2)} tCO₂/vessel; route-independent`));
 }
 
 function renderP3(M){

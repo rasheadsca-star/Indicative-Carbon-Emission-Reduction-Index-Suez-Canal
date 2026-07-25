@@ -497,10 +497,11 @@ const INTERNAL_VESSEL_DB={
   "9337755":{name:"MOZAH",type:"lng",fuel:"LNG",buildYear:2008}
 };
 const VESSEL_LOOKUP_META={rc:{source:'manual',label:'Manual inputs'},vs:{source:'manual',label:'Manual inputs'}};
+const VESSEL_LOOKUP_TIMER={rc:null,vs:null};
 function vesselLookupText(){
   return lang==='ar'
-    ?{search:'بحث مباشر',prompt:'أدخل رقم IMO صحيحًا للبحث في المصدر الحي ثم المرجع الداخلي.',invalid:'رقم IMO غير صحيح؛ يجب أن يكون 7 أرقام مع رقم تحقق صحيح.',loading:'جارٍ الاتصال بمصدر بيانات السفن الحي…',live:n=>`تم جلب ${n} من مصدر بيانات حي. تم تحديث الحقول المتاحة فقط، بينما تظل بيانات الوقود والأداء افتراضات تشغيلية قابلة للمراجعة.`,internal:n=>`تم العثور على ${n} في المرجع الداخلي بعد تعذر أو نقص المصدر الحي. بيانات الوقود والأداء افتراضات تشغيلية تقديرية.`,missing:'رقم IMO صحيح، لكن لم تُعثر له على بيانات حية أو داخلية. لم يتم تغيير الحقول؛ أكملها يدويًا.'}
-    :{search:'Live search',prompt:'Enter a valid IMO to search the live source, then the internal reference.',invalid:'Invalid IMO; enter seven digits with a valid check digit.',loading:'Connecting to the live vessel-data source…',live:n=>`${n} retrieved from a live data source. Only available profile fields were updated; fuel and performance remain reviewable operating assumptions.`,internal:n=>`${n} found in the internal reference after the live source was unavailable or incomplete. Fuel and performance remain indicative assumptions.`,missing:'The IMO is valid, but no live or internal profile was found. No fields were changed; continue manually.'};
+    ?{search:'بحث مباشر',prompt:'اكتب رقم IMO؛ يبدأ البحث تلقائيًا فور اكتمال الرقم الصحيح.',invalid:'رقم IMO غير صحيح؛ يجب أن يكون 7 أرقام مع رقم تحقق صحيح.',loading:'جارٍ تغيير السفينة وتحميل مواصفاتها…',live:n=>`تم تغيير السفينة إلى ${n} وتحديث مواصفاتها والنتائج تلقائيًا. القيم التشغيلية غير المتاحة من المصدر عُوّضت بافتراضات نوع السفينة وتظل قابلة للمراجعة.`,internal:n=>`تم تغيير السفينة إلى ${n} من المرجع الداخلي، وتحديث جميع المواصفات والنتائج. القيم التشغيلية التقديرية قابلة للمراجعة.`,missing:n=>`لم تتوافر مواصفات موثوقة للرقم ${n}. مُسحت مواصفات السفينة السابقة ووُضعت افتراضات عامة واضحة بدلًا من نسب بيانات سفينة أخرى إليه.`}
+    :{search:'Live search',prompt:'Enter an IMO; lookup starts automatically when all seven valid digits are complete.',invalid:'Invalid IMO; enter seven digits with a valid check digit.',loading:'Changing vessel and loading its particulars…',live:n=>`Vessel changed to ${n}; particulars and results were updated automatically. Operational fields unavailable from the source use editable ship-type assumptions.`,internal:n=>`Vessel changed to ${n} from the internal reference; all particulars and results were refreshed. Indicative operating values remain editable.`,missing:n=>`No reliable particulars were found for ${n}. Previous-vessel data were cleared and replaced with clearly identified generic assumptions.`};
 }
 function setVesselLookupStatus(prefix,state,message){
   const el=document.getElementById(prefix+'IMOLookupStatus');if(!el)return;
@@ -516,10 +517,22 @@ function applyVesselLookupData(prefix,d,meta){
   const ids=prefix==='rc'
     ?{name:'rcShipName',flag:'rcFlag',buildYear:'rcBuildYear',enginePower:'rcEnginePower',type:'rcShipType',fuel:'rcFuelType',dwt:'rcDwt',gt:'rcGt',capacity:'rcCapacity',speed:'rcSpeed',refSpeed:'rcRefSpeed',mainFuel:'rcMainFuel',auxFuel:'rcAuxFuel',fuelPrice:'rcFuelPrice'}
     :{name:'vsShipName',type:'vsShipType',fuel:'vsFuelType',dwt:'vsDWT',gt:'vsGT',capacity:'vsCapacity',speed:'vsSpeed',refSpeed:'vsRefSpeed',mainFuel:'vsMainFuel',auxFuel:'vsAuxFuel',fuelPrice:'vsFuelPrice'};
+  const clearIds=prefix==='rc'?['rcShipName','rcFlag','rcBuildYear','rcEnginePower','rcDwt','rcGt','rcCapacity','rcSpeed','rcRefSpeed','rcMainFuel','rcAuxFuel']:['vsShipName','vsDWT','vsGT','vsCapacity','vsSpeed','vsRefSpeed','vsMainFuel','vsAuxFuel'];
+  clearIds.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const values={...d,fuelPrice:d.fuel?VS_FUELS[d.fuel]?.price:undefined};
   Object.entries(ids).forEach(([key,id])=>{const el=document.getElementById(id);if(el&&values[key]!==undefined&&values[key]!==null&&values[key]!=='')el.value=values[key];});
   VESSEL_LOOKUP_META[prefix]=meta;
   if(prefix==='rc'){rcCalculate();rcSaveState();}else calculateVesselSimulator();
+}
+function vesselIMOValue(prefix){
+  return String(document.getElementById(prefix==='rc'?'rcImo':'vsIMO')?.value||'').replace(/\D/g,'');
+}
+function queueVesselLookup(prefix){
+  clearTimeout(VESSEL_LOOKUP_TIMER[prefix]);
+  const imo=vesselIMOValue(prefix),T=vesselLookupText();
+  if(imo.length<7){setVesselLookupStatus(prefix,'neutral',T.prompt);return;}
+  if(!vsValidIMO(imo)){setVesselLookupStatus(prefix,'error',T.invalid);return;}
+  VESSEL_LOOKUP_TIMER[prefix]=setTimeout(()=>lookupVesselByIMO(prefix),450);
 }
 async function fetchLiveVesselProfile(imo){
   try{
@@ -542,19 +555,24 @@ async function lookupVesselByIMO(prefix='rc'){
   const internal=INTERNAL_VESSEL_DB[imo];
   try{
     const live=await fetchLiveVesselProfile(imo);
+    if(vesselIMOValue(prefix)!==imo)return false;
     if(live.found&&live.vessel){
-      const liveData={...internal,...live.vessel,type:vesselTypeFromLabel(live.vessel.typeLabel)||internal?.type};
+      const type=vesselTypeFromLabel(live.vessel.typeLabel)||internal?.type||'general';
+      const liveData={...VS_SHIP_DEFAULTS[type],...internal,...live.vessel,type};
       applyVesselLookupData(prefix,liveData,{source:'live',label:live.sourceName||'Wikidata Query Service',url:live.sourceUrl,retrievedAt:live.retrievedAt});
       setVesselLookupStatus(prefix,'success',T.live(liveData.name||imo));return true;
     }
   }catch(e){}
   finally{if(button){button.disabled=false;button.classList.remove('loading');}}
+  if(vesselIMOValue(prefix)!==imo)return false;
   if(internal){
-    applyVesselLookupData(prefix,internal,{source:'internal',label:lang==='ar'?'مرجع السفن الداخلي':'Internal vessel reference'});
+    const type=internal.type||'general',internalData={...VS_SHIP_DEFAULTS[type],...internal,type};
+    applyVesselLookupData(prefix,internalData,{source:'internal',label:lang==='ar'?'مرجع السفن الداخلي':'Internal vessel reference'});
     setVesselLookupStatus(prefix,'warning',T.internal(internal.name));return true;
   }
-  VESSEL_LOOKUP_META[prefix]={source:'manual',label:lang==='ar'?'مدخلات يدوية':'Manual inputs'};
-  setVesselLookupStatus(prefix,'warning',T.missing);return false;
+  const generic={...VS_SHIP_DEFAULTS.general,name:lang==='ar'?`سفينة IMO ${imo} — غير متاحة`:`IMO ${imo} — profile unavailable`,flag:'',buildYear:'',enginePower:'',type:'general'};
+  applyVesselLookupData(prefix,generic,{source:'manual',label:lang==='ar'?'افتراضات عامة — لا توجد بيانات للسفينة':'Generic assumptions — vessel data unavailable'});
+  setVesselLookupStatus(prefix,'warning',T.missing(imo));return false;
 }
 const VS_FUELS={
   HFO:{name:'HFO',nameAr:'وقود ثقيل HFO',ef:3.114,price:600},VLSFO:{name:'VLSFO',nameAr:'وقود منخفض الكبريت VLSFO',ef:3.151,price:650},
@@ -633,7 +651,7 @@ function calculateVesselSimulator(save=true){const R=vsT(),depId=document.getEle
   document.getElementById('vsTimestamp').textContent=`${R.generated}: ${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-GB')}`;window._lastVesselSim={s,c,dNm,dDays,dFuel,dCO2,costAdv,redPct,quality,shipName:document.getElementById('vsShipName').value,imo,depId,arrId,fuelId};if(save){vsSaveInputs();}}
 function printVesselSimulator(){calculateVesselSimulator();const m=document.getElementById('vesselModal');document.body.classList.add('vessel-print-mode');m.classList.add('print-vessel');setTimeout(()=>{window.print();setTimeout(()=>{m.classList.remove('print-vessel');document.body.classList.remove('vessel-print-mode');},300);},100);}
 function buildVesselSimulatorLauncher(){const d=document.createElement('div');d.className='vessel-launcher';d.innerHTML=`<div><h3>🚢 ${vsT().launcherTitle}</h3><p>${vsT().launcherText}</p></div><button class="vessel-btn primary" type="button" onclick="openVesselSimulator()">${vsT().openSimulator}</button>`;return d;}
-function initVesselSimulatorEvents(){const modal=document.getElementById('vesselModal');if(!modal)return;vsPopulateSelects();modal.querySelectorAll('input,select').forEach(el=>{el.addEventListener('input',()=>calculateVesselSimulator());el.addEventListener('change',()=>calculateVesselSimulator());});document.getElementById('vsIMO')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookupVesselByIMO('vs');}});document.getElementById('vsShipType')?.addEventListener('change',e=>applyVesselTypeDefaults(e.target.value));document.getElementById('vsFuelType')?.addEventListener('change',e=>{const f=VS_FUELS[e.target.value];if(f){document.getElementById('vsFuelPrice').value=f.price;document.getElementById('vsEF').value=`${f.ef.toFixed(3)} tCO₂/t`;}calculateVesselSimulator();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('vesselModal').classList.contains('open'))closeVesselSimulator();});}
+function initVesselSimulatorEvents(){const modal=document.getElementById('vesselModal');if(!modal)return;vsPopulateSelects();modal.querySelectorAll('input,select').forEach(el=>{el.addEventListener('input',()=>calculateVesselSimulator());el.addEventListener('change',()=>calculateVesselSimulator());});const imo=document.getElementById('vsIMO');imo?.addEventListener('input',()=>queueVesselLookup('vs'));imo?.addEventListener('change',()=>queueVesselLookup('vs'));imo?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookupVesselByIMO('vs');}});document.getElementById('vsShipType')?.addEventListener('change',e=>applyVesselTypeDefaults(e.target.value));document.getElementById('vsFuelType')?.addEventListener('change',e=>{const f=VS_FUELS[e.target.value];if(f){document.getElementById('vsFuelPrice').value=f.price;document.getElementById('vsEF').value=`${f.ef.toFixed(3)} tCO₂/t`;}calculateVesselSimulator();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('vesselModal').classList.contains('open'))closeVesselSimulator();});}
 
 
 
@@ -697,7 +715,7 @@ ${rcSourcesMarkup(data)}
 <div class="vessel-warning">⚠ ${R.method}</div>`;}
 function rcCalculate(){const R=rcText(),result=document.getElementById('rcResults');if(!result)return;const depId=document.getElementById('rcDeparture')?.value,arrId=document.getElementById('rcArrival')?.value,dist=vsRouteDistances(depId,arrId),fuelId=document.getElementById('rcFuelType')?.value||'HFO',fuelInfo=VS_FUELS[fuelId]||VS_FUELS.HFO,ef=document.getElementById('rcEf');if(ef)ef.value=`${fuelInfo.ef.toFixed(3)} tCO₂/t`;const imo=(document.getElementById('rcImo')?.value||'').replace(/\D/g,''),imoOK=vsValidIMO(imo),help=document.getElementById('rcImoHelp');if(help){help.textContent=imoOK?`✓ ${R.valid}`:`⚠ ${R.invalid}`;help.style.color=imoOK?'var(--accent)':'var(--cape)';}if(!dist){result.innerHTML=`<div class="single-vessel-empty"><div><span>🧭</span>${R.invalidRoute}</div></div>`;rcSaveState();return;}
 const speed=Math.max(.1,rcNum('rcSpeed',18)),refSpeed=Math.max(.1,rcNum('rcRefSpeed',20)),mainBase=Math.max(0,rcNum('rcMainFuel',105)),aux=Math.max(0,rcNum('rcAuxFuel',8)),load=Math.min(100,Math.max(0,rcNum('rcLoad',85))),weather=Math.max(0,rcNum('rcSeaMargin',8)),fouling=Math.min(5,Math.max(0,Math.round(rcNum('rcFouling',2)))),boundary=document.getElementById('rcEmissionBoundary')?.value||'TTW',upstream=Math.max(0,rcNum('rcUpstreamFactor',18)),methaneSlip=fuelId==='LNG'?Math.max(0,rcNum('rcMethaneSlip',0)):0,transitHours=Math.max(0,rcNum('rcTransitHours',14)),canalFuel=Math.max(0,rcNum('rcCanalFuel',10)),fuelPrice=Math.max(0,rcNum('rcFuelPrice',fuelInfo.price)),charter=Math.max(0,rcNum('rcCharter',45000)),toll=Math.max(0,rcNum('rcToll',500000));const foulingFactors=[1,1.02,1.05,1.09,1.14,1.20],loadFactor=.70+.30*(load/100),mainDaily=mainBase*Math.pow(speed/refSpeed,3)*(1+weather/100)*foulingFactors[fouling]*loadFactor;function routeCalc(nm,isSuez){const seaDays=nm/(speed*24),transitDays=isSuez?transitHours/24:0,totalDays=seaDays+transitDays,seaFuel=(mainDaily+aux)*seaDays,transitFuel=isSuez?canalFuel*transitDays:0,totalFuel=seaFuel+transitFuel,ttw=totalFuel*fuelInfo.ef,upstreamCO2=boundary==='WTW'?ttw*(upstream/100):0,methaneCO2e=boundary==='WTW'?totalFuel*(methaneSlip/100)*27.2:0,co2=ttw+upstreamCO2+methaneCO2e,cost=totalFuel*fuelPrice+totalDays*charter+(isSuez?toll:0);return{nm,totalDays,totalFuel,co2,ttw,upstreamCO2,methaneCO2e,cost};}const s=routeCalc(dist.suez,true),c=routeCalc(dist.cape,false),dNm=c.nm-s.nm,dDays=c.totalDays-s.totalDays,dFuel=c.totalFuel-s.totalFuel,dCO2=c.co2-s.co2,costAdv=c.cost-s.cost,redPct=c.co2>0?dCO2/c.co2*100:0;let quality=35;quality+=imoOK?18:0;quality+=(document.getElementById('rcShipName')?.value||'').trim()?8:0;quality+=mainBase>0&&refSpeed>0?15:0;quality+=dist.exact?12:7;quality+=document.getElementById('rcEnginePower')?.value?5:0;quality+=document.getElementById('rcBuildYear')?.value?3:0;quality=Math.min(100,quality);const data={s,c,dist,dep:VS_PORTS[depId],arr:VS_PORTS[arrId],ship:(document.getElementById('rcShipName')?.value||'—').trim(),imo,imoOK,boundary,upstream,methaneSlip,dNm,dDays,dFuel,dCO2,costAdv,redPct,quality,suezPreferred:costAdv>1000,capePreferred:costAdv<-1000};result.innerHTML=rcResultsMarkup(data);const ts=document.getElementById('rcTimestamp');if(ts)ts.textContent=`${R.calculated}: ${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-GB')}`;rcSaveState();}
-function initRouteCompareSingleVessel(){document.querySelectorAll('#singleVesselPage input,#singleVesselPage select').forEach(el=>{el.addEventListener('input',rcCalculate);el.addEventListener('change',rcCalculate);});document.getElementById('rcImo')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookupVesselByIMO('rc');}});document.getElementById('rcShipType')?.addEventListener('change',rcApplyShipDefaults);document.getElementById('rcFuelType')?.addEventListener('change',rcFuelChanged);rcCalculate();}
+function initRouteCompareSingleVessel(){document.querySelectorAll('#singleVesselPage input,#singleVesselPage select').forEach(el=>{el.addEventListener('input',rcCalculate);el.addEventListener('change',rcCalculate);});const imo=document.getElementById('rcImo');imo?.addEventListener('input',()=>queueVesselLookup('rc'));imo?.addEventListener('change',()=>queueVesselLookup('rc'));imo?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookupVesselByIMO('rc');}});document.getElementById('rcShipType')?.addEventListener('change',rcApplyShipDefaults);document.getElementById('rcFuelType')?.addEventListener('change',rcFuelChanged);rcCalculate();}
 function updatePageContextControls(){
   const single=pg===1;
   ['ySel','liveBadge','manualBtn','vesselSimBtn'].forEach(id=>document.getElementById(id)?.classList.toggle('context-hidden',single));

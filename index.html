@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CERI-SC Intelligence Platform v6 — Indicative Suez Canal Carbon Emission Reduction Index</title>
+<meta name="theme-color" content="#0b6b57">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/favicon.svg">
+<title>CERI-SC Intelligence Platform V8.0 — Indicative Suez Canal Carbon Emission Reduction Index</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#061a23;--card:#0d2630;--border:#21414c;--accent:#20c997;--adim:#0b6b57;--cape:#ef5350;--txt:#edf8fa;--dim:#a8c1c7;--gold:#ffb020;--blue:#4da3ff;--purple:#a78bfa;--cyan:#22d3ee}
@@ -321,7 +324,7 @@ footer{text-align:center;padding:16px 20px;margin-top:24px;border-top:1px solid 
   <div class="logo">
     <div class="logo-i">SC</div>
     <div>
-      <h1 id="appName">CERI-SC Intelligence Platform V7.5.4</h1>
+      <h1 id="appName">CERI-SC Intelligence Platform V8.0</h1>
       <p id="appSub">Indicative Carbon Emission Reduction Index — Suez Canal</p>
     </div>
   </div>
@@ -333,6 +336,7 @@ footer{text-align:center;padding:16px 20px;margin-top:24px;border-top:1px solid 
     <button class="utility-btn" id="vesselSimBtn" onclick="openVesselSimulator()">🚢 Vessel Simulator</button>
     <button class="utility-btn" id="themeBtn" onclick="cycleTheme()">🎨 Background</button>
     <button class="utility-btn" id="printBtn" onclick="printDashboard()">🖨 Print</button>
+    <button class="utility-btn" id="installBtn" onclick="installCeriApp()" hidden>⬇ Install</button>
     <button class="lang-btn" id="langBtn" onclick="toggleLang()">🇸🇦 AR</button>
   </div>
 </header>
@@ -726,12 +730,12 @@ function updatePageContextControls(){
 // ═══ TRANSLATIONS ═══
 const LANG = {
   en: {
-    appName: "CERI-SC Intelligence Platform V7.5.4",
+    appName: "CERI-SC Intelligence Platform V8.0",
     appSub: "Indicative Carbon Emission Reduction Index — Suez Canal",
     live: "● ESTIMATE",
     langBtn: "🇸🇦 AR",
-    pages: ["Overview","Single Vessel Compare","Historical Trend","Alt Fuels","Green Projects"],
-    footer: "CERI-SC V7.5.4 · Live IMO lookup, expanded vessel reference & upgraded simulator · Not a measured inventory or approved MRV statement",
+    pages: ["Overview","Single Vessel Compare","Historical Intelligence","Alt Fuels","Green Projects Monitor","Admin & Data"],
+    footer: "CERI-SC V8.0 · Database, administration, PWA and automated quality checks · Indicative—not an approved MRV statement",
     liveMode: "Dynamic Estimate Mode",
     histMode: "Historical Estimate Mode",
     infoLive: (yr,total,route,src) => `<b>You're viewing the ${yr} illustrative annual indicator.</b> Unannounced years equal vessel transits × the simple mean of the officially announced per-vessel values for 2021 and 2023. “Today” and “This Month” are arithmetic annual averages, not live measurements.<br><small style="color:var(--dim)">Status/source: ${src} · Route-independent annual series · Not a measured inventory or approved MRV statement</small>`,
@@ -823,12 +827,12 @@ Current-year dynamic estimate: Pro-rata by elapsed seconds
     srcRoute: rk=>`Route: ${RT[rk].n}`,
   },
   ar: {
-    appName: "منصة CERI-SC الذكية — الإصدار V7.5.4",
+    appName: "منصة CERI-SC الذكية — الإصدار V8.0",
     appSub: "مؤشر تقديري لخفض انبعاثات الكربون — قناة السويس",
     live: "● تقديري",
     langBtn: "🇬🇧 EN",
-    pages: ["نظرة عامة","مقارنة سفينة واحدة","الاتجاه التاريخي","وقود بديل","مشروعات خضراء"],
-    footer: "CERI-SC الإصدار V7.5.4 · بحث IMO حي ومرجع سفن موسع ومحاكي مطور · ليس جردًا مقاسًا أو بيان MRV معتمدًا",
+    pages: ["نظرة عامة","مقارنة سفينة واحدة","الذكاء التاريخي","وقود بديل","مراقبة المشروعات الخضراء","الإدارة والبيانات"],
+    footer: "CERI-SC الإصدار V8.0 · قاعدة بيانات ولوحة إدارة وPWA واختبارات جودة · مؤشر توضيحي وليس بيان MRV معتمدًا",
     liveMode: "وضع التقدير المتجدد",
     histMode: "وضع التقدير التاريخي",
     infoLive: (yr,total,route,src) => `<b>تشاهد المؤشر التوضيحي السنوي لعام ${yr}.</b> السنوات غير المعلنة = عدد السفن × المتوسط الحسابي البسيط للقيم الرسمية المعلنة لكل سفينة في 2021 و2023. «اليوم» و«الشهر» متوسطات حسابية وليسا قياسًا حيًا.<br><small style="color:var(--dim)">الحالة/المصدر: ${src} · السلسلة السنوية مستقلة عن المسار · ليست جردًا مقاسًا أو بيان MRV معتمدًا</small>`,
@@ -1335,7 +1339,8 @@ function render(){
   else if(pg===1)renderP1(M);
   else if(pg===2)renderP2(M,rk);
   else if(pg===3)renderP3(M);
-  else renderP4(M);
+  else if(pg===4)renderP4(M);
+  else renderP5(M);
 }
 
 function renderP0(M,res,yr,rk){
@@ -2195,6 +2200,67 @@ function renderP4(M){
     document.querySelectorAll('.green-total-rate-live-value').forEach(el=>{el.textContent='≈ '+totalRateCurrent;});
   },5000));
 }
+
+// ═══ V8.0 DATABASE & ADMINISTRATION ═══
+let adminProjects=[],deferredInstallPrompt=null;
+const ADMIN_FALLBACK=[
+  {id:1,name:'B20 Biofuel Programme',category:'Alternative fuel',status:'Active',currentValue:1624,unit:'tCO2e',targetYear:2026,source:'SCA programme baseline'},
+  {id:2,name:'Solar Stations — 4.5 MW',category:'Renewable energy',status:'Tender',currentValue:3840,unit:'tCO2e',targetYear:2027,source:'Project planning estimate'},
+  {id:3,name:'LNG Tug Conversion — 6 units',category:'Fleet transition',status:'Financing',currentValue:13500,unit:'tCO2e',targetYear:2030,source:'Completed feasibility studies'},
+  {id:4,name:'Hybrid Ferries — 2 units',category:'Fleet transition',status:'Offers under review',currentValue:570,unit:'tCO2e',targetYear:2027,source:'Tender-stage estimate'},
+  {id:5,name:'Ultrasonic Anti-Fouling',category:'Efficiency',status:'Installation',currentValue:695.9,unit:'tCO2e',targetYear:2026,source:'Procurement record'}
+];
+function adminEsc(v){return vsEsc(v);}
+function adminProjectRows(projects){
+  return projects.map(p=>`<tr><td><b>${adminEsc(p.name)}</b><small>${adminEsc(p.category)}</small></td><td><span class="admin-status">${adminEsc(p.status)}</span></td><td class="ta">${vsFmt(p.currentValue||0,1)} ${adminEsc(p.unit||'tCO2e')}</td><td>${adminEsc(p.targetYear)}</td><td><small>${adminEsc(p.source||'—')}</small></td><td><button class="admin-mini" onclick="adminEditProject(${p.id})">${lang==='ar'?'تعديل':'Edit'}</button><button class="admin-mini danger" onclick="adminDeleteProject(${p.id})">${lang==='ar'?'حذف':'Delete'}</button></td></tr>`).join('');
+}
+function adminSetMessage(message,state='neutral'){const el=document.getElementById('adminMessage');if(el){el.className=`admin-message ${state}`;el.textContent=message;}}
+async function adminLoad(){
+  const body=document.getElementById('adminProjectBody'),health=document.getElementById('adminHealth');if(!body)return;
+  try{
+    const r=await fetch('/api/admin',{headers:{Accept:'application/json'}}),data=await r.json();
+    if(!r.ok||!data.ok)throw new Error('offline');
+    adminProjects=data.projects||[];body.innerHTML=adminProjectRows(adminProjects);
+    if(health)health.innerHTML=`<strong>${lang==='ar'?'متصل':'Connected'}</strong><span>${adminEsc(data.storage)} · ${adminProjects.length} ${lang==='ar'?'مشروعات':'projects'} · ${data.vesselProfiles} ${lang==='ar'?'سجلات سفن':'vessel records'}</span><small>${new Date(data.generatedAt).toLocaleString(lang==='ar'?'ar-EG':'en-GB')}</small>`;
+    const audit=document.getElementById('adminAudit');if(audit)audit.innerHTML=(data.audits||[]).map(x=>`<div><b>${adminEsc(x.action)}</b><span>${adminEsc(x.detail)}</span><small>${new Date(x.createdAt).toLocaleString(lang==='ar'?'ar-EG':'en-GB')}</small></div>`).join('')||`<p>${lang==='ar'?'لا توجد تعديلات مسجلة بعد.':'No recorded changes yet.'}</p>`;
+  }catch(e){
+    adminProjects=ADMIN_FALLBACK;body.innerHTML=adminProjectRows(adminProjects);
+    if(health)health.innerHTML=`<strong>${lang==='ar'?'وضع قراءة احتياطي':'Read-only fallback'}</strong><span>${lang==='ar'?'قاعدة البيانات غير متاحة على هذا المضيف؛ تُعرض بيانات مرجعية محلية.':'Database is unavailable on this host; local reference data are shown.'}</span>`;
+    adminSetMessage(lang==='ar'?'الحفظ الدائم متاح في النسخة المنشورة المزودة بقاعدة D1.':'Durable saving is available on the D1-enabled deployment.','warning');
+  }
+}
+function adminEditProject(id){
+  const p=adminProjects.find(x=>Number(x.id)===Number(id));if(!p)return;
+  ['Id','Name','Category','Status','Value','Target','Source'].forEach(k=>{const el=document.getElementById('admin'+k);if(!el)return;const map={Id:p.id,Name:p.name,Category:p.category,Status:p.status,Value:p.currentValue,Target:p.targetYear,Source:p.source};el.value=map[k]??'';});
+  document.getElementById('adminName')?.focus();
+}
+function adminClearForm(){['Id','Name','Category','Status','Value','Target','Source'].forEach(k=>{const el=document.getElementById('admin'+k);if(el)el.value='';});}
+async function adminSaveProject(){
+  const project={id:Number(document.getElementById('adminId')?.value)||undefined,name:document.getElementById('adminName')?.value.trim(),category:document.getElementById('adminCategory')?.value.trim(),status:document.getElementById('adminStatus')?.value.trim(),currentValue:Number(document.getElementById('adminValue')?.value)||0,targetYear:Number(document.getElementById('adminTarget')?.value),source:document.getElementById('adminSource')?.value.trim(),unit:'tCO2e'};
+  if(!project.name||!project.category||!project.status||!project.targetYear){adminSetMessage(lang==='ar'?'أكمل الاسم والفئة والحالة والسنة المستهدفة.':'Complete name, category, status and target year.','error');return;}
+  adminSetMessage(lang==='ar'?'جارٍ الحفظ…':'Saving…');
+  try{const r=await fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project})});if(!r.ok)throw new Error('save');adminClearForm();adminSetMessage(lang==='ar'?'تم الحفظ في قاعدة البيانات.':'Saved to the database.','success');await adminLoad();}catch(e){adminSetMessage(lang==='ar'?'تعذر الحفظ الدائم على هذا المضيف.':'Durable save failed on this host.','error');}
+}
+async function adminDeleteProject(id){
+  if(!confirm(lang==='ar'?'هل تريد حذف هذا المشروع من قاعدة البيانات؟':'Delete this project from the database?'))return;
+  try{const r=await fetch(`/api/admin?id=${encodeURIComponent(id)}`,{method:'DELETE'});if(!r.ok)throw new Error('delete');adminSetMessage(lang==='ar'?'تم حذف المشروع.':'Project deleted.','success');await adminLoad();}catch(e){adminSetMessage(lang==='ar'?'تعذر حذف المشروع.':'Project deletion failed.','error');}
+}
+function adminExport(){
+  const blob=new Blob([JSON.stringify({version:'V8.0',exportedAt:new Date().toISOString(),projects:adminProjects},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ceri-sc-projects-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function renderP5(M){
+  const ar=lang==='ar';M.innerHTML=`
+  <section class="admin-hero"><div><span>CERI‑SC V8.0</span><h2>${ar?'مركز الإدارة والبيانات':'Administration & Data Centre'}</h2><p>${ar?'إدارة سجل المشروعات الخضراء، متابعة صحة البيانات، ومراجعة سجل التغييرات من مكان واحد.':'Manage the green-project register, inspect data health and review the change log in one place.'}</p></div><button class="vessel-btn secondary" onclick="adminExport()">⇩ ${ar?'تصدير JSON':'Export JSON'}</button></section>
+  <div class="admin-kpis"><article><span>${ar?'التخزين':'Storage'}</span><strong>Cloudflare D1</strong><small>${ar?'قاعدة بيانات دائمة':'Durable database'}</small></article><article><span>${ar?'حالة PWA':'PWA status'}</span><strong>${window.matchMedia('(display-mode: standalone)').matches?(ar?'مثبّت':'Installed'):(ar?'جاهز':'Ready')}</strong><small>${ar?'تشغيل دون اتصال للأصول الأساسية':'Offline-ready application shell'}</small></article><article><span>${ar?'الاختبارات':'Automated tests'}</span><strong>Build + API + PWA</strong><small>${ar?'فحوصات الإصدار الأساسية':'Release quality gates'}</small></article></div>
+  <section class="admin-grid"><div class="cd"><div class="ct">🗄 ${ar?'سجل المشروعات الدائم':'Durable project register'}</div><div class="admin-table-wrap"><table><thead><tr><th>${ar?'المشروع':'Project'}</th><th>${ar?'الحالة':'Status'}</th><th>${ar?'الأثر الحالي':'Current impact'}</th><th>${ar?'السنة المستهدفة':'Target'}</th><th>${ar?'المصدر':'Source'}</th><th>${ar?'إجراء':'Action'}</th></tr></thead><tbody id="adminProjectBody"><tr><td colspan="6">${ar?'جارٍ تحميل قاعدة البيانات…':'Loading database…'}</td></tr></tbody></table></div></div>
+  <aside class="cd admin-editor"><div class="ct">✏ ${ar?'إضافة أو تعديل مشروع':'Add or edit project'}</div><input id="adminId" type="hidden"><label>${ar?'اسم المشروع':'Project name'}<input id="adminName"></label><div class="admin-form-two"><label>${ar?'الفئة':'Category'}<input id="adminCategory"></label><label>${ar?'الحالة':'Status'}<input id="adminStatus"></label></div><div class="admin-form-two"><label>${ar?'الأثر الحالي tCO₂e':'Current tCO₂e'}<input id="adminValue" type="number" step="0.1"></label><label>${ar?'السنة المستهدفة':'Target year'}<input id="adminTarget" type="number" min="2024" max="2050"></label></div><label>${ar?'مصدر البيانات':'Data source'}<input id="adminSource"></label><div class="admin-actions"><button class="vessel-btn secondary" onclick="adminClearForm()">${ar?'جديد':'New'}</button><button class="vessel-btn primary" onclick="adminSaveProject()">${ar?'حفظ':'Save'}</button></div><div id="adminMessage" class="admin-message neutral"></div></aside></section>
+  <section class="admin-grid lower"><div class="cd"><div class="ct">⚙ ${ar?'صحة النظام':'System health'}</div><div id="adminHealth" class="admin-health"><span>${ar?'جارٍ الفحص…':'Checking…'}</span></div></div><div class="cd"><div class="ct">🧾 ${ar?'سجل التغييرات':'Audit trail'}</div><div id="adminAudit" class="admin-audit"></div></div></section>`;
+  adminLoad();
+}
+window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;const b=document.getElementById('installBtn');if(b)b.hidden=false;});
+async function installCeriApp(){if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;const b=document.getElementById('installBtn');if(b)b.hidden=true;}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
 
 // ═══ INIT ═══
 // Year selector

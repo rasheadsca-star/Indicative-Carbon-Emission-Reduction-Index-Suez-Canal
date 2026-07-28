@@ -232,8 +232,20 @@ function securityHeaders(contentType) {
 }
 
 function sameOrigin(request, url) {
+  const fetchSite = request.headers.get("Sec-Fetch-Site");
+  if (fetchSite && fetchSite !== "same-origin" && fetchSite !== "none") {
+    return false;
+  }
+
   const origin = request.headers.get("Origin");
-  return !origin || origin === url.origin;
+  if (!origin || origin === "null") return true;
+
+  try {
+    const parsedOrigin = new URL(origin);
+    return parsedOrigin.protocol === url.protocol && parsedOrigin.host === url.host;
+  } catch {
+    return false;
+  }
 }
 
 function safeNext(value) {

@@ -417,4 +417,44 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     visibility:visible!important;
     opacity:1!important;
   }
+  /* Keep the official basis together with the opening overview on sheet one. */
+  body.dashboard-printing.print-overview .official-reference-box{
+    margin:0 0 7px!important;
+    padding:8px 10px!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  body.dashboard-printing.print-overview .official-reference-head{
+    margin-bottom:6px!important;
+  }
+  body.dashboard-printing.print-overview .official-reference-head>span{
+    width:24px!important;
+    height:24px!important;
+    border-radius:7px!important;
+  }
+  body.dashboard-printing.print-overview .official-reference-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,.8fr) minmax(0,.8fr) minmax(0,1.4fr)!important;
+    gap:6px!important;
+  }
+  body.dashboard-printing.print-overview .official-reference-grid>a,
+  body.dashboard-printing.print-overview .official-reference-formula{
+    min-height:0!important;
+    padding:6px 8px!important;
+    gap:2px!important;
+  }
+  body.dashboard-printing.print-overview .official-reference-grid strong{
+    font-size:11pt!important;
+    line-height:1.15!important;
+  }
+  body.dashboard-printing.print-overview .official-reference-grid b,
+  body.dashboard-printing.print-overview .official-reference-grid span{
+    font-size:7.5pt!important;
+    line-height:1.25!important;
+  }
+  body.dashboard-printing.print-overview .official-reference-box>p{
+    margin:5px 0 0!important;
+    font-size:8pt!important;
+    line-height:1.25!important;
+  }
 }

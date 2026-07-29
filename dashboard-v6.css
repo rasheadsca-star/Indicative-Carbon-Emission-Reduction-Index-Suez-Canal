@@ -252,4 +252,16 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     print-color-adjust:exact!important;
     opacity:1!important;
   }
+  /* Unfilled gauge capacity must read as background, not achieved value. */
+  body.dashboard-printing .dial-svg path[stroke*="-track"]{
+    stroke:#d9edf2!important;
+    opacity:1!important;
+  }
+  body.dashboard-printing .dial-svg path[stroke="#0a0e1a"]{
+    stroke:#eef7f9!important;
+    opacity:1!important;
+  }
+  body.dashboard-printing .dial-svg line{
+    stroke:#789ba2!important;
+  }
 }

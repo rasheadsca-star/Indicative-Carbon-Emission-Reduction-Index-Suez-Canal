@@ -289,13 +289,96 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     color:#064c3b!important;
     opacity:1!important;
   }
-  /*
-    Overview print composition:
-    omit the screen-only opening hero so it cannot become a blank paper block,
-    then keep the three index-basis references in one clear horizontal row.
-  */
+  /* Overview print composition: retain the satellite opening image. */
   body.dashboard-printing .opening-hero{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.05fr) minmax(370px,.95fr)!important;
+    min-height:300px!important;
+    height:auto!important;
+    gap:14px!important;
+    margin:0 0 10px!important;
+    padding:18px!important;
+    overflow:hidden!important;
+    background:#eefbff!important;
+    background-image:none!important;
+    border:1.4px solid #5b8f96!important;
+    box-shadow:none!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  body.dashboard-printing .opening-copy{
+    align-self:center!important;
+    max-width:none!important;
+  }
+  body.dashboard-printing .opening-copy h2{
+    max-width:none!important;
+    color:#064c3b!important;
+    font-size:27pt!important;
+    line-height:1.08!important;
+  }
+  body.dashboard-printing .opening-copy p{
+    max-width:none!important;
+    color:#164f45!important;
+    font-size:10.5pt!important;
+    line-height:1.45!important;
+  }
+  body.dashboard-printing .opening-actions{
     display:none!important;
+  }
+  body.dashboard-printing .opening-visual.satellite-corridor{
+    display:grid!important;
+    grid-template-columns:minmax(0,.82fr) minmax(210px,1.18fr)!important;
+    min-height:270px!important;
+    height:270px!important;
+    overflow:hidden!important;
+    background:#dff4f8!important;
+    border:1px solid #699aa1!important;
+    box-shadow:none!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+  body.dashboard-printing .satellite-copy{
+    display:block!important;
+    align-self:center!important;
+    padding:14px 10px 60px 14px!important;
+  }
+  body.dashboard-printing .satellite-copy h3{
+    color:#064c3b!important;
+    font-size:14pt!important;
+  }
+  body.dashboard-printing .satellite-copy p,
+  body.dashboard-printing .satellite-route-fact strong,
+  body.dashboard-printing .satellite-route-fact small{
+    color:#164f45!important;
+  }
+  body.dashboard-printing .satellite-route-fact{
+    background:#fff!important;
+    border:1px solid #78aeb5!important;
+  }
+  body.dashboard-printing .satellite-frame{
+    display:block!important;
+    height:270px!important;
+    background:#cfe8ed!important;
+    overflow:hidden!important;
+  }
+  body.dashboard-printing .satellite-frame img{
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+    opacity:1!important;
+    visibility:visible!important;
+    filter:none!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+  body.dashboard-printing .satellite-track,
+  body.dashboard-printing .satellite-frame figcaption,
+  body.dashboard-printing .opening-impact,
+  body.dashboard-printing .opening-badge{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
   }
   body.dashboard-printing .official-reference-box{
     margin:0 0 10px!important;
@@ -382,5 +465,15 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     padding:4px 8px!important;
     break-inside:avoid!important;
     page-break-inside:avoid!important;
+  }
+  /* A section heading must travel with the first project card. */
+  body.dashboard-printing .section-title{
+    break-after:avoid-page!important;
+    page-break-after:avoid!important;
+    margin-bottom:8px!important;
+  }
+  body.dashboard-printing .section-title+div{
+    break-before:avoid-page!important;
+    page-break-before:avoid!important;
   }
 }

@@ -512,6 +512,7 @@ function printDashboard(){
   const b=document.getElementById('printBtn');
   if(b){b.disabled=true;b.style.opacity='.65';}
   document.body.classList.add('dashboard-printing');
+  document.body.classList.toggle('print-overview',pg===0);
   const printable=document.querySelector('main');
   const fitPrintPage=()=>{
     if(!printable)return;
@@ -529,6 +530,7 @@ function printDashboard(){
   };
   const finish=()=>{
     document.body.classList.remove('dashboard-printing');
+    document.body.classList.remove('print-overview');
     document.documentElement.style.removeProperty('--dashboard-print-scale');
     if(b){b.disabled=false;b.style.opacity='1';}
   };

@@ -264,4 +264,29 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
   body.dashboard-printing .dial-svg line{
     stroke:#789ba2!important;
   }
+  /* Map labels stay bright over the dark satellite/chart background. */
+  body.dashboard-printing .vessel-visual svg text,
+  body.dashboard-printing .vessel-visual .vessel-pin-label,
+  body.dashboard-printing .vessel-visual .vessel-geo-label,
+  body.dashboard-printing .vessel-visual .vessel-geo-sub{
+    fill:#fff!important;
+    color:#fff!important;
+    stroke:#03252b!important;
+    stroke-width:3px!important;
+    paint-order:stroke fill!important;
+    opacity:1!important;
+    font-weight:900!important;
+  }
+  body.dashboard-printing .vessel-visual .vessel-geo-sub{
+    fill:#dffcff!important;
+    stroke-width:2.5px!important;
+  }
+  body.dashboard-printing .vessel-visual-label,
+  body.dashboard-printing .vessel-map-badge,
+  body.dashboard-printing .vessel-route-legend{
+    background:#fff!important;
+    border:1px solid #40757d!important;
+    color:#064c3b!important;
+    opacity:1!important;
+  }
 }

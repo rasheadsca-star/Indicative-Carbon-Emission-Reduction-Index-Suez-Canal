@@ -476,4 +476,45 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     break-before:avoid-page!important;
     page-break-before:avoid!important;
   }
+  /* Keep the final voyage sources and disclaimer on the preceding sheet. */
+  body.dashboard-printing .single-vessel-results .economic-box,
+  body.dashboard-printing .single-vessel-results .sensitivity-box{
+    margin-top:6px!important;
+    padding:8px!important;
+  }
+  body.dashboard-printing .single-vessel-results .economic-grid>div{
+    padding:6px!important;
+  }
+  body.dashboard-printing .single-vessel-results .sensitivity-row{
+    padding:4px 6px!important;
+  }
+  body.dashboard-printing .single-vessel-results .sources-register{
+    display:inline-block!important;
+    width:36%!important;
+    min-height:0!important;
+    margin:5px 1% 0 0!important;
+    padding:7px 9px!important;
+    vertical-align:top!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  body.ar.dashboard-printing .single-vessel-results .sources-register{
+    margin:5px 0 0 1%!important;
+  }
+  body.dashboard-printing .single-vessel-results .sources-register summary{
+    font-size:9.5pt!important;
+    line-height:1.25!important;
+  }
+  body.dashboard-printing .single-vessel-results .sources-register+.vessel-warning{
+    display:inline-block!important;
+    width:63%!important;
+    min-height:0!important;
+    margin:5px 0 0!important;
+    padding:7px 9px!important;
+    vertical-align:top!important;
+    font-size:8.5pt!important;
+    line-height:1.35!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
 }

@@ -330,7 +330,7 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     grid-template-columns:minmax(0,.82fr) minmax(210px,1.18fr)!important;
     min-height:270px!important;
     height:270px!important;
-    overflow:hidden!important;
+    overflow:visible!important;
     background:#dff4f8!important;
     border:1px solid #699aa1!important;
     box-shadow:none!important;
@@ -366,7 +366,7 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     display:flex!important;
     position:absolute!important;
     z-index:8!important;
-    left:16px!important;
+    left:calc(-103% - 8px)!important;
     right:auto!important;
     top:auto!important;
     bottom:14px!important;

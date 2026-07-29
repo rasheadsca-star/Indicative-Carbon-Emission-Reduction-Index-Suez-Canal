@@ -476,6 +476,38 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     break-before:avoid-page!important;
     page-break-before:avoid!important;
   }
+  /* Keep Alt Fuels methodology attached to the charts above it. */
+  body.dashboard-printing .g2:has(+.fuel-methodology-card){
+    margin-bottom:3px!important;
+    break-after:avoid-page!important;
+    page-break-after:avoid!important;
+  }
+  body.dashboard-printing .g2:has(+.fuel-methodology-card)>.cd{
+    min-height:0!important;
+    padding:7px!important;
+    margin-bottom:0!important;
+  }
+  body.dashboard-printing .fuel-methodology-card{
+    min-height:0!important;
+    margin-top:3px!important;
+    margin-bottom:4px!important;
+    padding:8px 10px!important;
+    break-before:avoid-page!important;
+    page-break-before:avoid!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  body.dashboard-printing .fuel-methodology-card .ct{
+    margin-bottom:4px!important;
+    font-size:11pt!important;
+    line-height:1.2!important;
+  }
+  body.dashboard-printing .fuel-methodology-card .m{
+    margin:0!important;
+    white-space:pre-wrap!important;
+    font-size:8.5pt!important;
+    line-height:1.35!important;
+  }
   /* Keep the final voyage sources and disclaimer on the preceding sheet. */
   body.dashboard-printing .single-vessel-results .economic-box,
   body.dashboard-printing .single-vessel-results .sensitivity-box{

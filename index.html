@@ -512,35 +512,14 @@ function printDashboard(){
   const b=document.getElementById('printBtn');
   if(b){b.disabled=true;b.style.opacity='.65';}
   document.body.classList.add('dashboard-printing');
-  document.body.classList.toggle('print-overview',pg===0);
-  const printable=document.querySelector('main');
-  const fitPrintPage=()=>{
-    if(!printable)return;
-    document.documentElement.style.setProperty('--dashboard-print-scale','1');
-    /*
-      A4 landscape at 96 CSS px/in, after the 8 mm page margins.
-      Reserve a compact band for the report header, active navigation and footer.
-    */
-    const printableWidth=1058;
-    const printableHeight=625;
-    const contentWidth=Math.max(printable.scrollWidth,1);
-    const contentHeight=Math.max(printable.scrollHeight,1);
-    const scale=Math.min(1,printableWidth/contentWidth,printableHeight/contentHeight);
-    document.documentElement.style.setProperty('--dashboard-print-scale',String(Math.max(.1,scale)));
-  };
   const finish=()=>{
     document.body.classList.remove('dashboard-printing');
-    document.body.classList.remove('print-overview');
-    document.documentElement.style.removeProperty('--dashboard-print-scale');
     if(b){b.disabled=false;b.style.opacity='1';}
   };
   window.addEventListener('afterprint',finish,{once:true});
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    fitPrintPage();
-    requestAnimationFrame(()=>{
-      window.print();
-      setTimeout(finish,1000);
-    });
+    window.print();
+    setTimeout(finish,1000);
   }));
 }
 

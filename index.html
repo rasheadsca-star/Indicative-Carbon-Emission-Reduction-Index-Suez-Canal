@@ -118,6 +118,8 @@ footer{text-align:center;padding:16px 20px;margin-top:24px;border-top:1px solid 
 /* v4 utility controls, manual data and print mode */
 .utility-btn{padding:4px 9px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(255,255,255,.045);color:var(--txt);border:1px solid var(--border);cursor:pointer;font-family:inherit;transition:.2s;white-space:nowrap}
 .utility-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(32,201,151,.09)}
+.utility-btn.print-white{background:#fff;color:#075c4b;border-color:#9acfc3}
+.utility-btn.print-white:hover{background:#eaf8f4;color:#043f34;border-color:#20c997}
 .next-header-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;background:linear-gradient(135deg,var(--accent),#06b6d4);color:#03251e!important;border:0!important;text-decoration:none;font-size:10px;font-weight:800;white-space:nowrap;box-shadow:0 0 0 1px rgba(255,255,255,.12),0 5px 18px rgba(32,201,151,.22)}
 .next-float-btn{display:none}
 .share-toast{position:fixed;z-index:9000;left:50%;bottom:24px;transform:translate(-50%,16px);padding:10px 14px;border:1px solid rgba(32,201,151,.42);border-radius:10px;background:rgba(3,25,21,.96);color:#dffbf2;font-size:10px;font-weight:700;opacity:0;pointer-events:none;transition:.25s}.share-toast.show{opacity:1;transform:translate(-50%,0)}
@@ -152,6 +154,8 @@ footer{text-align:center;padding:16px 20px;margin-top:24px;border-top:1px solid 
   svg text{fill:#111!important}.dial-svg{max-width:100%;height:auto}
   footer{color:#111!important;border-top:1px solid #777!important;margin-top:8px;padding:8px}
   .g4,.g3,.g2,.gauges-row{gap:7px!important;margin-bottom:8px!important}.cd{padding:10px!important;margin-bottom:7px!important}
+  img{max-width:100%!important}
+  a{color:#0645ad!important;text-decoration:underline!important}
 }
 
 
@@ -344,7 +348,7 @@ footer{text-align:center;padding:16px 20px;margin-top:24px;border-top:1px solid 
     <button class="utility-btn" id="vesselSimBtn" onclick="openVesselSimulator()">🚢 Vessel Simulator</button>
     <a class="next-header-btn" id="nextHeaderBtn" href="./next/" title="Open CERI-SC NEXT vessel intelligence">⚓ CERI-SC NEXT ↗</a>
     <button class="utility-btn" id="themeBtn" onclick="cycleTheme()">🎨 Background</button>
-    <button class="utility-btn" id="printBtn" onclick="printDashboard()">🖨 Print</button>
+    <button class="utility-btn print-white" id="printBtn" onclick="printDashboard()" title="Print with a clean white background or save as PDF">🖨 White Print / PDF</button>
     <button class="utility-btn" id="shareBtn" onclick="shareDashboard()">↗ Share</button>
     <button class="utility-btn" id="feedbackBtn" onclick="openFeedback()">💬 Feedback</button>
     <button class="utility-btn" id="installBtn" onclick="installCeriApp()" hidden>⬇ Install</button>
@@ -377,7 +381,20 @@ function applyTheme(){
   storeSet('localStorage',THEME_STORE_KEY,String(themeIndex));
 }
 function cycleTheme(){themeIndex=(themeIndex+1)%THEME_PRESETS.length;applyTheme();}
-function printDashboard(){const b=document.getElementById('printBtn');if(b){b.disabled=true;b.style.opacity='.65';}setTimeout(()=>{window.print();if(b){b.disabled=false;b.style.opacity='1';}},2300);}
+function printDashboard(){
+  const b=document.getElementById('printBtn');
+  if(b){b.disabled=true;b.style.opacity='.65';}
+  document.body.classList.add('dashboard-printing');
+  const finish=()=>{
+    document.body.classList.remove('dashboard-printing');
+    if(b){b.disabled=false;b.style.opacity='1';}
+  };
+  window.addEventListener('afterprint',finish,{once:true});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    window.print();
+    setTimeout(finish,1000);
+  }));
+}
 
 function hasManualOverride(yr){const o=manualOverrides[String(yr)]||{};return Number.isFinite(+o.vessels)||Number.isFinite(+o.reduction);}
 function getYearTransit(yr){const o=manualOverrides[String(yr)]||{};return Number.isFinite(+o.vessels)&&+o.vessels>=0?+o.vessels:Y[yr].t;}
@@ -445,7 +462,8 @@ function updateUtilityLabels(){
   document.getElementById('nextHeaderBtn').textContent=ar?'⚓ التحليل المتقدم NEXT ↗':'⚓ CERI-SC NEXT ↗';
   document.getElementById('manualBtn').textContent=ar?'⌨ إدخال يدوي':'⌨ Manual';
   document.getElementById('themeBtn').textContent=ar?'🎨 الخلفية':'🎨 Background';
-  document.getElementById('printBtn').textContent=ar?'🖨 طباعة':'🖨 Print';
+  document.getElementById('printBtn').textContent=ar?'🖨 طباعة بيضاء / PDF':'🖨 White Print / PDF';
+  document.getElementById('printBtn').title=ar?'طباعة بخلفية بيضاء واضحة أو حفظ بصيغة PDF':'Print with a clean white background or save as PDF';
   document.getElementById('shareBtn').textContent=ar?'↗ مشاركة':'↗ Share';
   document.getElementById('feedbackBtn').textContent=ar?'💬 ملاحظات وتواصل':'💬 Feedback';
   document.getElementById('manualTitle').textContent=ar?'إدخال البيانات يدويًا':'Manual Data Override';

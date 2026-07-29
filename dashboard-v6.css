@@ -289,4 +289,48 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     color:#064c3b!important;
     opacity:1!important;
   }
+  /*
+    Overview print composition:
+    omit the screen-only opening hero so it cannot become a blank paper block,
+    then keep the three index-basis references in one clear horizontal row.
+  */
+  body.dashboard-printing .opening-hero{
+    display:none!important;
+  }
+  body.dashboard-printing .official-reference-box{
+    margin:0 0 10px!important;
+    padding:12px!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  body.dashboard-printing .official-reference-head{
+    margin-bottom:8px!important;
+  }
+  body.dashboard-printing .official-reference-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,.8fr) minmax(0,.8fr) minmax(0,1.4fr)!important;
+    gap:8px!important;
+  }
+  body.dashboard-printing .official-reference-grid>a,
+  body.dashboard-printing .official-reference-formula{
+    display:flex!important;
+    min-width:0!important;
+    min-height:76px!important;
+    padding:9px 10px!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  body.dashboard-printing .official-reference-grid strong{
+    font-size:12pt!important;
+    line-height:1.2!important;
+  }
+  body.dashboard-printing .official-reference-grid b,
+  body.dashboard-printing .official-reference-grid span{
+    overflow-wrap:anywhere!important;
+  }
+  body.dashboard-printing .official-reference-box>p{
+    margin:8px 0 0!important;
+    font-size:9.5pt!important;
+    line-height:1.4!important;
+  }
 }

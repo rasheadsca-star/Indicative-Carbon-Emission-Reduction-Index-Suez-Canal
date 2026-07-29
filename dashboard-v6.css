@@ -333,4 +333,54 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
     font-size:9.5pt!important;
     line-height:1.4!important;
   }
+  /*
+    Four-sheet report: reclaim only vertical whitespace so the final status
+    strip remains on sheet four instead of creating an almost-empty fifth page.
+    Type sizes and content width stay unchanged.
+  */
+  body.dashboard-printing footer{
+    display:block!important;
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    z-index:20!important;
+    margin:0!important;
+    padding:3px 5px!important;
+    border-top:1px solid #8aaeb3!important;
+    background:#fff!important;
+    color:#064c3b!important;
+    font-size:7.5pt!important;
+    line-height:1.2!important;
+  }
+  body.dashboard-printing .g4,
+  body.dashboard-printing .g3,
+  body.dashboard-printing .g2,
+  body.dashboard-printing .gauges-row{
+    gap:5px!important;
+    margin-bottom:5px!important;
+  }
+  body.dashboard-printing .cd{
+    padding:8px!important;
+    margin-bottom:5px!important;
+  }
+  body.dashboard-printing .info-box,
+  body.dashboard-printing .live-counter{
+    padding:9px 11px!important;
+    margin-bottom:6px!important;
+  }
+  body.dashboard-printing .cum-counter{
+    padding:7px 10px!important;
+    margin-top:5px!important;
+  }
+  body.dashboard-printing .official-reference-box{
+    margin-bottom:6px!important;
+    padding:9px!important;
+  }
+  body.dashboard-printing .src{
+    margin-top:4px!important;
+    padding:4px 8px!important;
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
 }

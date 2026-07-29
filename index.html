@@ -240,6 +240,49 @@ footer{text-align:center;padding:16px 20px;margin-top:24px;border-top:1px solid 
     print-color-adjust:exact!important;
   }
   body.dashboard-printing a{color:#004f9e!important;font-weight:700!important}
+  /* Paper-first contrast: neutralise late inline component fills. */
+  body.dashboard-printing div:not(.vb):not(.hbf):not(.bf):not(.rd):not(.sb):not(.logo-i):not(.gw){
+    background-color:#fff!important;
+    background-image:none!important;
+  }
+  body.dashboard-printing .g4,
+  body.dashboard-printing .g3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.dashboard-printing .g2,
+  body.dashboard-printing .gauges-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.dashboard-printing{font-size:12pt!important}
+  body.dashboard-printing p,
+  body.dashboard-printing li{font-size:11pt!important;line-height:1.55!important;color:#101820!important}
+  body.dashboard-printing .ct{font-size:13pt!important;font-weight:800!important;color:#062d36!important}
+  body.dashboard-printing .kl,
+  body.dashboard-printing .ku,
+  body.dashboard-printing .kn,
+  body.dashboard-printing .lc-sub,
+  body.dashboard-printing .dial-sub,
+  body.dashboard-printing .rs,
+  body.dashboard-printing .ruu,
+  body.dashboard-printing .eq-l,
+  body.dashboard-printing .vbl,
+  body.dashboard-printing .hbl,
+  body.dashboard-printing .hbv{font-size:10pt!important;color:#263a40!important}
+  body.dashboard-printing table,
+  body.dashboard-printing td{font-size:10.5pt!important}
+  body.dashboard-printing th{font-size:10pt!important;background:#e8f3f0!important;color:#062d36!important}
+  body.dashboard-printing .src,
+  body.dashboard-printing .eq-note{font-size:9.5pt!important;color:#172d34!important}
+  body.dashboard-printing .ta,
+  body.dashboard-printing .kv,
+  body.dashboard-printing .lc-value,
+  body.dashboard-printing .cum-val,
+  body.dashboard-printing .eq-v,
+  body.dashboard-printing .rv{color:#00634f!important}
+  body.dashboard-printing .cd,
+  body.dashboard-printing .info-box,
+  body.dashboard-printing .live-counter,
+  body.dashboard-printing .cum-counter,
+  body.dashboard-printing div[style*="border"]{border-color:#59666a!important}
+  body.dashboard-printing a[href*="/auth/logout"],
+  body.dashboard-printing a[href*="auth/logout"],
+  body.dashboard-printing button[onclick*="logout"]{display:none!important}
 }
 
 

@@ -1,0 +1,32 @@
+CREATE TABLE IF NOT EXISTS projects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  status TEXT NOT NULL,
+  current_value REAL NOT NULL DEFAULT 0,
+  unit TEXT NOT NULL DEFAULT 'tCO2e',
+  target_year INTEGER NOT NULL CHECK (target_year BETWEEN 2025 AND 2050),
+  source TEXT NOT NULL,
+  impact_type TEXT NOT NULL,
+  evidence_status TEXT NOT NULL,
+  owner TEXT NOT NULL,
+  version INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS audit_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  action TEXT NOT NULL,
+  detail TEXT NOT NULL,
+  record_id INTEGER,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS feedback (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  category TEXT NOT NULL,
+  message TEXT NOT NULL,
+  page TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);

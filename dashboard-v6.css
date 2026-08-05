@@ -14,6 +14,41 @@
   --purple:#b399ff!important;
   --cyan:#42d9ea!important;
 }
+
+@media print{
+  @page{size:A4 portrait;margin:0}
+  #rcReportSheet .report-brand b{font-size:0!important}
+  #rcReportSheet .report-brand b:after{content:"CERI-SC V9.0";font-size:12pt!important}
+  body.dashboard-printing #dashboardPrintReport .print-report-page{width:210mm!important;height:297mm!important;font-size:12pt!important}
+}
+
+/* V9.0 — governed controls, feedback and deterministic four-page report */
+.logout-btn{display:inline-flex;align-items:center;text-decoration:none}.feedback-card{width:min(620px,100%)}
+.feedback-label{display:grid;gap:6px;margin-bottom:12px;color:var(--dim);font-size:10px;font-weight:800}
+.feedback-label select,.feedback-label textarea{width:100%;border:1px solid var(--border);border-radius:9px;background:rgba(2,18,15,.78);color:var(--txt);padding:10px;font:inherit;outline:none}
+.feedback-label textarea{resize:vertical;min-height:130px;line-height:1.6}.feedback-label select:focus,.feedback-label textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(32,201,151,.09)}
+.feedback-privacy{margin:0 0 12px;color:var(--dim);font-size:9px;line-height:1.6}.admin-mini:disabled{opacity:.4;cursor:not-allowed}.data-anchor{margin:7px 0;padding:7px;border:1px solid rgba(245,158,11,.25);border-radius:7px;color:var(--gold);font-size:9px;text-align:center}
+.lifecycle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:10px 0}.lifecycle-grid span{display:grid;gap:5px;padding:11px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.025);font-size:9px;color:var(--dim)}.lifecycle-grid b{color:var(--accent);font-size:10px}.lifecycle-boundary a{color:var(--cyan);font-weight:800}@media(max-width:760px){.lifecycle-grid{grid-template-columns:1fr}}
+#dashboardPrintReport{display:none}
+@media print{
+  @page{size:A4 portrait;margin:0}
+  body.dashboard-printing>*:not(#dashboardPrintReport){display:none!important}
+  body.dashboard-printing{margin:0!important;background:#fff!important;color:#064c3b!important;font-family:Arial,"Cairo",sans-serif!important}
+  body.dashboard-printing #dashboardPrintReport{display:block!important;background:#fff!important;color:#064c3b!important}
+  #dashboardPrintReport .print-report-page{position:relative;width:210mm;height:297mm;overflow:hidden;padding:16mm 15mm 17mm;background:#fff!important;color:#064c3b!important;break-after:page;page-break-after:always;font-size:12pt;line-height:1.45}
+  #dashboardPrintReport .print-report-page:last-child{break-after:auto;page-break-after:auto}
+  #dashboardPrintReport header{display:flex;justify-content:space-between;align-items:center;padding-bottom:5mm;border-bottom:2px solid #0b8065;color:#064c3b;font-size:12pt}
+  #dashboardPrintReport h1{margin:8mm 0 6mm;color:#064c3b;font-size:24pt;line-height:1.15}#dashboardPrintReport h2{margin:5mm 0 2mm;color:#096c57;font-size:15pt}
+  #dashboardPrintReport p,#dashboardPrintReport li,#dashboardPrintReport td,#dashboardPrintReport th,#dashboardPrintReport a,#dashboardPrintReport span,#dashboardPrintReport small,#dashboardPrintReport b,#dashboardPrintReport strong{font-size:12pt;color:#064c3b!important}
+  #dashboardPrintReport footer{position:absolute;left:15mm;right:15mm;bottom:8mm;padding-top:3mm;border-top:1px solid #7fa79f;background:#fff!important;color:#315e55!important;font-size:10pt!important}
+  #dashboardPrintReport .print-hero{display:grid;gap:2mm;padding:8mm;border:1.5px solid #5b8f96;border-radius:4mm;background:#e5f8f4!important}#dashboardPrintReport .print-hero>span{font-weight:800}#dashboardPrintReport .print-hero>strong{font-size:32pt!important;color:#08765d!important}
+  #dashboardPrintReport .print-grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin:6mm 0}#dashboardPrintReport .print-grid article{display:grid;gap:2mm;padding:5mm;border:1px solid #86aaa3;border-radius:3mm;background:#f0fbf8!important}#dashboardPrintReport .print-grid article strong{font-size:16pt!important}
+  #dashboardPrintReport .official-reference-box{padding:5mm;border:1px solid #86aaa3;background:#fff!important}#dashboardPrintReport .official-reference-grid{display:grid;grid-template-columns:1fr 1fr;gap:3mm}#dashboardPrintReport .official-reference-formula{grid-column:1/-1}#dashboardPrintReport .official-reference-grid>*{padding:4mm;border:1px solid #9ab8b2;background:#f0fbf8!important;text-decoration:none}#dashboardPrintReport .official-reference-box p{margin-bottom:0}
+  #dashboardPrintReport table{width:100%;border-collapse:collapse;font-size:12pt!important}#dashboardPrintReport th,#dashboardPrintReport td{padding:2.5mm;border:1px solid #6e9991;text-align:start}#dashboardPrintReport th{background:#d9f1ec!important;font-weight:800}#dashboardPrintReport tbody tr:nth-child(even) td{background:#f2fbf9!important}
+  #dashboardPrintReport .print-note{margin-top:6mm;padding:5mm;border:1px solid #6e9991;border-radius:3mm;background:#e8f7f4!important}
+  #dashboardPrintReport .print-roadmap{display:grid;gap:6mm}#dashboardPrintReport .print-roadmap article{padding:7mm;border:1.5px solid #5b8f96;border-radius:4mm;background:#edf9f6!important}#dashboardPrintReport .print-roadmap article b{font-size:17pt!important;color:#08765d!important}
+  #dashboardPrintReport .print-method{padding:7mm;border:1.5px solid #5b8f96;border-radius:4mm;background:#edf9f6!important}#dashboardPrintReport .print-sources{display:grid;gap:3mm;margin-top:6mm}#dashboardPrintReport .print-sources a{padding:3mm;border:1px solid #86aaa3;background:#fff!important;color:#075f4c!important;overflow-wrap:anywhere}
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;background:#031612}
 body{
@@ -71,7 +106,7 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
 .vessel-map-badge:after{content:" · V7.5";color:var(--accent);font-weight:800}
 .boundary-chip{color:#d8c8ff!important;border-color:rgba(179,153,255,.35)!important;background:rgba(179,153,255,.08)!important}
 .scenario-panel{margin-top:16px}.scenario-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.scenario-head strong{font-size:11px}.scenario-head button{border:0;background:transparent;color:var(--cape);font-size:9px;cursor:pointer}.scenario-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.scenario-card{display:grid;gap:5px;padding:11px;border:1px solid rgba(112,181,164,.15);border-radius:11px;background:rgba(255,255,255,.018)}.scenario-card>b{font-size:11px}.scenario-card>span,.scenario-card small,.scenario-card em{color:var(--dim);font-size:8px}.scenario-card>div{display:flex;align-items:center;justify-content:space-between}.scenario-card em{font-style:normal}.scenario-empty{padding:14px;border:1px dashed rgba(111,185,166,.2);border-radius:10px;color:var(--dim);font-size:9px;text-align:center}.sensitivity-box{margin-top:14px;padding:13px;border:1px solid rgba(179,153,255,.18);border-radius:12px;background:rgba(179,153,255,.025)}.sensitivity-table{display:grid;gap:2px}.sensitivity-row{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:8px;padding:7px 8px;border-radius:7px;font-size:9px;background:rgba(255,255,255,.018)}.sensitivity-row.head{color:var(--dim);font-size:8px;background:transparent}.sensitivity-row .negative{color:var(--cape)}
-.opening-badge{font-size:0}.opening-badge:after{content:"CERI‑SC V8.5";font-size:9px}
+.opening-badge{font-size:0}.opening-badge:after{content:"CERI‑SC V9.0";font-size:9px}
 .economic-box{margin-top:14px;padding:15px;border:1px solid rgba(255,196,104,.22);border-radius:13px;background:linear-gradient(135deg,rgba(255,196,104,.055),rgba(62,226,173,.025))}.economic-box .scenario-head>span{color:var(--gold);font-size:8px;font-weight:800}.economic-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.economic-grid>div{display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:9px;background:rgba(255,255,255,.022)}.economic-grid span{color:var(--dim);font-size:8px}.economic-grid strong{font-size:13px}.economic-grid .featured{background:rgba(62,226,173,.07);border:1px solid rgba(62,226,173,.14)}.economic-box p,.sources-register p{margin-top:10px;color:var(--dim);font-size:8px;line-height:1.65}.sources-register{margin-top:14px;padding:12px;border:1px solid rgba(93,185,255,.18);border-radius:12px;background:rgba(93,185,255,.025)}.sources-register summary{cursor:pointer;font-size:10px;font-weight:800;color:#b9dcff}.source-table{display:grid;gap:2px;margin-top:10px}.source-row{display:grid;grid-template-columns:1.1fr 1fr .75fr;gap:7px;padding:7px;border-radius:6px;background:rgba(255,255,255,.018);font-size:8px}.source-row.head{color:var(--dim);background:transparent}.source-row em{color:var(--blue);font-style:normal}
 #rcReportSheet{display:none}
 @media print{#rcReportSheet .report-brand{display:flex;align-items:center;gap:12px}#rcReportSheet .report-logos{display:flex;align-items:center;gap:5px}#rcReportSheet .report-logos img{width:76px;height:43px;padding:3px;object-fit:contain;border:1px solid #ddd;border-radius:5px}}
@@ -137,457 +172,4 @@ table{font-size:10px!important}th{padding:10px 9px!important;font-size:9px!impor
 
 /* V8.4 — geographic advantage: Suez shortcut versus Cape detour */
 .opening-visual.geo-corridor{position:relative;min-height:330px;align-self:center;overflow:hidden;border:1px solid rgba(85,205,178,.2);border-radius:22px;background-color:#061c22;background-image:linear-gradient(rgba(98,201,181,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(98,201,181,.035) 1px,transparent 1px),radial-gradient(circle at 54% 44%,rgba(32,201,151,.08),transparent 46%);background-size:28px 28px,28px 28px,100% 100%;box-shadow:inset 0 0 75px rgba(0,0,0,.35),0 24px 70px rgba(0,0,0,.22)}
-.geo-map{position:absolute;inset:0;width:100%;height:100%}.landmass{fill:url(#land);stroke:rgba(95,189,169,.14);stroke-width:1}.route-path{fill:none;stroke-linecap:round;stroke-linejoin:round}.suez-route{stroke:#48e2b1;stroke-width:4;filter:url(#suezGlow);stroke-dasharray:9 8;animation:routeDash 2.8s linear infinite}.cape-route{stroke:#f07a70;stroke-width:2.2;stroke-dasharray:5 7;opacity:.68;animation:routeDash 4.8s linear infinite}.port-dot{fill:#e7fff8;stroke:#36cfa1;stroke-width:2}.suez-focus{fill:#0c604f;stroke:#78f2ce;stroke-width:2;filter:url(#suezGlow);animation:suezPulse 2.6s ease-out infinite}.route-vessel{stroke:#f5fffc;stroke-width:1.3;filter:url(#suezGlow)}.vessel-suez{fill:#48e2b1}.vessel-cape{fill:#ef7a70;opacity:.85}.geo-label{fill:rgba(179,217,208,.48);font-size:8px;font-weight:800;letter-spacing:.18em}.suez-label{fill:#8ff2d3;font-size:9px;font-weight:900;letter-spacing:.08em}.cape-label{fill:rgba(247,161,153,.7);font-size:7px;font-weight:800;letter-spacing:.08em}.route-legend-card{position:absolute;left:4%;bottom:5%;display:grid;grid-template-columns:10px auto;column-gap:7px;row-gap:2px;padding:10px 12px;border:1px solid rgba(114,199,180,.15);border-radius:11px;background:rgba(3,22,25,.82);backdrop-filter:blur(10px)}.route-legend-card b{color:#dff9f2;font-size:7px;letter-spacing:.07em}.route-legend-card small{grid-column:2;color:#7ca39a;font-size:7px;margin-bottom:4px}.route-key{width:9px;height:3px;margin-top:4px;border-radius:4px}.key-suez{background:#48e2b1;box-shadow:0 0 7px rgba(72,226,177,.65)}.key-cape{background:#ef7a70}.suez-callout{position:absolute;left:51%;top:42%;display:grid;gap:3px;max-width:175px;padding:10px 11px;border-left:2px solid #48e2b1;border-radius:0 9px 9px 0;background:rgba(3,25,27,.87);box-shadow:0 12px 34px rgba(0,0,0,.22)}.suez-callout span{color:#63e6bd;font-size:6px;font-weight:900;letter-spacing:.14em}.suez-callout strong{color:#e8fff8;font-size:8px;line-height:1.35}.suez-callout small{color:#86aaa1;font-size:6px;line-height:1.4}.geo-corridor .opening-impact{right:4%;bottom:5%;min-width:132px;padding:9px 10px}.geo-corridor .opening-impact strong{font-size:21px}.geo-corridor .opening-badge{right:4%;top:5%}
-@keyframes routeDash{to{stroke-dashoffset:-34}}@keyframes suezPulse{0%{r:5;opacity:.95}70%{r:13;opacity:.18}100%{r:5;opacity:.95}}
-@media(max-width:760px){.opening-visual.geo-corridor{min-height:300px}.suez-callout{left:45%;top:39%;max-width:155px}.route-legend-card{left:3%;bottom:3%}.geo-corridor .opening-impact{right:3%;bottom:3%}}
-@media(prefers-reduced-motion:reduce){.geo-corridor *{animation:none!important}.geo-corridor animateMotion{display:none}}
-
-/* V8.5 — authentic Copernicus Sentinel view of the Suez Canal */
-.opening-visual.satellite-corridor{position:relative;display:grid;grid-template-columns:minmax(0,.92fr) minmax(180px,.58fr);min-height:340px;align-self:center;overflow:hidden;border:1px solid rgba(97,210,183,.2);border-radius:22px;background:radial-gradient(circle at 18% 25%,rgba(37,197,158,.11),transparent 38%),linear-gradient(145deg,#061d21,#041619);box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 24px 70px rgba(0,0,0,.24)}
-.satellite-copy{position:relative;z-index:3;align-self:center;padding:26px 16px 70px 24px}.satellite-copy>span{color:#60e6bd;font-size:7px;font-weight:900;letter-spacing:.15em}.satellite-copy h3{max-width:300px;margin:8px 0 8px;color:#effffb;font-size:20px;line-height:1.12;letter-spacing:-.035em}.satellite-copy p{max-width:300px;color:#93b9b0;font-size:9px;line-height:1.65}.satellite-route-fact{display:grid;grid-template-columns:12px 1fr;column-gap:8px;row-gap:3px;margin-top:16px;padding:11px 12px;border:1px solid rgba(76,221,178,.15);border-radius:10px;background:rgba(21,112,91,.1)}.satellite-route-fact i{width:8px;height:8px;margin-top:2px;border:2px solid #58edbf;border-radius:50%;box-shadow:0 0 12px rgba(64,234,183,.55)}.satellite-route-fact strong{color:#dffaf2;font-size:8px}.satellite-route-fact small{grid-column:2;color:#779e95;font-size:7px}.satellite-frame{position:relative;z-index:2;height:340px;margin:0;overflow:hidden;border-left:1px solid rgba(104,202,180,.13);background:#061419}.satellite-frame:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(5,23,25,.45),transparent 24%),linear-gradient(180deg,rgba(2,13,17,.08),transparent 68%,rgba(2,13,17,.4))}.satellite-frame img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%;filter:saturate(.94) contrast(1.04) brightness(.88)}.satellite-track{position:absolute;z-index:2;inset:0;width:100%;height:100%;pointer-events:none}.satellite-frame figcaption{position:absolute;z-index:4;left:7px;right:7px;bottom:6px;padding:4px 6px;border-radius:6px;background:rgba(1,12,16,.72);backdrop-filter:blur(5px);text-align:center}.satellite-frame figcaption a{color:rgba(222,250,242,.72);font-size:5.8px;text-decoration:none;line-height:1.35}.satellite-corridor .opening-impact{z-index:6;left:24px;right:auto;bottom:17px;min-width:145px;padding:9px 11px;background:rgba(3,24,24,.88)}.satellite-corridor .opening-impact strong{font-size:22px}.satellite-corridor .opening-badge{z-index:6;right:4%;top:4%}
-@media(max-width:760px){.opening-visual.satellite-corridor{grid-template-columns:1fr minmax(150px,.65fr);min-height:310px}.satellite-copy{padding:20px 12px 67px 16px}.satellite-copy h3{font-size:17px}.satellite-frame{height:310px}.satellite-corridor .opening-impact{left:16px;bottom:12px}}
-@media(max-width:480px){.opening-visual.satellite-corridor{grid-template-columns:1fr;min-height:auto}.satellite-copy{padding:20px 16px 16px}.satellite-frame{height:310px;border-left:0;border-top:1px solid rgba(104,202,180,.13)}.satellite-corridor .opening-impact{left:12px;bottom:12px}.satellite-corridor .opening-badge{top:calc(100% - 294px)}}
-@media(prefers-reduced-motion:reduce){.satellite-track animateMotion{display:none}}
-.official-reference-box{margin:0 0 16px;padding:15px;border:1px solid rgba(32,201,151,.34);border-radius:14px;background:linear-gradient(135deg,rgba(32,201,151,.1),rgba(34,211,238,.035));box-shadow:0 14px 34px rgba(0,0,0,.12)}
-.official-reference-head{display:flex;align-items:center;gap:10px;margin-bottom:11px}.official-reference-head>span{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--accent);color:#042018;font-weight:900}.official-reference-head strong{display:block;font-size:12px}.official-reference-head small{display:block;margin-top:2px;color:var(--dim);font-size:9px}
-.official-reference-grid{display:grid;grid-template-columns:.8fr .8fr 1.4fr;gap:9px}.official-reference-grid>a,.official-reference-formula{display:flex;flex-direction:column;gap:3px;min-height:82px;padding:10px;border:1px solid var(--border);border-radius:10px;background:rgba(2,15,21,.52);text-decoration:none;color:var(--txt);transition:.2s}.official-reference-grid>a:hover{border-color:var(--accent);transform:translateY(-1px)}.official-reference-grid b{font-size:9px;color:var(--dim)}.official-reference-grid strong{font-size:15px;color:var(--accent)}.official-reference-grid span{font-size:8px;color:var(--dim);line-height:1.45}.official-reference-formula strong{font-size:12px}.official-reference-box p{margin:10px 0 0;color:var(--dim);font-size:9px;line-height:1.65}.official-source-link{color:var(--accent);font-weight:800;text-decoration:none}.official-source-link:hover{text-decoration:underline}
-@media(max-width:760px){.official-reference-grid{grid-template-columns:1fr}.official-reference-grid>a,.official-reference-formula{min-height:auto}}
-.imo-search-control{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px}.imo-search-control button{min-width:84px;border:1px solid rgba(32,201,151,.42);border-radius:9px;background:rgba(32,201,151,.11);color:var(--accent);font-family:inherit;font-size:10px;font-weight:800;cursor:pointer;padding:7px 10px}.imo-search-control button:hover{background:rgba(32,201,151,.2);transform:translateY(-1px)}
-.imo-lookup-status{padding:9px 11px;border:1px solid var(--border);border-radius:9px;font-size:9px;line-height:1.55}.imo-lookup-status.neutral{color:var(--dim);background:rgba(148,163,184,.06)}.imo-lookup-status.success{color:#8df3d2;border-color:rgba(32,201,151,.45);background:rgba(32,201,151,.11)}.imo-lookup-status.warning{color:#ffd27a;border-color:rgba(255,176,32,.42);background:rgba(255,176,32,.09)}.imo-lookup-status.error{color:#ff9a97;border-color:rgba(239,83,80,.45);background:rgba(239,83,80,.09)}
-.imo-search-control button:disabled{opacity:.65;cursor:wait}.imo-search-control button.loading:before{content:"";display:inline-block;width:9px;height:9px;margin-inline-end:5px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;vertical-align:-2px;animation:imoSpin .7s linear infinite}@keyframes imoSpin{to{transform:rotate(360deg)}}
-.vessel-data-provenance{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center;margin:10px 0 13px;padding:12px 14px;border:1px solid rgba(148,163,184,.18);border-radius:12px;background:linear-gradient(120deg,rgba(148,163,184,.055),rgba(255,255,255,.015))}.vessel-data-provenance>div{display:flex;align-items:center;gap:8px}.vessel-data-provenance>div>span{font-size:11px}.vessel-data-provenance strong{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.055em}.vessel-data-provenance b{font-size:10px;color:var(--txt)}.vessel-data-provenance small{grid-column:1/-1;color:var(--dim);font-size:8px;line-height:1.5}.vessel-data-provenance a{color:#9ad7ff;font-size:8px;font-weight:800;text-decoration:none}.vessel-data-provenance.live{border-color:rgba(32,201,151,.38);background:linear-gradient(120deg,rgba(32,201,151,.1),rgba(34,211,238,.035))}.vessel-data-provenance.live>div>span{color:#43e8b5;text-shadow:0 0 12px #43e8b5}.vessel-data-provenance.internal{border-color:rgba(255,196,104,.3);background:linear-gradient(120deg,rgba(255,196,104,.075),rgba(255,255,255,.015))}.vessel-data-provenance.internal>div>span{color:#ffc468}
-@media(max-width:600px){.vessel-data-provenance{grid-template-columns:1fr}.vessel-data-provenance a{justify-self:start}.vessel-data-provenance small{grid-column:auto}}
-.admin-hero{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:15px;padding:22px;border:1px solid rgba(32,201,151,.28);border-radius:17px;background:linear-gradient(120deg,rgba(32,201,151,.11),rgba(34,211,238,.035))}.admin-hero span{color:var(--accent);font-size:9px;font-weight:900;letter-spacing:.12em}.admin-hero h2{margin:5px 0 6px;font-size:23px}.admin-hero p{max-width:760px;color:var(--dim);font-size:10px;line-height:1.65}.admin-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.admin-kpis article{display:flex;flex-direction:column;gap:5px;padding:14px;border:1px solid var(--border);border-radius:13px;background:rgba(255,255,255,.018)}.admin-kpis span,.admin-kpis small{color:var(--dim);font-size:8px}.admin-kpis strong{font-size:13px;color:var(--accent)}.admin-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(310px,.65fr);gap:12px}.admin-grid.lower{grid-template-columns:1fr 1fr}.admin-table-wrap{overflow:auto}.admin-table-wrap td:first-child b,.admin-table-wrap td:first-child small{display:block}.admin-table-wrap td:first-child small{margin-top:3px;color:var(--dim)}.admin-status{display:inline-flex;padding:4px 7px;border:1px solid rgba(32,201,151,.25);border-radius:99px;background:rgba(32,201,151,.08);color:#8df3d2;font-size:8px;font-weight:800}.admin-mini{margin:2px;padding:4px 7px;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.03);color:var(--txt);font-size:8px;cursor:pointer}.admin-mini.danger{color:#ff9a97}.admin-editor label{display:grid;gap:5px;margin-bottom:9px;color:var(--dim);font-size:8px;font-weight:700}.admin-editor input{min-height:38px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(2,18,15,.72);color:var(--txt);font:inherit;font-size:10px;outline:none}.admin-editor input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(32,201,151,.08)}.admin-form-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.admin-actions{display:flex;justify-content:flex-end;gap:7px}.admin-message{margin-top:10px;padding:8px;border-radius:8px;font-size:8px;line-height:1.5}.admin-message.neutral{color:var(--dim);background:rgba(148,163,184,.05)}.admin-message.success{color:#8df3d2;background:rgba(32,201,151,.09)}.admin-message.warning{color:#ffd27a;background:rgba(255,176,32,.08)}.admin-message.error{color:#ff9a97;background:rgba(239,83,80,.08)}.admin-health{display:grid;gap:5px;padding:13px;border-radius:10px;background:rgba(32,201,151,.06)}.admin-health strong{color:var(--accent);font-size:13px}.admin-health span,.admin-health small{color:var(--dim);font-size:8px}.admin-audit{display:grid;gap:5px;max-height:190px;overflow:auto}.admin-audit>div{display:grid;grid-template-columns:70px 1fr auto;gap:8px;padding:7px;border-radius:7px;background:rgba(255,255,255,.018);font-size:8px}.admin-audit b{color:var(--accent)}.admin-audit small{color:var(--dim)}
-@media(max-width:900px){.admin-grid,.admin-grid.lower{grid-template-columns:1fr}.admin-kpis{grid-template-columns:1fr 1fr}}@media(max-width:600px){.admin-hero{align-items:flex-start;flex-direction:column}.admin-kpis,.admin-form-two{grid-template-columns:1fr}.admin-health{overflow-wrap:anywhere}}
-
-/* FINAL PRINT PALETTE — loaded last so screen-only component rules cannot win. */
-@media print{
-  @page{size:A4 landscape;margin:8mm}
-  body.dashboard-printing,
-  body.dashboard-printing main,
-  body.dashboard-printing .hdr,
-  body.dashboard-printing .nav,
-  body.dashboard-printing footer{
-    background:#fff!important;
-    background-image:none!important;
-    color:#064c3b!important;
-  }
-  body.dashboard-printing *,
-  body.dashboard-printing p,
-  body.dashboard-printing span,
-  body.dashboard-printing small,
-  body.dashboard-printing strong,
-  body.dashboard-printing b,
-  body.dashboard-printing h1,
-  body.dashboard-printing h2,
-  body.dashboard-printing h3,
-  body.dashboard-printing h4,
-  body.dashboard-printing h5,
-  body.dashboard-printing th,
-  body.dashboard-printing td{
-    color:#064c3b!important;
-    text-shadow:none!important;
-  }
-  body.dashboard-printing .cd,
-  body.dashboard-printing .info-box,
-  body.dashboard-printing .live-counter,
-  body.dashboard-printing .cum-counter,
-  body.dashboard-printing .official-reference-box,
-  body.dashboard-printing .official-reference-grid>a,
-  body.dashboard-printing .official-reference-formula,
-  body.dashboard-printing .single-vessel-scope,
-  body.dashboard-printing .single-vessel-inputs,
-  body.dashboard-printing .single-vessel-results,
-  body.dashboard-printing .single-vessel-kpi,
-  body.dashboard-printing .vessel-route-card,
-  body.dashboard-printing .vessel-delta,
-  body.dashboard-printing .vessel-quality,
-  body.dashboard-printing .scenario-card,
-  body.dashboard-printing .sensitivity-box,
-  body.dashboard-printing .economic-box,
-  body.dashboard-printing .sources-register,
-  body.dashboard-printing .admin-hero,
-  body.dashboard-printing .admin-kpis article{
-    background:#eefbff!important;
-    background-image:none!important;
-    border:1.4px solid #5b8f96!important;
-    box-shadow:none!important;
-  }
-  body.dashboard-printing .cd:nth-child(even),
-  body.dashboard-printing tr:nth-child(even) td,
-  body.dashboard-printing .official-reference-grid>a:nth-child(even){
-    background:#fff!important;
-  }
-  body.dashboard-printing .official-reference-grid>a,
-  body.dashboard-printing .official-reference-formula{
-    min-height:auto!important;
-  }
-  body.dashboard-printing th{
-    background:#cceff5!important;
-    border-color:#477b82!important;
-    font-weight:800!important;
-  }
-  body.dashboard-printing td{
-    background:#fff!important;
-    border-color:#8aaeb3!important;
-  }
-  body.dashboard-printing tr:nth-child(even) td{background:#eefbff!important}
-  body.dashboard-printing .src,
-  body.dashboard-printing .eq-note,
-  body.dashboard-printing .report-disclaimer{
-    background:#e2f6fa!important;
-    border:1px solid #6f9fa6!important;
-    color:#064c3b!important;
-  }
-  body.dashboard-printing .next-float-btn,
-  body.dashboard-printing a[href*="/auth/logout"],
-  body.dashboard-printing a[href*="auth/logout"]{display:none!important}
-  body.dashboard-printing .vb,
-  body.dashboard-printing .hbf,
-  body.dashboard-printing .bf,
-  body.dashboard-printing .rd,
-  body.dashboard-printing .sb,
-  body.dashboard-printing .logo-i{
-    -webkit-print-color-adjust:exact!important;
-    print-color-adjust:exact!important;
-    opacity:1!important;
-  }
-  /* Unfilled gauge capacity must read as background, not achieved value. */
-  body.dashboard-printing .dial-svg path[stroke*="-track"]{
-    stroke:#d9edf2!important;
-    opacity:1!important;
-  }
-  body.dashboard-printing .dial-svg path[stroke="#0a0e1a"]{
-    stroke:#eef7f9!important;
-    opacity:1!important;
-  }
-  body.dashboard-printing .dial-svg line{
-    stroke:#789ba2!important;
-  }
-  /* Map labels stay bright over the dark satellite/chart background. */
-  body.dashboard-printing .vessel-visual svg text,
-  body.dashboard-printing .vessel-visual .vessel-pin-label,
-  body.dashboard-printing .vessel-visual .vessel-geo-label,
-  body.dashboard-printing .vessel-visual .vessel-geo-sub{
-    fill:#fff!important;
-    color:#fff!important;
-    stroke:#03252b!important;
-    stroke-width:3px!important;
-    paint-order:stroke fill!important;
-    opacity:1!important;
-    font-weight:900!important;
-  }
-  body.dashboard-printing .vessel-visual .vessel-geo-sub{
-    fill:#dffcff!important;
-    stroke-width:2.5px!important;
-  }
-  body.dashboard-printing .vessel-visual-label,
-  body.dashboard-printing .vessel-map-badge,
-  body.dashboard-printing .vessel-route-legend{
-    background:#fff!important;
-    border:1px solid #40757d!important;
-    color:#064c3b!important;
-    opacity:1!important;
-  }
-  /* Overview print composition: retain the satellite opening image. */
-  body.dashboard-printing .opening-hero{
-    display:grid!important;
-    grid-template-columns:minmax(0,1.05fr) minmax(370px,.95fr)!important;
-    min-height:300px!important;
-    height:auto!important;
-    gap:14px!important;
-    margin:0 0 10px!important;
-    padding:18px!important;
-    overflow:hidden!important;
-    background:#eefbff!important;
-    background-image:none!important;
-    border:1.4px solid #5b8f96!important;
-    box-shadow:none!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-  }
-  body.dashboard-printing .opening-copy{
-    align-self:center!important;
-    max-width:none!important;
-  }
-  body.dashboard-printing .opening-copy h2{
-    max-width:none!important;
-    color:#064c3b!important;
-    font-size:27pt!important;
-    line-height:1.08!important;
-  }
-  body.dashboard-printing .opening-copy p{
-    max-width:none!important;
-    color:#164f45!important;
-    font-size:10.5pt!important;
-    line-height:1.45!important;
-  }
-  body.dashboard-printing .opening-actions{
-    display:none!important;
-  }
-  body.dashboard-printing .opening-visual.satellite-corridor{
-    display:grid!important;
-    grid-template-columns:minmax(0,.82fr) minmax(210px,1.18fr)!important;
-    min-height:270px!important;
-    height:270px!important;
-    overflow:visible!important;
-    background:#dff4f8!important;
-    border:1px solid #699aa1!important;
-    box-shadow:none!important;
-    -webkit-print-color-adjust:exact!important;
-    print-color-adjust:exact!important;
-  }
-  body.dashboard-printing .satellite-copy{
-    display:block!important;
-    align-self:center!important;
-    padding:14px 10px 60px 14px!important;
-  }
-  body.dashboard-printing .satellite-copy h3{
-    color:#064c3b!important;
-    font-size:14pt!important;
-  }
-  body.dashboard-printing .satellite-copy p,
-  body.dashboard-printing .satellite-route-fact strong,
-  body.dashboard-printing .satellite-route-fact small{
-    color:#164f45!important;
-  }
-  body.dashboard-printing .satellite-route-fact{
-    background:#fff!important;
-    border:1px solid #78aeb5!important;
-  }
-  body.dashboard-printing .satellite-frame{
-    display:block!important;
-    height:270px!important;
-    background:#cfe8ed!important;
-    overflow:hidden!important;
-  }
-  /* Place the cumulative-impact card in the vacant lower-left satellite-copy area. */
-  body.dashboard-printing .opening-visual.satellite-corridor .opening-impact{
-    display:flex!important;
-    position:absolute!important;
-    z-index:8!important;
-    left:calc(-103% - 46px)!important;
-    right:auto!important;
-    top:auto!important;
-    bottom:-16px!important;
-    width:150px!important;
-    min-width:150px!important;
-    min-height:46px!important;
-    margin:0!important;
-    padding:5px 8px!important;
-    align-items:center!important;
-    justify-content:center!important;
-    background:#eefbff!important;
-    background-image:none!important;
-    border:1.4px solid #5b8f96!important;
-    border-radius:11px!important;
-    box-shadow:none!important;
-    opacity:1!important;
-    visibility:visible!important;
-  }
-  body.dashboard-printing .opening-visual.satellite-corridor .opening-impact span,
-  body.dashboard-printing .opening-visual.satellite-corridor .opening-impact small{
-    color:#245f54!important;
-    font-size:6.5pt!important;
-    line-height:1.2!important;
-    text-align:center!important;
-  }
-  body.dashboard-printing .opening-visual.satellite-corridor .opening-impact strong{
-    display:block!important;
-    margin:2px 0!important;
-    color:#08765d!important;
-    font-size:15pt!important;
-    line-height:1!important;
-    white-space:nowrap!important;
-  }
-  body.dashboard-printing .satellite-frame img{
-    display:block!important;
-    width:100%!important;
-    height:100%!important;
-    object-fit:cover!important;
-    opacity:1!important;
-    visibility:visible!important;
-    filter:none!important;
-    -webkit-print-color-adjust:exact!important;
-    print-color-adjust:exact!important;
-  }
-  body.dashboard-printing .satellite-track,
-  body.dashboard-printing .satellite-frame figcaption,
-  body.dashboard-printing .opening-impact,
-  body.dashboard-printing .opening-badge{
-    display:block!important;
-    visibility:visible!important;
-    opacity:1!important;
-  }
-  body.dashboard-printing .official-reference-box{
-    margin:0 0 10px!important;
-    padding:12px!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-  }
-  body.dashboard-printing .official-reference-head{
-    margin-bottom:8px!important;
-  }
-  body.dashboard-printing .official-reference-grid{
-    display:grid!important;
-    grid-template-columns:minmax(0,.8fr) minmax(0,.8fr) minmax(0,1.4fr)!important;
-    gap:8px!important;
-  }
-  body.dashboard-printing .official-reference-grid>a,
-  body.dashboard-printing .official-reference-formula{
-    display:flex!important;
-    min-width:0!important;
-    min-height:76px!important;
-    padding:9px 10px!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-  }
-  body.dashboard-printing .official-reference-grid strong{
-    font-size:12pt!important;
-    line-height:1.2!important;
-  }
-  body.dashboard-printing .official-reference-grid b,
-  body.dashboard-printing .official-reference-grid span{
-    overflow-wrap:anywhere!important;
-  }
-  body.dashboard-printing .official-reference-box>p{
-    margin:8px 0 0!important;
-    font-size:9.5pt!important;
-    line-height:1.4!important;
-  }
-  /*
-    Four-sheet report: reclaim only vertical whitespace so the final status
-    strip remains on sheet four instead of creating an almost-empty fifth page.
-    Type sizes and content width stay unchanged.
-  */
-  body.dashboard-printing footer{
-    display:block!important;
-    position:fixed!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    z-index:20!important;
-    margin:0!important;
-    padding:3px 5px!important;
-    border-top:1px solid #8aaeb3!important;
-    background:#fff!important;
-    color:#064c3b!important;
-    font-size:7.5pt!important;
-    line-height:1.2!important;
-  }
-  body.dashboard-printing .g4,
-  body.dashboard-printing .g3,
-  body.dashboard-printing .g2,
-  body.dashboard-printing .gauges-row{
-    gap:5px!important;
-    margin-bottom:5px!important;
-  }
-  body.dashboard-printing .cd{
-    padding:8px!important;
-    margin-bottom:5px!important;
-  }
-  body.dashboard-printing .info-box,
-  body.dashboard-printing .live-counter{
-    padding:9px 11px!important;
-    margin-bottom:6px!important;
-  }
-  body.dashboard-printing .cum-counter{
-    padding:7px 10px!important;
-    margin-top:5px!important;
-  }
-  body.dashboard-printing .official-reference-box{
-    margin-bottom:6px!important;
-    padding:9px!important;
-  }
-  body.dashboard-printing .src{
-    margin-top:4px!important;
-    padding:4px 8px!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-  }
-  /* A section heading must travel with the first project card. */
-  body.dashboard-printing .section-title{
-    break-after:avoid-page!important;
-    page-break-after:avoid!important;
-    margin-bottom:8px!important;
-  }
-  body.dashboard-printing .section-title+div{
-    break-before:avoid-page!important;
-    page-break-before:avoid!important;
-  }
-  /* Keep Alt Fuels methodology attached to the charts above it. */
-  body.dashboard-printing .g2:has(+.fuel-methodology-card){
-    margin-bottom:3px!important;
-    break-after:avoid-page!important;
-    page-break-after:avoid!important;
-  }
-  body.dashboard-printing .g2:has(+.fuel-methodology-card)>.cd{
-    min-height:0!important;
-    padding:7px!important;
-    margin-bottom:0!important;
-  }
-  body.dashboard-printing .fuel-methodology-card{
-    display:block!important;
-    width:49%!important;
-    max-width:49%!important;
-    min-height:0!important;
-    margin:3px auto 4px 0!important;
-    padding:8px 10px!important;
-    break-before:avoid-page!important;
-    page-break-before:avoid!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-  }
-  body.dashboard-printing .fuel-methodology-card .ct{
-    margin-bottom:4px!important;
-    font-size:11pt!important;
-    line-height:1.2!important;
-  }
-  body.dashboard-printing .fuel-methodology-card .m{
-    margin:0!important;
-    white-space:pre-wrap!important;
-    font-size:8.5pt!important;
-    line-height:1.35!important;
-  }
-  /* Keep the final voyage sources and disclaimer on the preceding sheet. */
-  body.dashboard-printing .single-vessel-results .economic-box,
-  body.dashboard-printing .single-vessel-results .sensitivity-box{
-    margin-top:6px!important;
-    padding:8px!important;
-  }
-  body.dashboard-printing .single-vessel-results .economic-grid>div{
-    padding:6px!important;
-  }
-  body.dashboard-printing .single-vessel-results .sensitivity-row{
-    padding:4px 6px!important;
-  }
-  body.dashboard-printing .single-vessel-results .sources-register{
-    display:inline-block!important;
-    width:36%!important;
-    min-height:0!important;
-    margin:5px 1% 0 0!important;
-    padding:7px 9px!important;
-    vertical-align:top!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-  }
-  body.ar.dashboard-printing .single-vessel-results .sources-register{
-    margin:5px 0 0 1%!important;
-  }
-  body.dashboard-printing .single-vessel-results .sources-register summary{
-    font-size:9.5pt!important;
-    line-height:1.25!important;
-  }
-  body.dashboard-printing .single-vessel-results .sources-register+.vessel-warning{
-    display:inline-block!important;
-    width:63%!important;
-    min-height:0!important;
-    margin:5px 0 0!important;
-    padding:7px 9px!important;
-    vertical-align:top!important;
-    font-size:8.5pt!important;
-    line-height:1.35!important;
-    break-inside:avoid!important;
-    page-break-inside:avoid!important;
-  }
-}
+.geo-map{position:absolute;inset:0;width:100%;height:100%}.landmass{fill:url(#land);stroke:rgba(95,189,169,.14);stroke-width:1}.route-path{fill:none;stroke-linecap:round;stroke-linejoin:round}.suez-route{stroke:#48e2b1;stroke-width:4;filter:url(#suezGlow);stroke-dasharray:9 8;animation:routeDash 2.8s linear infinite}.cape-route{stroke:#f07a70;stroke-width:2.2;stroke-dasharray:5 7;opacity:.68;animation:routeDash 4.8s linear infinite}.port-dot{fill:#e7fff8;stroke:#36cfa1;stroke-width:2}.suez-focus{fill:#0c604f;stroke:#78f2ce;stroke-width:2;filter:url(#suezGlow);animation:suezPulse 2.6s ease-out infinite}.route-vessel{stroke:#f5fffc;stroke-width:1.3;filter:url(#suezGlow)}.vessel-suez{fill:#48e2b1}.vessel-cape{fill:#ef7a70;opacity:.85}.geo-label{fill:rgba(179,217,208,.48);font-size:8px;font-weight:800;letter-spacing:.18em}.suez-label{fill:#8ff2d3;font-size:9px;font-weight:900;letter-spacing:.08em}.cape-label{fill:rgba(247,161,153,.7);font-size:7px;font-weight:800;letter-spacing:.08em}.route-legend-card{position:absolute;left:4%;bo

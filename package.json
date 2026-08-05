@@ -1,0 +1,11 @@
+{
+  "name": "ceri-sc",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --check worker.js && node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
+}

@@ -1645,9 +1645,6 @@ function renderP0(M,res,yr,rk){
     .reduce((s, y) => s + calcYr(+y, rk).tR, 0);
 
   // Cumulative up to selected year
-  // Per-second rate (float, for live ticking)
-  const perSec = res.tR / (365.25*24*3600);
-
   const gaugesRow = document.createElement('div');
   gaugesRow.className = 'gauges-row';
 
@@ -1661,9 +1658,9 @@ function renderP0(M,res,yr,rk){
   const g1CumLbl = lang==='ar'
     ? '\u062a\u0631\u0627\u0643\u0645\u064a 2015\u2192' + yr
     : '2015\u2192' + yr + ' Total';
-  const g1NoMax  = lang==='ar' ? '\u0644\u0627 \u062d\u062f \u0623\u0642\u0635\u0649' : 'No upper limit';
+  const g1NoMax  = lang==='ar' ? '\u0645\u062c\u0645\u0648\u0639 \u0633\u0646\u0648\u064a \u062d\u0633\u0627\u0628\u064a' : 'Arithmetic annual sum';
   const g1CumLblWord = lang==='ar' ? '\u062a\u0631\u0627\u0643\u0645\u064a' : 'Cumulative';
-  const g1RateLbl = '+' + perSec.toFixed(1) + '/sec';
+  const g1RateLbl = lang==='ar' ? '\u0644\u064a\u0633 \u0642\u064a\u0627\u0633\u064b\u0627 \u0645\u0628\u0627\u0634\u0631\u064b\u0627' : 'Not a live measurement';
 
   g1.innerHTML =
     '<div class="ct" style="width:100%;text-align:center;font-size:13px">' + g1Title + '</div>' +
@@ -1686,7 +1683,7 @@ function renderP0(M,res,yr,rk){
         '<circle id="cum-dot" cx="32" cy="182" r="8" fill="#10b981" filter="url(#glow-c1)" style="transition:cx 2s,cy 2s"/>' +
         '<circle id="cum-dot2" cx="32" cy="182" r="4" fill="#fff" opacity=".9" style="transition:cx 2s,cy 2s"/>' +
         '<circle id="pulse-ring" cx="32" cy="182" r="12" fill="none" stroke="#10b981" stroke-width="1.5" opacity="0" style="transition:cx 2s,cy 2s"/>' +
-        '<text x="160" y="44" fill="#475569" font-size="20" font-weight="800" text-anchor="middle" font-family="DM Sans,sans-serif">\u221e</text>' +
+        '<text x="160" y="44" fill="#475569" font-size="20" font-weight="800" text-anchor="middle" font-family="DM Sans,sans-serif">\u03a3</text>' +
         '<text x="160" y="57" fill="#475569" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif">' + g1NoMax + '</text>' +
         '<text x="160" y="136" fill="#10b981" font-size="26" font-weight="800" text-anchor="middle" font-family="DM Sans,sans-serif" id="cum-big">\u2014</text>' +
         '<text x="160" y="155" fill="#06b6d4" font-size="10" font-weight="700" text-anchor="middle" font-family="DM Sans,sans-serif">M tCO\u2082</text>' +
@@ -1826,96 +1823,12 @@ function renderP0(M,res,yr,rk){
       setTimeout(pulsate, 2200);
     }
 
-    // Rate badge
-    if(rateBadge) rateBadge.textContent = '+' + perSec.toFixed(1) + ' /sec';
-
-    // ── Animate cumulative big number ──
-    const animDur=2200, t0=performance.now();
-    function animBig(now){
-      const p=Math.min(1,(now-t0)/animDur);
-      const eased=1-Math.pow(1-p,3);
-      const cur=cumUpToYr*eased;
-      if(cumBig) cumBig.textContent = (cur/1e6).toFixed(4);
-      if(p<1){ requestAnimationFrame(animBig); }
-      else{
-        let liveC = cumUpToYr;
-        // Tick every 3s
-        _gaugeIntervals.push(setInterval(()=>{
-          if(!document.getElementById('cum-big'))return;
-          liveC += perSec*2;
-          if(cumBig) cumBig.textContent = (liveC/1e6).toFixed(4);
-          if(cumStrip) cumStrip.textContent = (liveC/1e6).toFixed(4)+'M tCO₂';
-          if(tickEl2){
-            tickEl2.textContent = '+'+fmt(Math.round(perSec*3))+' tCO₂';
-            tickEl2.style.animation='none'; void tickEl2.offsetWidth;
-            tickEl2.style.animation='popUp .4s ease-out';
-          }
-          // Nudge dot slightly forward
-          const newFrac = Math.min(0.98, arcFill + (liveC-cumUpToYr)/cumUpToYr*0.03);
-          setDot(newFrac);
-        }, 2000));
-      }
-    }
-    requestAnimationFrame(animBig);
-
-    // ── Strip counter (below cum gauge) ──
-    if(cumStrip){
-      const s0=performance.now();
-      function animStrip(now){
-        const p=Math.min(1,(now-s0)/animDur);
-        const eased=1-Math.pow(1-p,3);
-        cumStrip.textContent=(cumUpToYr*eased/1e6).toFixed(4)+'M tCO₂';
-        if(p<1) requestAnimationFrame(animStrip);
-      }
-      requestAnimationFrame(animStrip);
-    }
-
-    // ── Year live counter (gauge 2 mini strip) ──
-    if(yrLiveVal){
-      if(isCurrentYrRte){
-        // Current year: show live CO2 avoided SO FAR this year
-        let yrVal = soFarVal;
-        yrLiveVal.textContent = fmt(yrVal) + ' tCO₂';
-        _gaugeIntervals.push(setInterval(()=>{
-          if(!document.getElementById('yr-live-val'))return;
-          yrVal += Math.round(perSec * 2);
-          yrLiveVal.textContent = fmt(yrVal) + ' tCO₂';
-        }, 2000));
-      } else {
-        // Historical year: just animate to full year value
-        const s0b=performance.now();
-        function animYr(now){
-          const p=Math.min(1,(now-s0b)/1800);
-          yrLiveVal.textContent=fmt(Math.round(res.tR*(1-Math.pow(1-p,3))))+' tCO₂';
-          if(p<1) requestAnimationFrame(animYr);
-          else yrLiveVal.textContent=fmt(res.tR)+' tCO₂';
-        }
-        requestAnimationFrame(animYr);
-      }
-    }
-
-    // ── Needle micro-pulse on gauge 2 ──
-    setTimeout(()=>{
-      if(!document.getElementById('needle-route-gauge'))return;
-      let nudge=0;
-      _gaugeIntervals.push(setInterval(()=>{
-        if(!document.getElementById('needle-route-gauge'))return;
-        nudge=(nudge+0.4)%2;
-        const np=routePct+nudge;
-        const R2=128, aLen2=R2*Math.PI;
-        const off=aLen2*(1-Math.min(100,np)/100);
-        const cx2p=160, cy2p=182;
-        const ang2=Math.PI-(Math.min(100,np)/100)*Math.PI;
-        const nx=(cx2p+R2*Math.cos(ang2)).toFixed(1);
-        const ny=(cy2p-R2*Math.sin(ang2)).toFixed(1);
-        const fe=document.getElementById('fill-route-gauge');
-        const ne=document.getElementById('needle-route-gauge');
-        const n2e=document.getElementById('needle2-route-gauge');
-        if(fe) fe.style.strokeDashoffset=off.toFixed(2);
-        if(ne){ ne.setAttribute('cx',nx); ne.setAttribute('cy',ny); }
-        if(n2e){ n2e.setAttribute('cx',nx); n2e.setAttribute('cy',ny); }
-      }, 4000));
-    }, 2500);
+    // Static governed totals: these are model outputs, not sensor feeds.
+    if(rateBadge) rateBadge.textContent = g1RateLbl;
+    if(cumBig) cumBig.textContent = '\u2248 ' + (cumUpToYr/1e6).toFixed(1);
+    if(cumStrip) cumStrip.textContent = '\u2248 ' + fmtCompact(cumUpToYr) + ' tCO₂';
+    if(tickEl2) tickEl2.textContent = lang==='ar' ? '\u062b\u0627\u0628\u062a \u062d\u062a\u0649 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a' : 'Fixed until data update';
+    if(yrLiveVal) yrLiveVal.textContent = (isCurrentYrRte?'\u2248 ':'') + fmtCompact(isCurrentYrRte?soFarVal:res.tR) + ' tCO₂';
 
   }, 120);
 

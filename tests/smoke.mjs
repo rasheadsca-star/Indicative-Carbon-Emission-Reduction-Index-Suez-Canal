@@ -19,6 +19,8 @@ assert.match(html, /Input completeness — not confidence/);
 assert.match(html, /Tank-to-Wake CO₂ Factors/);
 assert.doesNotMatch(html, /CO₂ Reduced Today \(est\.\)/);
 assert.doesNotMatch(html, /This Month \(est\.\)/);
+assert.doesNotMatch(html, /No upper limit/);
+assert.doesNotMatch(html, /\bperSec\b|liveC\s*\+=|g1RateLbl\s*=\s*['"]\+/);
 assert.match(css, /\.print-report-page:last-child/);
 assert.match(css, /font-size:12pt/);
 assert.match(worker, /\/api\/admin/);

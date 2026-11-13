@@ -2329,12 +2329,14 @@ async function adminLoad(){
   const body=document.getElementById('adminProjectBody'),health=document.getElementById('adminHealth');if(!body)return;
   try{
     const r=await fetch('/api/admin',{headers:{Accept:'application/json'}}),data=await r.json();
+    if(!body.isConnected)return; // Ignore late API responses after navigation or document teardown.
     if(!r.ok||!data.ok)throw new Error('offline');
     adminProjects=data.projects||[];adminRole=data.role||'viewer';adminDurable=true;body.innerHTML=adminProjectRows(adminProjects);
     if(health)health.innerHTML=`<strong>${lang==='ar'?'متصل':'Connected'}</strong><span>${adminEsc(data.storage)} · ${adminProjects.length} ${lang==='ar'?'مشروعات':'projects'} · ${adminEsc(adminRole)} · ${data.vesselProfiles} ${lang==='ar'?'سجلات سفن':'vessel records'}</span><small>${new Date(data.generatedAt).toLocaleString(lang==='ar'?'ar-EG':'en-GB')}</small>`;
     const storage=document.getElementById('adminStorageKpi');if(storage)storage.textContent=data.storage;
     const audit=document.getElementById('adminAudit');if(audit)audit.innerHTML=(data.audits||[]).map(x=>`<div><b>${adminEsc(x.action)}</b><span>${adminEsc(x.detail)}</span><small>${new Date(x.createdAt).toLocaleString(lang==='ar'?'ar-EG':'en-GB')}</small></div>`).join('')||`<p>${lang==='ar'?'لا توجد تعديلات مسجلة بعد.':'No recorded changes yet.'}</p>`;
   }catch(e){
+    if(!body.isConnected)return; // Avoid stale async DOM work after the view is removed.
     adminProjects=ADMIN_FALLBACK;adminDurable=false;adminRole='viewer';body.innerHTML=adminProjectRows(adminProjects);
     const storage=document.getElementById('adminStorageKpi');if(storage)storage.textContent=lang==='ar'?'مرجع محلي للقراءة فقط':'Read-only reference';
     if(health)health.innerHTML=`<strong>${lang==='ar'?'وضع قراءة احتياطي':'Read-only fallback'}</strong><span>${lang==='ar'?'قاعدة البيانات غير متاحة على هذا المضيف؛ تُعرض بيانات مرجعية محلية.':'Database is unavailable on this host; local reference data are shown.'}</span>`;

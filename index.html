@@ -556,32 +556,31 @@ function buildDashboardPrintReport(){
   return report;
 }
 
-function hasManualOverride(yr){const o=manualOverrides[String(yr)]||{};return Number.isFinite(+o.vessels)||Number.isFinite(+o.reduction);}
-function getYearTransit(yr){const o=manualOverrides[String(yr)]||{};return Number.isFinite(+o.vessels)&&+o.vessels>=0?+o.vessels:Y[yr].t;}
+function hasManualOverride(yr){const o=manualOverrides[String(yr)]||{};return o.vessels!==undefined && Number.isInteger(Number(o.vessels)) && Number(o.vessels)>=0;}
+function getYearTransit(yr){const o=manualOverrides[String(yr)]||{};return o.vessels!==undefined&&Number.isInteger(Number(o.vessels))&&+o.vessels>=0?+o.vessels:Y[yr].t;}
 function getYearSource(yr){const o=manualOverrides[String(yr)]||{};return hasManualOverride(yr)?(o.source||((lang==='ar'?'إدخال يدوي للمستخدم':'Manual user input'))):Y[yr].src;}
 function openManualModal(){
   const yr=+document.getElementById('ySel').value,o=manualOverrides[String(yr)]||{};
-  document.getElementById('manualVessels').value=Number.isFinite(+o.vessels)?o.vessels:Y[yr].t;
-  document.getElementById('manualReduction').value=Number.isFinite(+o.reduction)?o.reduction:'';
+  document.getElementById('manualVessels').value=o.vessels!==undefined&&Number.isInteger(+o.vessels)?o.vessels:Y[yr].t;
+  document.getElementById('manualReduction').value='';document.getElementById('manualReduction').disabled=true;
   document.getElementById('manualSource').value=o.source||'';
   document.getElementById('manualYearText').innerHTML=(lang==='ar'?'<b>السنة المختارة:</b> ':'<b>Selected year:</b> ')+yr+(hasManualOverride(yr)?' <span class="manual-indicator">'+(lang==='ar'?'بيانات يدوية':'MANUAL DATA')+'</span>':'');
   document.getElementById('manualModal').classList.add('open');
 }
 function closeManualModal(){document.getElementById('manualModal').classList.remove('open');}
 function applyManualData(){
-  const yr=+document.getElementById('ySel').value;
-  const vesselsRaw=document.getElementById('manualVessels').value.trim();
-  const reductionRaw=document.getElementById('manualReduction').value.trim();
+  const yr=Number(document.getElementById('ySel').value);
+  const raw=document.getElementById('manualVessels').value.trim();
   const source=document.getElementById('manualSource').value.trim();
-  const vessels=vesselsRaw===''?null:Number(vesselsRaw);
-  const reduction=reductionRaw===''?null:Number(reductionRaw);
-  if((vessels!==null&&(!Number.isFinite(vessels)||vessels<0))||(reduction!==null&&(!Number.isFinite(reduction)||reduction<0))){
-    alert(lang==='ar'?'أدخل أرقامًا صحيحة غير سالبة.':'Enter valid non-negative numbers.');return;
+  if(raw==='' || !/^[0-9]+$/.test(raw) || !Number.isSafeInteger(Number(raw))){
+    alert(lang==='ar'?'أدخل عدد سفن صحيحًا غير سالب.':'Enter a non-negative whole-number vessel count.');return;
+  }
+  if(Number(raw)!==Y[yr].t && !source){
+    alert(lang==='ar'?'يلزم توثيق مصدر بيانات السيناريو.':'A source is required for scenario traffic data.');return;
   }
   const o={};
-  if(vessels!==null&&vessels!==Y[yr].t)o.vessels=Math.round(vessels);
-  if(reduction!==null)o.reduction=Math.round(reduction);
-  if(source)o.source=source;
+  if(Number(raw)!==Y[yr].t)o.vessels=Number(raw);
+  if(o.vessels!==undefined)o.source=source;
   if(Object.keys(o).length)manualOverrides[String(yr)]=o;else delete manualOverrides[String(yr)];
   storeSet('localStorage',MANUAL_STORE_KEY,JSON.stringify(manualOverrides));
   closeManualModal();render();
@@ -646,9 +645,9 @@ function updateUtilityLabels(){
   document.getElementById('feedbackSubmit').textContent=ar?'إرسال':'Send';
   document.getElementById('manualTitle').textContent=ar?'إدخال البيانات يدويًا':'Manual Data Override';
   document.getElementById('vesselLabel').textContent=ar?'عدد السفن العابرة':'Vessel transits';
-  document.getElementById('vesselHelp').textContent=ar?'يستبدل عدد السفن للسنة المختارة ويعيد حساب جميع نتائج المسارات.':"Overrides the selected year's vessel count and recalculates all route results.";
-  document.getElementById('reductionLabel').textContent=ar?'الخفض السنوي التقديري (طن CO₂)':'Estimated annual CO₂ reduction (tCO₂)';
-  document.getElementById('reductionHelp').textContent=ar?'اختياري: اتركه فارغًا لاستخدام التقدير الحسابي للنموذج.':'Optional direct override. Leave blank to use the modelled estimate.';
+  document.getElementById('vesselHelp').textContent=ar?'سيناريو مستخدم منفصل، وليس بيانات ملاحة رسمية. يلزم إدخال المصدر.':"User-supplied scenario, not official traffic data. Cite the data source.";
+  document.getElementById('reductionLabel').textContent=ar?'تعديل خفض CO₂ المباشر — غير مسموح':'Direct CO₂ override — disabled';
+  document.getElementById('reductionHelp').textContent=ar?'لا يمكن إدخال خفض CO₂ مباشرة؛ ينتج فقط من نموذج الحساب.':'Direct CO₂ reduction overrides are prohibited; results are model-calculated.';
   document.getElementById('sourceLabel').textContent=ar?'المصدر / ملاحظة':'Source / note';
   document.getElementById('manualReduction').placeholder=ar?'اختياري':'Optional';
   document.getElementById('manualSource').placeholder=ar?'مثال: تقرير تشغيلي لهيئة قناة السويس — يونيو 2026':'Example: SCA operational report — June 2026';
@@ -1479,14 +1478,12 @@ function calcYr(yr,rk){
     bt.forEach(x=>{x.tot=Math.round(x.tot*scale);x.ps=x.n?Math.round(x.tot/x.n):0;});
   }
   bt.sort((a,b)=>b.tot-a.tot);
-  const o=manualOverrides[String(yr)]||{};
-  if(Number.isFinite(+o.reduction)&&+o.reduction>=0&&tR>0){
-    const target=+o.reduction,scale=target/tR;
-    bt.forEach(x=>{x.tot=Math.round(x.tot*scale);x.ps=Math.round(x.ps*scale);});
-    tR=Math.round(target);tC=tR;
-  }
-  const manualReduction=Number.isFinite(+o.reduction)&&+o.reduction>=0;
-  return{tR:Math.round(tR),low:manualReduction?Math.round(tR):annual.low,high:manualReduction?Math.round(tR):annual.high,tS:0,tC:Math.round(tC),ap:tot>0?(tR/tot).toFixed(1):'0',bt,tot,src:annual.label,trafficSrc:getYearSource(yr),official:annual.official,status:manualReduction?'manual-override':annual.status,sourceName:annual.sourceName||'',sourceUrl:annual.sourceUrl||'',rate:annual.rate,routeIndependent:true,manual:hasManualOverride(yr)};
+  const scenario=hasManualOverride(yr);
+  return{tR:Math.round(tR),low:annual.low,high:annual.high,tS:0,tC:Math.round(tC),ap:tot>0?(tR/tot).toFixed(1):'0',bt,tot,
+    src:annual.label,trafficSrc:getYearSource(yr),official:scenario?false:annual.official,
+    status:scenario?'user-scenario':annual.status,
+    sourceName:scenario?getYearSource(yr):(annual.sourceName||''),sourceUrl:scenario?'':(annual.sourceUrl||''),
+    rate:annual.rate,routeIndependent:true,manual:scenario};
 }
 function allYears(rk){return Object.keys(Y).map(yr=>({yr:+yr,res:calcYr(yr,rk)}));}
 function cumulative(rk){let c=0,low=0,high=0;return Object.keys(Y).map(yr=>{const r=calcYr(yr,rk);c+=r.tR;low+=r.low;high+=r.high;return{yr:+yr,cum:c,low,high};});}

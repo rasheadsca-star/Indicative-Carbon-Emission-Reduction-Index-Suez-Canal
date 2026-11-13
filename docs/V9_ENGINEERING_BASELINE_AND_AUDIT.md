@@ -32,3 +32,12 @@ Only merge after CI success and reviewer inspection. The published GitHub Pages 
 - **Open gate:** no authenticated live SCA feed or externally validated historical category counts; do not substitute the unverified CSV for official observations, actual vessel fuel usage, or IMO-vetted GHG factors.
 - **Open gate:** independent visual/browser accessibility testing and enterprise storage/role-based audit for imported datasets are not complete.
 - The user requested Claude review only **at project completion**; not triggered.
+
+## Developer / critic — period coverage and provenance cycle 3 (2026-11-14)
+- Built `navigation-analysis.mjs`: computes daily reconciled observations; monthly and annual values are shown **only** with all calendar days and both directions present, including leap years. Incomplete periods display `null`, not zero or annualised figures.
+- Added a monthly/annual coverage table within `navigation-data.html` and included coverage data in the non-verified JSON export.
+- Tests include 366 days for 2024; partial periods, a missing direction, no category totals, and the failure to infer missing dates.
+- **Critic finding:** widely separated dates could cause excess calendar allocation; limited import analysis to a 20-year span.
+- **Critic finding:** cross-day comparable-provenance flag did not assess publisher changes; added an across-day source check without requiring identical publication dates.
+- Monthly and annual `complete=true` indicates structural coverage only. It **never** means SCA official verification, verified ship-type splits, complete WtW emissions, or entitlement to a green transit certificate.
+- Unresolved: no authenticated SCA daily source connection, no checked historical fleet mix, no AIS voyage-level validation, no authorized carbon accounting approval, and no real-browser acceptance test. Remain on draft PR until evidence exists.

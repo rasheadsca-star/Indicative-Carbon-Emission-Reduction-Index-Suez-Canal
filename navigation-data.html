@@ -31,24 +31,32 @@ code{direction:ltr;unicode-bidi:isolate}
 <p><a href="./navigation-template.csv" download>تحميل قالب CSV توضيحي</a> — بياناته افتراضية للاختبار وليست إحصاءات فعلية.</p>
 </section>
 <section class="panel"><h2>2. التحقق</h2><p id="status" aria-live="polite">لم يتم استيراد بيانات.</p><div id="issues"></div></section>
-<section class="panel"><h2>3. ملخص النتائج</h2><p id="summaryNote">لا توجد نتائج حتى الآن.</p>
+<section class="panel"><h2>3. ملخص النتائج اليومية</h2><p id="summaryNote">لا توجد نتائج حتى الآن.</p>
 <div class="scroller"><table><thead><tr><th>التاريخ</th><th>الاتجاه</th><th>السفن</th><th>الحمولة الصافية</th><th>الاكتمال</th><th>المصدر وتاريخه</th><th>حالة التحقق</th></tr></thead><tbody id="rows"></tbody></table></div>
 <p><button id="exportBtn" disabled>تصدير JSON بعد التحقق الحسابي</button></p>
 <small>يتم جمع الصفوف التفصيلية دون تكرار صف TOTAL. تصدير JSON يوضح أن البيانات مستوردة وغير متحقق منها، ولا ينقلها تلقائيًا إلى النموذج الحسابي.</small>
+</section>
+<section class="panel"><h2>4. تحليل التغطية الشهرية والسنوية</h2>
+<p id="coverageNote">لا يوجد ملف مستورد. مجاميع الفترات الناقصة غير متاحة، ولا تُستنتج من متوسطات الأيام.</p>
+<div class="scroller"><table><thead><tr><th>الفترة</th><th>أيام مصالحة/أيام متوقعة</th><th>عدد السفن</th><th>الحمولة الصافية</th><th>اكتمال الأنواع</th><th>حالة البيانات</th></tr></thead><tbody id="periodRows"></tbody></table></div>
+<p class="notice">الاكتمال الزمني والحسابي لا يعني التحقق من المصدر. تُمنع مقارنة إجماليات سنوية غير مكتملة على أنها إحصاءات فعلية.</p>
 </section>
 </main>
 <footer>Research intake module · Not an approved MRV statement · Not a certificate</footer>
 <script type="module">
 import {parseNavigationCSV} from "./navigation-data.mjs";
+import {buildNavigationIntelligence} from "./navigation-analysis.mjs";
 const file=document.getElementById("csvFile");
 const status=document.getElementById("status");
 const issues=document.getElementById("issues");
 const tbody=document.getElementById("rows");
 const exportBtn=document.getElementById("exportBtn");
+const periodBody=document.getElementById("periodRows");
+const coverageNote=document.getElementById("coverageNote");
 let latest=null;
 function td(tr,value){const cell=document.createElement("td");cell.textContent=String(value??"غير متاح");tr.appendChild(cell)}
 file.addEventListener("change",async()=>{
-  latest=null;exportBtn.disabled=true;tbody.replaceChildren();issues.replaceChildren();
+  latest=null;exportBtn.disabled=true;tbody.replaceChildren();periodBody.replaceChildren();issues.replaceChildren();coverageNote.textContent="لا يوجد تحليل حتى اكتمال الاستيراد.";
   const selected=file.files?.[0];if(!selected)return;
   if(selected.size>5_000_000){status.textContent="حجم الملف أكبر من الحد المسموح (5 MB).";return}
   try{
@@ -58,7 +66,14 @@ file.addEventListener("change",async()=>{
       issues.className="error";issues.textContent=result.errors.map(x=>"صف "+(x.line??"—")+": "+x.message).join("\n");
       return;
     }
-    latest={version:"CERI-SC-navigation-import-v1",importedAt:new Date().toISOString(),verification:"unverified-import",records:result.records,summaries:result.summaries,warnings:result.warnings};
+    const analysis=buildNavigationIntelligence(result);
+    latest={version:"CERI-SC-navigation-import-v2",importedAt:new Date().toISOString(),verification:"unverified-import",records:result.records,summaries:result.summaries,warnings:result.warnings,analysis};
+    coverageNote.textContent="الأيام المرصودة: "+analysis.observedDates+" | أيام غائبة بين أول وآخر سجل: "+analysis.gapCount+" | لا يوجد اعتماد رسمي.";
+    for(const period of [...analysis.monthly,...analysis.yearly]){
+      const tr=document.createElement("tr");
+      for(const value of [period.period,period.coverage,period.vesselCount,period.netTonnage,period.categoryComplete?"مكتمل بنيويًا":"غير مكتمل",period.status])td(tr,value);
+      periodBody.appendChild(tr);
+    }
     status.textContent="اجتاز "+result.records.length+" صف التحقق الحسابي والبنيوي؛ المصدر لا يزال غير معتمد.";
     status.className="success";
     issues.className="notice";issues.textContent=result.warnings.join("\n");

@@ -68,7 +68,12 @@ export function buildNavigationIntelligence(importResult){
     const accepted=observed.filter(d=>d.aggregateComplete);
     const complete=accepted.length===requiredDates.length;
     const allCategories=complete&&accepted.every(d=>d.categoryComplete);
-    const sameProvenance=complete&&accepted.every(d=>d.comparableProvenance);
+    // Comparable provenance is a within-day and across-day property.
+    const sameProvenance=complete&&accepted.every(d=>d.comparableProvenance)&&
+      new Set(accepted.map(d=>{
+        const ref=index.get(groupKey(d.date,"northbound"));
+        return ref.source+"|"+ref.sourceDate;
+      })).size===1;
     const cat={};
     if(allCategories){
       for(const day of accepted)for(const [name,count] of Object.entries(day.categories)){
@@ -91,6 +96,9 @@ export function buildNavigationIntelligence(importResult){
   });
   const yearly=years.map(year=>periodSummary(String(year),daysInYear(year)));
   const minDate=dates[0],maxDate=dates[dates.length-1];
+  // A hostile or accidental very-wide date range must not allocate millions of calendar rows.
+  if(new Date(maxDate+"T00:00:00Z").getTime()-new Date(minDate+"T00:00:00Z").getTime()>20*366*86400000)
+    throw Error("Imported date span exceeds 20 years; split into smaller datasets");
   const calendar=dayRange(minDate,maxDate);
   const missingDates=calendar.filter(date=>!datesIndex.has(date));
   return {verification:"unverified-import",dayRows,monthly,yearly,

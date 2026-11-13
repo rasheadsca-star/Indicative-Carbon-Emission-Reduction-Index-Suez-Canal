@@ -21,3 +21,14 @@ V9 in this repository is the **single primary development baseline**. The separa
 
 ## Acceptance and deployment
 Only merge after CI success and reviewer inspection. The published GitHub Pages main branch is unchanged by this development branch. No official Green Transit Certificate or actual carbon credit is produced. Claude review is deferred to project end.
+
+## Developer / critic — navigation intake cycle 2 (2026-11-14)
+- Added `navigation-data.mjs` with bounded CSV parsing, ISO date validation, explicit source provenance and categorical reconciliation.
+- Added `navigation-data.html` (Arabic, RTL), reachable from the V9 header; exports records labelled `unverified-import` without changing route-engine inputs.
+- Added `navigation-template.csv`, **synthetic only**, and `tests/navigation-data.mjs`; these tests run inside the existing CI quality gate.
+- **Critic finding:** percentage-based tonnage matching allowed nontrivial discrepancies on large aggregated tonnages. Tightened to 0.01 absolute-unit tolerance and re-ran CI.
+- A `TOTAL` record is never added to its category records; day/direction/type duplicates are rejected. A missing category breakdown stays explicitly incomplete; missing net tonnage is `null`, not zero.
+- Mixed source provenance and incomplete aggregate/category coverage produce warnings, never silent official status.
+- **Open gate:** no authenticated live SCA feed or externally validated historical category counts; do not substitute the unverified CSV for official observations, actual vessel fuel usage, or IMO-vetted GHG factors.
+- **Open gate:** independent visual/browser accessibility testing and enterprise storage/role-based audit for imported datasets are not complete.
+- The user requested Claude review only **at project completion**; not triggered.

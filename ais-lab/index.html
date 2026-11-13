@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08292f">
+<meta name="description" content="CERI-SC AIS Lab — experimental Suez Canal vessel observatory, research only, not official ship transit counts.">
+<title>CERI-SC | AIS Live Traffic Lab</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyo5CSf9JJ2Ks4=" crossorigin="">
+<style>
+:root{--navy:#071f26;--deep:#0d3038;--mint:#34dbb1;--teal:#078777;--paper:#f4f5f0;--white:#fff;--ink:#14343a;--muted:#668084;--line:#dfe6e1;--amber:#8b5800;--panel:#fff;--shadow:0 18px 50px #103b3d0a}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Tahoma,"Segoe UI",Arial,sans-serif;line-height:1.6}a{color:#087f74}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}header{background:var(--navy);color:#fff;border-bottom:3px solid var(--mint)}.top{max-width:1600px;margin:auto;min-height:88px;padding:14px 34px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}.brand{display:flex;gap:14px;align-items:center}.symbol{display:grid;place-items:center;width:48px;height:48px;background:#154149;border:1px solid #32746d;border-radius:12px;font-size:23px}.brand h1{font-size:19px;line-height:1.3;margin:0;font-weight:800;letter-spacing:.01em}.brand small{display:block;color:#9ec5c2;font-size:11px;direction:ltr;text-align:right;margin-top:3px}.headlinks{display:flex;gap:10px;flex-wrap:wrap}.headlinks a{color:#d4eae5;border:1px solid #416068;padding:8px 13px;border-radius:7px;text-decoration:none;font-size:12px}.headlinks a:hover{background:#1a4a50}main{max-width:1600px;margin:auto;padding:28px 34px 60px}.intro{display:flex;justify-content:space-between;align-items:start;gap:20px;flex-wrap:wrap;margin-bottom:21px}.intro .eyebrow{color:#087e74;font-size:11px;font-weight:800;letter-spacing:.16em;direction:ltr;text-align:right}.intro h2{margin:2px 0 6px;font-size:clamp(23px,2.4vw,34px);line-height:1.25}.intro p{margin:0;color:var(--muted);font-size:13px;max-width:800px}.statebox{background:#fff;border:1px solid var(--line);padding:10px 14px;border-radius:10px;box-shadow:var(--shadow);min-width:220px}.statebox small{font-size:11px;color:var(--muted);display:block}.state{font-size:15px;font-weight:800;color:#445c61}.state:before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:#90a2a2;margin-left:7px}.state[data-kind=connected]:before{background:#0abf8b;box-shadow:0 0 0 4px #dbf8ed}.state[data-kind=pending]:before{background:#eca52b}.state[data-kind=error]:before{background:#c44444}.warning{background:#fff4dc;border:1px solid #ead5a7;color:#694c12;padding:13px 17px;border-radius:10px;font-size:12px;margin-bottom:22px}.warning strong{font-weight:800}.metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:13px;margin-bottom:22px}.metric{background:#fff;border:1px solid var(--line);border-radius:12px;padding:17px 18px;box-shadow:var(--shadow);min-width:0}.metric small{display:block;color:var(--muted);font-size:11px;line-height:1.6}.metric strong{display:block;font-size:27px;color:#0d3941;line-height:1.2;margin-top:8px;direction:ltr;text-align:right;font-family:"Segoe UI",Arial,sans-serif}.metric.accent{background:var(--navy);border-color:var(--navy)}.metric.accent small{color:#abccc6}.metric.accent strong{color:#64ebc4}.main-grid{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(300px,.8fr);gap:20px;margin-bottom:20px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}.panelhead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.panelhead h3{margin:0;font-size:15px}.panelhead small{color:var(--muted);font-size:11px}.mapwrap{position:relative;background:#d1e0dc;height:505px}#map{height:100%;width:100%;z-index:1}.mapfallback{position:absolute;inset:0;display:grid;place-items:center;background:#dce7e3;color:#426366;font-size:14px;z-index:2}.mapfallback[hidden]{display:none}.legend{display:flex;gap:15px;align-items:center;flex-wrap:wrap;padding:12px 18px;font-size:11px;color:#576e70}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-left:5px}.north{background:#62c6fa}.canal{background:#20cfac}.south{background:#ffb873}.controls{padding:19px;display:grid;gap:13px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}button{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#f5f8f5;color:#17444a;font-size:12px;font-weight:800}.primary{background:#0c766b;color:white;border-color:#0c766b}.stop{background:#fff0e8;color:#8c4932;border-color:#efc4ad}.actions button:hover:not(:disabled){filter:brightness(.95)}.detail{border-top:1px solid var(--line);padding-top:13px;display:grid;gap:10px}.detailrow{display:flex;align-items:baseline;justify-content:space-between;gap:7px;font-size:12px}.detailrow span{color:var(--muted)}.detailrow strong{font-size:12px;text-align:left;direction:ltr}.notice{background:#e8f5f1;padding:11px;border-radius:8px;color:#18594f;font-size:11px;line-height:1.7;min-height:54px}.error{color:#a34037;font-size:11px;overflow-wrap:anywhere;min-height:30px}.side-note{font-size:11px;color:#576f73;border-top:1px solid var(--line);padding-top:11px}.sectiongap{margin-top:20px}.filters{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.filters input,.filters select{background:#fff;border:1px solid #cadad4;border-radius:7px;padding:8px 11px;font-size:12px;color:#25464b;min-width:120px}.filters input{width:210px}.tablewrap{overflow:auto;max-height:430px}.tablewrap table{border-collapse:collapse;width:100%;min-width:700px;direction:rtl}th{background:#f6f8f5;color:#6a7f7e;font-size:11px;white-space:nowrap;position:sticky;top:0;text-align:right}td{font-size:12px;color:#314d50}th,td{padding:12px 14px;border-bottom:1px solid #edf0ed}tbody tr:hover{background:#f3faf6}.mono{font-family:Consolas,monospace;direction:ltr;text-align:right;font-size:11px}.vesselname{font-weight:800}.empty{padding:25px;text-align:center;color:#768987;font-size:12px}.foot{background:#fff;border:1px solid var(--line);border-radius:11px;padding:17px 20px;margin-top:21px}.foot h4{font-size:13px;margin:0 0 8px}.foot p{color:#5a7375;margin:4px 0;font-size:11px}.foot code{direction:ltr;display:inline-block;color:#385b5e}.foot a{overflow-wrap:anywhere}.leaflet-popup-content{font-family:Arial,sans-serif;line-height:1.8}.leaflet-control-attribution{font-size:10px!important}@media(max-width:1200px){.metrics{grid-template-columns:repeat(3,1fr)}.main-grid{grid-template-columns:1fr}}@media(max-width:640px){main{padding:18px 12px 35px}.top{padding:12px}.brand h1{font-size:15px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:13px}.metric strong{font-size:24px}.mapwrap{height:390px}.panelhead{padding:13px}.filters input{width:100%}.filters{width:100%}.filters select{flex:1}.controls{padding:14px}.headlinks{width:100%}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="brand">
+      <div class="symbol" aria-hidden="true">⛴</div>
+      <div><h1>CERI-SC | مرصد الحركة الملاحية</h1><small>SU​EZ CANAL · AIS LIVE TRAFFIC LAB · PILOT 0.1</small></div>
+    </div>
+    <div class="headlinks"><a href="../">المنصة الرئيسية</a><a href="../next/">Vessel Intelligence</a><a href="https://openwaters.io/ais/" target="_blank" rel="noopener noreferrer">المصدر AIS</a></div>
+  </div>
+</header>
+<main>
+  <div class="intro">
+    <div>
+      <div class="eyebrow">EXPERIMENTAL / RESEARCH USE ONLY</div>
+      <h2>رصد تجريبي لحركة السفن في قناة السويس</h2>
+      <p>متابعة مواقع السفن من رسائل AIS المتاحة، مع تصنيف السفن والاقتراب من القناة واستنتاج عبور محتمل فقط عند رصد تسلسل مكاني وزمني كافٍ.</p>
+    </div>
+    <div class="statebox"><small>حالة البث</small><div class="state" data-id="state" data-kind="idle">Not started</div></div>
+  </div>
+  <div class="warning">
+    <strong>تنبيه منهجي:</strong> هذه أداة بحثية عامة وليست نظامًا رسميًا لهيئة قناة السويس. تغطية AIS قد تكون ناقصة أو متأخرة. لا تعتبر أعداد السفن المرصودة إجمالي حركة القناة، ولا يعتبر العبور المستنتج إثباتًا رسميًا. لا توجد هنا قياسات فعلية للوقود أو انبعاثات CO₂ أو شهادات وفورات معتمدة.
+  </div>
+  <section class="metrics" aria-label="مؤشرات الرصد">
+    <div class="metric"><small>سفن حديثة الرصد (آخر 30 دقيقة)</small><strong data-id="observed">0</strong></div>
+    <div class="metric"><small>داخل الممر التقريبي</small><strong data-id="canal">0</strong></div>
+    <div class="metric"><small>المنطقة الشمالية</small><strong data-id="north">0</strong></div>
+    <div class="metric"><small>المنطقة الجنوبية</small><strong data-id="south">0</strong></div>
+    <div class="metric accent"><small>عبور محتمل خلال جلسة الرصد</small><strong data-id="transits">0</strong></div>
+    <div class="metric"><small>رسائل AIS المستقبلة في الجلسة</small><strong data-id="liveMessages">0</strong></div>
+  </section>
+  <div class="main-grid">
+    <section class="panel" aria-label="خريطة رصد السفن">
+      <div class="panelhead"><div><h3>الخريطة الملاحية التجريبية</h3><small>العلامات تمثل آخر موقع معروف، وليست موقعًا مؤكدًا في هذه اللحظة</small></div><small>© OpenStreetMap · Open Waters AIS</small></div>
+      <div class="mapwrap"><div id="map" data-id="map" aria-label="Suez Canal AIS map"></div><div class="mapfallback" data-id="mapFallback" hidden>الخريطة غير متاحة · استخدم جدول السفن أدناه</div></div>
+      <div class="legend"><span><i class="dot north"></i>المداخل الشمالية</span><span><i class="dot canal"></i>ممر القناة التقريبي</span><span><i class="dot south"></i>المداخل الجنوبية</span><span>العلامات والحدود للبحث وليست خرائط ملاحة معتمدة</span></div>
+    </section>
+    <section class="panel" aria-label="التحكم والمصدر">
+      <div class="panelhead"><div><h3>التحكم في الاتصال</h3><small>Open Waters AIS · WebSocket / GeoJSON</small></div></div>
+      <div class="controls">
+        <div class="actions">
+          <button class="primary" data-id="start" type="button">▶ بدء الرصد</button>
+          <button class="stop" data-id="stop" type="button" disabled>■ إيقاف الرصد</button>
+          <button data-id="snapshot" type="button">↻ تحديث اللقطة</button>
+          <button data-id="export" type="button">↓ تصدير عبور CSV</button>
+        </div>
+        <button data-id="reset" type="button">مسح بيانات هذه الجلسة</button>
+        <div class="detail">
+          <div class="detailrow"><span>اتصال المصدر</span><strong data-id="connection">Not started</strong></div>
+          <div class="detailrow"><span>فئة الوصول</span><strong data-id="tier">—</strong></div>
+          <div class="detailrow"><span>آخر رسالة مباشرة</span><strong data-id="lastEvent">—</strong></div>
+          <div class="detailrow"><span>آخر لقطة</span><strong data-id="lastSnapshot">—</strong></div>
+          <div class="detailrow"><span>حداثة أحدث موقع مرصود</span><strong data-id="freshness">—</strong></div>
+        </div>
+        <div class="notice" data-id="notice" role="status">لم يبدأ استقبال بيانات AIS بعد.</div>
+        <div class="error" data-id="error" role="alert"></div>
+        <div class="side-note">الرصد يعمل أثناء فتح الصفحة فقط. لا يوجد تجميع تلقائي على خادم أو سجل يومي مستمر. التحديثات اللحظية مرتبطة بجودة الاتصال بالمصدر. أرقام العبور تبدأ من الصفر لكل جلسة.</div>
+      </div>
+    </section>
+  </div>
+  <section class="panel sectiongap">
+    <div class="panelhead">
+      <div><h3>سجل السفن المرصودة</h3><small>نتائج التصفية: <span data-id="visible">0</span> · قد تكون معلومات الاسم والنوع غير مكتملة</small></div>
+      <div class="filters">
+        <input data-id="search" aria-label="اسم السفينة أو MMSI" placeholder="اسم السفينة أو MMSI" autocomplete="off">
+        <select data-id="type" aria-label="نوع السفينة"><option value="all">كل الأنواع</option><option value="Cargo">Cargo</option><option value="Tanker">Tanker</option><option value="Passenger">Passenger</option><option value="Special">Special</option><option value="High-speed / service">Service</option><option value="Other">Other</option><option value="Unknown">Unknown</option></select>
+        <select data-id="zone" aria-label="منطقة الرصد"><option value="all">كل المناطق</option><option value="north">الشمال</option><option value="canal">داخل الممر</option><option value="south">الجنوب</option></select>
+      </div>
+    </div>
+    <div class="tablewrap"><table><thead><tr><th>السفينة</th><th>MMSI</th><th>النوع</th><th>الموقع التقريبي</th><th>السرعة</th><th>عمر الموقع</th><th>المصدر</th></tr></thead><tbody data-id="rows"></tbody></table><div class="empty" data-id="empty">لا توجد مواقع حديثة متاحة طبقًا لمصدر البيانات أو خيارات التصفية.</div></div>
+  </section>
+  <section class="panel sectiongap">
+    <div class="panelhead"><div><h3>عبور محتمل مستنتج من AIS</h3><small>يشترط رصد بوابة دخول، وموقع في الممر، وبوابة خروج مقابلة بفاصل بين 3 و48 ساعة؛ لا يُعدّ إحصاءً رسميًا</small></div></div>
+    <div class="tablewrap"><table><thead><tr><th>السفينة</th><th>الاتجاه</th><th>دخول تقديري (القاهرة)</th><th>خروج تقديري (القاهرة)</th><th>المدة</th><th>الحالة</th></tr></thead><tbody data-id="passageRows"></tbody></table><div class="empty" data-id="passageEmpty">لم يكتمل تسلسل عبور خلال جلسة المتصفح الحالية.</div></div>
+  </section>
+  <section class="foot">
+    <h4>حوكمة البيانات وربط CERI-SC</h4>
+    <p>مصدر البيانات: <a href="https://openwaters.io/ais/" target="_blank" rel="noopener noreferrer">Open Waters AIS</a>، مع الإسناد الخاص بكل مصدر أصلي للبيانات. شروط الترخيص تختلف حسب المصدر، ولا يُفترض السماح بالاستخدام التجاري أو إعادة النشر دون مراجعتها.</p>
+    <p><strong>الإسناد المتاح من المصدر:</strong> <span data-id="license">Open Waters AIS — source attribution per vessel.</span></p>
+    <p>يصلح سجل CSV كمدخل بحثي للمراجعة وربط السفن بنموذج CERI-SC عند توافر رقم IMO ومواصفات السفينة وبيانات محركها. لا تُحسب الوفورات أو تُصدر الشهادات آليًا من AIS وحده.</p>
+    <p>المنطقة: <code>29.70–31.65 N / 31.90–32.85 E</code> | النسخة: <code>AIS LAB 0.1 — 14 NOV 2026</code></p>
+  </section>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>

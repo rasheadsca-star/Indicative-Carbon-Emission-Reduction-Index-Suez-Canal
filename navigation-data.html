@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CERI-SC V9 — استيراد إحصاءات الملاحة</title>
+<style>
+:root{font-family:system-ui,"Segoe UI",sans-serif;color-scheme:dark}
+*{box-sizing:border-box}body{background:#061a23;color:#edf8fa;margin:0;line-height:1.65}
+header,main,footer{max-width:1100px;margin:auto;padding:18px 24px}
+a{color:#55e3c0}h1{font-size:1.55rem}h2{font-size:1.12rem}
+.panel{background:#0d2630;border:1px solid #31535e;border-radius:12px;padding:18px;margin:15px 0}
+.notice{color:#f5d68a}input,button{font:inherit;border-radius:7px;padding:8px}
+input{background:#071922;color:white;border:1px solid #4a7882;max-width:100%}
+button{background:#20c997;color:#041c18;border:0;font-weight:700;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+table{border-collapse:collapse;width:100%;min-width:670px}th,td{padding:8px;text-align:start;border-bottom:1px solid #31535e;font-size:.85rem}th{color:#9edace}
+.scroller{overflow-x:auto}#issues{white-space:pre-wrap;overflow-wrap:anywhere}
+small{color:#b5cbd0}.error{color:#ffafab}.success{color:#70e3b8}
+code{direction:ltr;unicode-bidi:isolate}
+</style>
+</head>
+<body>
+<header><a href="./">← العودة إلى CERI-SC V9</a>
+<h1>استيراد إحصاءات حركة الملاحة — وحدة تجريبية</h1>
+<p class="notice">لا يوجد اتصال مباشر بقاعدة بيانات هيئة قناة السويس. جميع الملفات المستوردة غير متحقق منها مؤسسيًا، ولا تغير مؤشرات المحرك الأصلي أو تُصدر شهادات معتمدة.</p></header>
+<main>
+<section class="panel"><h2>1. إعداد الملف</h2>
+<p>ارفع ملف CSV بترميز UTF-8. تاريخ اليوم وتاريخ المصدر بصيغة YYYY-MM-DD؛ الاتجاه <code>northbound</code> أو <code>southbound</code>؛ والنوع <code>TOTAL</code> للإجمالي المستقل، أو مسمى فئة السفينة. اجعل حقل الحمولة الصافية فارغًا عند عدم توافره، ولا تستخدم الصفر بدلًا من البيانات المفقودة.</p>
+<p>حالات المصدر المسموحة: <code>source-reported</code> أو <code>provisional</code> أو <code>scenario</code>. كتابة source-reported لا تجعل البيانات رسمية أو معتمدة تلقائيًا.</p>
+<input id="csvFile" type="file" accept=".csv,text/csv" aria-label="ملف CSV">
+<p><a href="./navigation-template.csv" download>تحميل قالب CSV توضيحي</a> — بياناته افتراضية للاختبار وليست إحصاءات فعلية.</p>
+</section>
+<section class="panel"><h2>2. التحقق</h2><p id="status" aria-live="polite">لم يتم استيراد بيانات.</p><div id="issues"></div></section>
+<section class="panel"><h2>3. ملخص النتائج</h2><p id="summaryNote">لا توجد نتائج حتى الآن.</p>
+<div class="scroller"><table><thead><tr><th>التاريخ</th><th>الاتجاه</th><th>السفن</th><th>الحمولة الصافية</th><th>الاكتمال</th><th>المصدر وتاريخه</th><th>حالة التحقق</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p><button id="exportBtn" disabled>تصدير JSON بعد التحقق الحسابي</button></p>
+<small>يتم جمع الصفوف التفصيلية دون تكرار صف TOTAL. تصدير JSON يوضح أن البيانات مستوردة وغير متحقق منها، ولا ينقلها تلقائيًا إلى النموذج الحسابي.</small>
+</section>
+</main>
+<footer>Research intake module · Not an approved MRV statement · Not a certificate</footer>
+<script type="module">
+import {parseNavigationCSV} from "./navigation-data.mjs";
+const file=document.getElementById("csvFile");
+const status=document.getElementById("status");
+const issues=document.getElementById("issues");
+const tbody=document.getElementById("rows");
+const exportBtn=document.getElementById("exportBtn");
+let latest=null;
+function td(tr,value){const cell=document.createElement("td");cell.textContent=String(value??"غير متاح");tr.appendChild(cell)}
+file.addEventListener("change",async()=>{
+  latest=null;exportBtn.disabled=true;tbody.replaceChildren();issues.replaceChildren();
+  const selected=file.files?.[0];if(!selected)return;
+  if(selected.size>5_000_000){status.textContent="حجم الملف أكبر من الحد المسموح (5 MB).";return}
+  try{
+    const result=parseNavigationCSV(await selected.text());
+    if(!result.ok){
+      status.textContent="فشل التحقق؛ لم يتم قبول أي صف.";
+      issues.className="error";issues.textContent=result.errors.map(x=>"صف "+(x.line??"—")+": "+x.message).join("\n");
+      return;
+    }
+    latest={version:"CERI-SC-navigation-import-v1",importedAt:new Date().toISOString(),verification:"unverified-import",records:result.records,summaries:result.summaries,warnings:result.warnings};
+    status.textContent="اجتاز "+result.records.length+" صف التحقق الحسابي والبنيوي؛ المصدر لا يزال غير معتمد.";
+    status.className="success";
+    issues.className="notice";issues.textContent=result.warnings.join("\n");
+    document.getElementById("summaryNote").textContent=result.summaries.length+" مجموعات بتاريخ واتجاه. لا يتم استنتاج الأيام المفقودة.";
+    for(const row of result.summaries){
+      const tr=document.createElement("tr");
+      for(const v of [row.date,row.direction,row.count,row.netTonnage,row.completeness,row.source+" — "+row.sourceDate,row.status])td(tr,v);
+      tbody.appendChild(tr);
+    }
+    exportBtn.disabled=false;
+  }catch(error){status.textContent="تعذر قراءة الملف: "+error.message;status.className="error"}
+});
+exportBtn.addEventListener("click",()=>{
+  if(!latest)return;
+  const blob=new Blob([JSON.stringify(latest,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const anchor=document.createElement("a");anchor.href=url;anchor.download="ceri-navigation-unverified.json";anchor.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+</script>
+</body></html>

@@ -94,7 +94,7 @@ export function parseNavigationCSV(csv) {
     const typedCount=types.reduce((n,x)=>n+x.vesselCount,0);
     const typedNet=types.every(x=>x.netTonnage!==null)?types.reduce((n,x)=>n+x.netTonnage,0):null;
     if(total && types.length && total.vesselCount!==typedCount)errors.push({line:null,message:key+": type counts differ from TOTAL"});
-    if(total && types.length && total.netTonnage!==null && typedNet!==null && Math.abs(total.netTonnage-typedNet)>Math.max(0.01,total.netTonnage*0.00001))
+    if(total && types.length && total.netTonnage!==null && typedNet!==null && Math.abs(total.netTonnage-typedNet)>0.01)
       errors.push({line:null,message:key+": type tonnages differ from TOTAL"});
     if(!total)warnings.push(key+": no independent aggregate TOTAL; categories may be incomplete");
     if(!types.length)warnings.push(key+": category breakdown unavailable");

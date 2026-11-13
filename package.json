@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --check worker.js && node tests/smoke.mjs"
+    "test": "node --check worker.js && node tests/smoke.mjs && node tests/navigation-data.mjs"
   },
   "devDependencies": {
     "jsdom": "^26.1.0"

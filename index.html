@@ -474,6 +474,7 @@ footer{text-align:center;padding:16px 20px;margin-top:24px;border-top:1px solid 
     <button class="utility-btn" id="manualBtn" onclick="openManualModal()">⌨ Manual</button>
     <button class="utility-btn" id="vesselSimBtn" onclick="openVesselSimulator()">🚢 Vessel Simulator</button>
     <a class="next-header-btn" id="nextHeaderBtn" href="./next/" title="Open CERI-SC NEXT vessel intelligence">⚓ CERI-SC NEXT ↗</a>
+    <a class="utility-btn" href="./navigation-data.html" id="navigationDataLink" aria-label="Navigation data import">📋 Navigation data / إحصاءات الملاحة</a>
     <button class="utility-btn" id="themeBtn" onclick="cycleTheme()">🎨 Background</button>
     <button class="utility-btn print-white" id="printBtn" onclick="printDashboard()" title="Print with a clean white background or save as PDF">🖨 White Print / PDF</button>
     <button class="utility-btn" id="shareBtn" onclick="shareDashboard()">↗ Share</button>
@@ -556,32 +557,31 @@ function buildDashboardPrintReport(){
   return report;
 }
 
-function hasManualOverride(yr){const o=manualOverrides[String(yr)]||{};return Number.isFinite(+o.vessels)||Number.isFinite(+o.reduction);}
-function getYearTransit(yr){const o=manualOverrides[String(yr)]||{};return Number.isFinite(+o.vessels)&&+o.vessels>=0?+o.vessels:Y[yr].t;}
+function hasManualOverride(yr){const o=manualOverrides[String(yr)]||{};return o.vessels!==undefined && Number.isInteger(Number(o.vessels)) && Number(o.vessels)>=0;}
+function getYearTransit(yr){const o=manualOverrides[String(yr)]||{};return o.vessels!==undefined&&Number.isInteger(Number(o.vessels))&&+o.vessels>=0?+o.vessels:Y[yr].t;}
 function getYearSource(yr){const o=manualOverrides[String(yr)]||{};return hasManualOverride(yr)?(o.source||((lang==='ar'?'إدخال يدوي للمستخدم':'Manual user input'))):Y[yr].src;}
 function openManualModal(){
   const yr=+document.getElementById('ySel').value,o=manualOverrides[String(yr)]||{};
-  document.getElementById('manualVessels').value=Number.isFinite(+o.vessels)?o.vessels:Y[yr].t;
-  document.getElementById('manualReduction').value=Number.isFinite(+o.reduction)?o.reduction:'';
+  document.getElementById('manualVessels').value=o.vessels!==undefined&&Number.isInteger(+o.vessels)?o.vessels:Y[yr].t;
+  document.getElementById('manualReduction').value='';document.getElementById('manualReduction').disabled=true;
   document.getElementById('manualSource').value=o.source||'';
   document.getElementById('manualYearText').innerHTML=(lang==='ar'?'<b>السنة المختارة:</b> ':'<b>Selected year:</b> ')+yr+(hasManualOverride(yr)?' <span class="manual-indicator">'+(lang==='ar'?'بيانات يدوية':'MANUAL DATA')+'</span>':'');
   document.getElementById('manualModal').classList.add('open');
 }
 function closeManualModal(){document.getElementById('manualModal').classList.remove('open');}
 function applyManualData(){
-  const yr=+document.getElementById('ySel').value;
-  const vesselsRaw=document.getElementById('manualVessels').value.trim();
-  const reductionRaw=document.getElementById('manualReduction').value.trim();
+  const yr=Number(document.getElementById('ySel').value);
+  const raw=document.getElementById('manualVessels').value.trim();
   const source=document.getElementById('manualSource').value.trim();
-  const vessels=vesselsRaw===''?null:Number(vesselsRaw);
-  const reduction=reductionRaw===''?null:Number(reductionRaw);
-  if((vessels!==null&&(!Number.isFinite(vessels)||vessels<0))||(reduction!==null&&(!Number.isFinite(reduction)||reduction<0))){
-    alert(lang==='ar'?'أدخل أرقامًا صحيحة غير سالبة.':'Enter valid non-negative numbers.');return;
+  if(raw==='' || !/^[0-9]+$/.test(raw) || !Number.isSafeInteger(Number(raw))){
+    alert(lang==='ar'?'أدخل عدد سفن صحيحًا غير سالب.':'Enter a non-negative whole-number vessel count.');return;
+  }
+  if(Number(raw)!==Y[yr].t && !source){
+    alert(lang==='ar'?'يلزم توثيق مصدر بيانات السيناريو.':'A source is required for scenario traffic data.');return;
   }
   const o={};
-  if(vessels!==null&&vessels!==Y[yr].t)o.vessels=Math.round(vessels);
-  if(reduction!==null)o.reduction=Math.round(reduction);
-  if(source)o.source=source;
+  if(Number(raw)!==Y[yr].t)o.vessels=Number(raw);
+  if(o.vessels!==undefined)o.source=source;
   if(Object.keys(o).length)manualOverrides[String(yr)]=o;else delete manualOverrides[String(yr)];
   storeSet('localStorage',MANUAL_STORE_KEY,JSON.stringify(manualOverrides));
   closeManualModal();render();
@@ -646,9 +646,9 @@ function updateUtilityLabels(){
   document.getElementById('feedbackSubmit').textContent=ar?'إرسال':'Send';
   document.getElementById('manualTitle').textContent=ar?'إدخال البيانات يدويًا':'Manual Data Override';
   document.getElementById('vesselLabel').textContent=ar?'عدد السفن العابرة':'Vessel transits';
-  document.getElementById('vesselHelp').textContent=ar?'يستبدل عدد السفن للسنة المختارة ويعيد حساب جميع نتائج المسارات.':"Overrides the selected year's vessel count and recalculates all route results.";
-  document.getElementById('reductionLabel').textContent=ar?'الخفض السنوي التقديري (طن CO₂)':'Estimated annual CO₂ reduction (tCO₂)';
-  document.getElementById('reductionHelp').textContent=ar?'اختياري: اتركه فارغًا لاستخدام التقدير الحسابي للنموذج.':'Optional direct override. Leave blank to use the modelled estimate.';
+  document.getElementById('vesselHelp').textContent=ar?'سيناريو مستخدم منفصل، وليس بيانات ملاحة رسمية. يلزم إدخال المصدر.':"User-supplied scenario, not official traffic data. Cite the data source.";
+  document.getElementById('reductionLabel').textContent=ar?'تعديل خفض CO₂ المباشر — غير مسموح':'Direct CO₂ override — disabled';
+  document.getElementById('reductionHelp').textContent=ar?'لا يمكن إدخال خفض CO₂ مباشرة؛ ينتج فقط من نموذج الحساب.':'Direct CO₂ reduction overrides are prohibited; results are model-calculated.';
   document.getElementById('sourceLabel').textContent=ar?'المصدر / ملاحظة':'Source / note';
   document.getElementById('manualReduction').placeholder=ar?'اختياري':'Optional';
   document.getElementById('manualSource').placeholder=ar?'مثال: تقرير تشغيلي لهيئة قناة السويس — يونيو 2026':'Example: SCA operational report — June 2026';
@@ -1200,7 +1200,20 @@ const ILLUSTRATIVE_RATE_LOW=Math.min(...OFFICIAL_PER_VESSEL_RATES);
 const ILLUSTRATIVE_RATE_HIGH=Math.max(...OFFICIAL_PER_VESSEL_RATES);
 function annualIllustrativeReduction(yr){
   const official=OFFICIAL_AVOIDED_CO2[yr];
-  if(official)return{value:official.value,low:official.value,high:official.value,official:true,rate:official.value/getYearTransit(yr),label:official.label,status:'official-announced',sourceName:official.sourceName,sourceUrl:official.sourceUrl};
+  if(official){
+    const scenario=hasManualOverride(yr);
+    // Announced aggregate estimates cannot remain 'official' after the input traffic count is changed.
+    // A user scenario uses a proportional proxy explicitly labelled as modelled; it does not
+    // recreate an official result or imply an empirically validated per-vessel emission factor.
+    if(scenario){
+      const count=getYearTransit(yr), base=Y[yr].t, rate=base>0?official.value/base:0;
+      const value=Math.round(count*rate);
+      return{value,low:Math.round(value*0.8),high:Math.round(value*1.2),
+        official:false,rate,label:'User scenario: count × announced aggregate per-transit proxy; indicative ±20% sensitivity only',
+        status:'user-scenario/modelled-impact',sourceName:getYearSource(yr),sourceUrl:''};
+    }
+    return{value:official.value,low:official.value,high:official.value,official:true,rate:official.value/Y[yr].t,label:official.label,status:'official-announced',sourceName:official.sourceName,sourceUrl:official.sourceUrl};
+  }
   const projected=+yr===2026;
   const transits=getYearTransit(yr);
   return{
@@ -1459,7 +1472,7 @@ function calcShip(type,rk){
 }
 function calcYr(yr,rk){
   const tot=Math.round(getYearTransit(yr));const annual=annualIllustrativeReduction(yr);let tR=annual.value,tS=0,tC=tR;const bt=[];
-  // Largest-remainder allocation keeps the six displayed ship-type counts equal to the annual total.
+  // Largest-remainder allocation keeps all nine illustrative ship-type counts equal to the annual total; historical year-specific mixes are NOT claimed.
   const typeEntries=Object.entries(TD);
   const rawCounts=typeEntries.map(([type,info])=>({type,info,raw:tot*info.pct}));
   const allocated=rawCounts.map(x=>Math.floor(x.raw));
@@ -1479,14 +1492,12 @@ function calcYr(yr,rk){
     bt.forEach(x=>{x.tot=Math.round(x.tot*scale);x.ps=x.n?Math.round(x.tot/x.n):0;});
   }
   bt.sort((a,b)=>b.tot-a.tot);
-  const o=manualOverrides[String(yr)]||{};
-  if(Number.isFinite(+o.reduction)&&+o.reduction>=0&&tR>0){
-    const target=+o.reduction,scale=target/tR;
-    bt.forEach(x=>{x.tot=Math.round(x.tot*scale);x.ps=Math.round(x.ps*scale);});
-    tR=Math.round(target);tC=tR;
-  }
-  const manualReduction=Number.isFinite(+o.reduction)&&+o.reduction>=0;
-  return{tR:Math.round(tR),low:manualReduction?Math.round(tR):annual.low,high:manualReduction?Math.round(tR):annual.high,tS:0,tC:Math.round(tC),ap:tot>0?(tR/tot).toFixed(1):'0',bt,tot,src:annual.label,trafficSrc:getYearSource(yr),official:annual.official,status:manualReduction?'manual-override':annual.status,sourceName:annual.sourceName||'',sourceUrl:annual.sourceUrl||'',rate:annual.rate,routeIndependent:true,manual:hasManualOverride(yr)};
+  const scenario=hasManualOverride(yr);
+  return{tR:Math.round(tR),low:annual.low,high:annual.high,tS:0,tC:Math.round(tC),ap:tot>0?(tR/tot).toFixed(1):'0',bt,tot,
+    src:annual.label,trafficSrc:getYearSource(yr),official:scenario?false:annual.official,
+    status:scenario?'user-scenario':annual.status,
+    sourceName:scenario?getYearSource(yr):(annual.sourceName||''),sourceUrl:scenario?'':(annual.sourceUrl||''),
+    rate:annual.rate,routeIndependent:true,manual:scenario};
 }
 function allYears(rk){return Object.keys(Y).map(yr=>({yr:+yr,res:calcYr(yr,rk)}));}
 function cumulative(rk){let c=0,low=0,high=0;return Object.keys(Y).map(yr=>{const r=calcYr(yr,rk);c+=r.tR;low+=r.low;high+=r.high;return{yr:+yr,cum:c,low,high};});}
@@ -2319,12 +2330,14 @@ async function adminLoad(){
   const body=document.getElementById('adminProjectBody'),health=document.getElementById('adminHealth');if(!body)return;
   try{
     const r=await fetch('/api/admin',{headers:{Accept:'application/json'}}),data=await r.json();
+    if(!body.isConnected)return; // Ignore late API responses after navigation or document teardown.
     if(!r.ok||!data.ok)throw new Error('offline');
     adminProjects=data.projects||[];adminRole=data.role||'viewer';adminDurable=true;body.innerHTML=adminProjectRows(adminProjects);
     if(health)health.innerHTML=`<strong>${lang==='ar'?'متصل':'Connected'}</strong><span>${adminEsc(data.storage)} · ${adminProjects.length} ${lang==='ar'?'مشروعات':'projects'} · ${adminEsc(adminRole)} · ${data.vesselProfiles} ${lang==='ar'?'سجلات سفن':'vessel records'}</span><small>${new Date(data.generatedAt).toLocaleString(lang==='ar'?'ar-EG':'en-GB')}</small>`;
     const storage=document.getElementById('adminStorageKpi');if(storage)storage.textContent=data.storage;
     const audit=document.getElementById('adminAudit');if(audit)audit.innerHTML=(data.audits||[]).map(x=>`<div><b>${adminEsc(x.action)}</b><span>${adminEsc(x.detail)}</span><small>${new Date(x.createdAt).toLocaleString(lang==='ar'?'ar-EG':'en-GB')}</small></div>`).join('')||`<p>${lang==='ar'?'لا توجد تعديلات مسجلة بعد.':'No recorded changes yet.'}</p>`;
   }catch(e){
+    if(!body.isConnected)return; // Avoid stale async DOM work after the view is removed.
     adminProjects=ADMIN_FALLBACK;adminDurable=false;adminRole='viewer';body.innerHTML=adminProjectRows(adminProjects);
     const storage=document.getElementById('adminStorageKpi');if(storage)storage.textContent=lang==='ar'?'مرجع محلي للقراءة فقط':'Read-only reference';
     if(health)health.innerHTML=`<strong>${lang==='ar'?'وضع قراءة احتياطي':'Read-only fallback'}</strong><span>${lang==='ar'?'قاعدة البيانات غير متاحة على هذا المضيف؛ تُعرض بيانات مرجعية محلية.':'Database is unavailable on this host; local reference data are shown.'}</span>`;

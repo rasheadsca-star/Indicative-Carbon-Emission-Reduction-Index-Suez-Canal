@@ -58,6 +58,24 @@ await new Promise((resolve) => setTimeout(resolve, 40));
 assert.match(dom.window.document.querySelector("#main").textContent, /Read-only fallback/);
 dom.window.openFeedback();
 assert.ok(dom.window.document.getElementById("feedbackModal").classList.contains("open"));
+// Regression: user-provided vessel counts are scenarios, never approved measurements.
+const beforeScenario = dom.window.calcYr(2023, "SG-RTM");
+dom.window.document.querySelector("#ySel").value = "2023";
+dom.window.openManualModal();
+assert.equal(dom.window.document.querySelector("#manualReduction").disabled, true);
+dom.window.document.querySelector("#manualVessels").value = String(beforeScenario.tot + 100);
+dom.window.document.querySelector("#manualSource").value = "TEST: hypothetical traffic scenario";
+dom.window.applyManualData();
+const afterScenario = dom.window.calcYr(2023, "SG-RTM");
+assert.equal(afterScenario.tot, beforeScenario.tot + 100);
+assert.equal(afterScenario.official, false);
+assert.match(afterScenario.status, /user-scenario/);
+assert.notEqual(afterScenario.tR, beforeScenario.tR);
+assert.equal(afterScenario.bt.reduce((sum, group) => sum + group.n, 0), afterScenario.tot);
+assert.doesNotMatch(html, /const target=\+o\.reduction/);
+dom.window.resetManualData();
+assert.equal(dom.window.calcYr(2023, "SG-RTM").tot, beforeScenario.tot);
+
 const report = dom.window.buildDashboardPrintReport();
 assert.equal(report.querySelectorAll(".print-report-page").length, 4);
 assert.deepEqual(runtimeErrors, []);

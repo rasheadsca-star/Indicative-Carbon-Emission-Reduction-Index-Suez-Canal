@@ -1199,7 +1199,20 @@ const ILLUSTRATIVE_RATE_LOW=Math.min(...OFFICIAL_PER_VESSEL_RATES);
 const ILLUSTRATIVE_RATE_HIGH=Math.max(...OFFICIAL_PER_VESSEL_RATES);
 function annualIllustrativeReduction(yr){
   const official=OFFICIAL_AVOIDED_CO2[yr];
-  if(official)return{value:official.value,low:official.value,high:official.value,official:true,rate:official.value/getYearTransit(yr),label:official.label,status:'official-announced',sourceName:official.sourceName,sourceUrl:official.sourceUrl};
+  if(official){
+    const scenario=hasManualOverride(yr);
+    // Announced aggregate estimates cannot remain 'official' after the input traffic count is changed.
+    // A user scenario uses a proportional proxy explicitly labelled as modelled; it does not
+    // recreate an official result or imply an empirically validated per-vessel emission factor.
+    if(scenario){
+      const count=getYearTransit(yr), base=Y[yr].t, rate=base>0?official.value/base:0;
+      const value=Math.round(count*rate);
+      return{value,low:Math.round(value*0.8),high:Math.round(value*1.2),
+        official:false,rate,label:'User scenario: count × announced aggregate per-transit proxy; indicative ±20% sensitivity only',
+        status:'user-scenario/modelled-impact',sourceName:getYearSource(yr),sourceUrl:''};
+    }
+    return{value:official.value,low:official.value,high:official.value,official:true,rate:official.value/Y[yr].t,label:official.label,status:'official-announced',sourceName:official.sourceName,sourceUrl:official.sourceUrl};
+  }
   const projected=+yr===2026;
   const transits=getYearTransit(yr);
   return{
@@ -1458,7 +1471,7 @@ function calcShip(type,rk){
 }
 function calcYr(yr,rk){
   const tot=Math.round(getYearTransit(yr));const annual=annualIllustrativeReduction(yr);let tR=annual.value,tS=0,tC=tR;const bt=[];
-  // Largest-remainder allocation keeps the six displayed ship-type counts equal to the annual total.
+  // Largest-remainder allocation keeps all nine illustrative ship-type counts equal to the annual total; historical year-specific mixes are NOT claimed.
   const typeEntries=Object.entries(TD);
   const rawCounts=typeEntries.map(([type,info])=>({type,info,raw:tot*info.pct}));
   const allocated=rawCounts.map(x=>Math.floor(x.raw));

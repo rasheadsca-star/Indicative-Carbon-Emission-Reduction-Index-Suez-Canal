@@ -72,7 +72,7 @@ export function buildNavigationIntelligence(importResult){
     const sameProvenance=complete&&accepted.every(d=>d.comparableProvenance)&&
       new Set(accepted.map(d=>{
         const ref=index.get(groupKey(d.date,"northbound"));
-        return ref.source+"|"+ref.sourceDate;
+        return ref.source; // Publication dates may legitimately differ by day
       })).size===1;
     const cat={};
     if(allCategories){

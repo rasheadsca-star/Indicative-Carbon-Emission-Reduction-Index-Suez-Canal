@@ -21,7 +21,7 @@ code{direction:ltr;unicode-bidi:isolate}#error{white-space:pre-wrap;color:#ffb6a
 <p>إحصاءات منشورة رسميًا، مع الفصل بين بيانات السنة والشهر، والبيانات اليومية أو الأسبوعية غير المتاحة أو غير المتحقق منها.</p></header>
 <main>
 <section class="panel">
-<div class="warn"><strong>حالة تحديث البيانات:</strong> أحدث فترة متحققة داخل قاعدة هذا التقرير هي ديسمبر 2025. لم يتم تأكيد سلسلة رسمية قابلة للسحب تلقائيًا لعام 2026. الأعداد الشهرية ليست رصدًا لحظيًا.</div>
+<div class="warn"><strong>حالة تحديث البيانات:</strong> أحدث فترة متحققة داخل قاعدة هذا التقرير هي ديسمبر 2025؛ السلسلة الشهرية تغطي 2023 إلى 2025. لم يتم تأكيد سلسلة رسمية قابلة للسحب تلقائيًا لعام 2026. الأعداد الشهرية ليست رصدًا لحظيًا.</div>
 <p>المصدر: <a href="https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2025.pdf" target="_blank" rel="noopener noreferrer">النشرة السنوية لهيئة قناة السويس 2025 — جدول (2)</a> |
 <a href="https://www.suezcanal.gov.eg/English/Downloads/pages/default.aspx?folder=Navigation+Reports%2FAnnual+Reports%E2%80%8B%E2%80%8B%E2%80%8B" target="_blank" rel="noopener noreferrer">أرشيف النشرات الرسمية</a>.</p>
 <div id="status" role="status">جاري تحميل النشرة المرجعية...</div>
@@ -32,7 +32,7 @@ code{direction:ltr;unicode-bidi:isolate}#error{white-space:pre-wrap;color:#ffb6a
 </section>
 <section class="panel">
 <h2>2 — المقارنة الشهرية الرسمية</h2>
-<label>السنة <select id="year"><option>2025</option><option>2024</option></select></label>
+<label>السنة <select id="year"><option>2025</option><option>2024</option><option>2023</option></select></label>
 <div class="scroller"><table><thead><tr><th>الشهر</th><th>عدد السفن</th><th>الحمولة الصافية (ألف طن)</th><th>التغير عن نفس شهر السنة الماضية</th></tr></thead><tbody id="monthlyRows"></tbody></table></div>
 <p id="monthlyInsight"></p>
 </section>
@@ -67,7 +67,7 @@ function showYear(){
     }
     $("monthlyRows").appendChild(tr);
   }
-  $("monthlyInsight").textContent=rows.length?"كل شهر يمثل قيمة منشورة، وليس متوسطًا يوميًا أو تغطية AIS.":"لا تتوفر بيانات هذه السنة.";
+  $("monthlyInsight").textContent=rows.length?"كل شهر يمثل قيمة منشورة من نشرات الهيئة لعامَي 2024 و2025، وليس متوسطًا يوميًا أو تغطية AIS.":"لا تتوفر بيانات هذه السنة.";
 }
 try{
   const response=await fetch("./data/sca-official-monthly-2024-2025.json",{cache:"no-store"});

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "checkedAt": "2026-11-14T08:06:33.286Z",
+  "provider": "Open Waters AIS",
+  "region": "Suez Canal approximate bounding box",
+  "bbox": "29.70,31.90,31.65,32.85",
+  "method": "Periodic anonymous snapshot. No official SCA comparison or AIS reception guarantee.",
+  "use": "diagnostic-only",
+  "official": false,
+  "emissionsVerified": false,
+  "coverageValidated": false,
+  "health": {
+    "reachable": true,
+    "httpStatus": 200
+  },
+  "snapshot": {
+    "reachable": true,
+    "httpStatus": 200,
+    "recentFeatureCount": 2,
+    "distinctMmsiCount": 2,
+    "truncated": false
+  },
+  "assessment": "NO_VERIFIED_COVERAGE",
+  "reason": "This source has not been calibrated against an authoritative daily transit register.",
+  "errors": []
+}

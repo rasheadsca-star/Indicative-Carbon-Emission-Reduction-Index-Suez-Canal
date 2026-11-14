@@ -9,5 +9,8 @@
   },
   "devDependencies": {
     "jsdom": "^26.1.0"
+  },
+  "dependencies": {
+    "ws": "^8.21.2"
   }
 }

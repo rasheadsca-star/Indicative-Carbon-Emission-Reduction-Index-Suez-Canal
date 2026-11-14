@@ -1,0 +1,39 @@
+name: Decision Room Engineering Gates
+on:
+  pull_request:
+    paths:
+      - 'decision-room.html'
+      - 'src/ais-quality-history.mjs'
+      - 'src/ais-quality-history.test.mjs'
+      - 'src/voyage-audit.mjs'
+      - 'src/voyage-audit.test.mjs'
+      - 'scripts/ais-source-quality.mjs'
+      - 'tests/decision-room.test.mjs'
+      - 'index.html'
+      - '.github/workflows/decision-room.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'decision-room.html'
+      - 'src/ais-quality-history.mjs'
+      - 'src/ais-quality-history.test.mjs'
+      - 'src/voyage-audit.mjs'
+      - 'src/voyage-audit.test.mjs'
+      - 'scripts/ais-source-quality.mjs'
+      - 'tests/decision-room.test.mjs'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: node --test src/ais-quality-history.test.mjs src/voyage-audit.test.mjs tests/decision-room.test.mjs
+      - run: node --check scripts/ais-source-quality.mjs

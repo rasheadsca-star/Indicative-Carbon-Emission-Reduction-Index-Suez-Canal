@@ -1,0 +1,72 @@
+{
+  "schema": "ceri-sc-official-provenance-v1",
+  "note": "Evidence tiers: OFFICIAL_REPORT (annual report table), OFFICIAL_ANNOUNCEMENT (SCA press release, rounded), CANDIDATE (secondary-reported, not ingested). Manually transcribed; not an API feed.",
+  "files": [
+    {
+      "path": "data/sca-official-monthly-2024-2025.json",
+      "sha256": "c9ce1284528754bed55319a14aa3383e6c164d3c372424454692ae8eaa19f11a",
+      "tier": "OFFICIAL_REPORT",
+      "publisher": "Suez Canal Authority",
+      "sources": [
+        "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2025.pdf",
+        "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2024.pdf"
+      ],
+      "periods": {
+        "monthly": "2023-01..2025-12",
+        "annual": [
+          "2023",
+          "2024",
+          "2025"
+        ]
+      },
+      "units": {
+        "vessels": "count",
+        "netTonnage": "thousand net tons"
+      },
+      "lastPublishedPeriod": "2025-12",
+      "checks": [
+        "12 months per year",
+        "sum(monthly vessels)=annual",
+        "sum(monthly net tonnage)=annual"
+      ]
+    },
+    {
+      "path": "data/sca-2026-official-announcements.json",
+      "sha256": "dad3af119bd2bc34abdf49cbd8b1da50e5d956ff6f29aa2eb7d995d4d10689db",
+      "tier": "OFFICIAL_ANNOUNCEMENT",
+      "publisher": "Suez Canal Authority",
+      "lastVerifiedAnnouncementDate": "2026-11-05",
+      "items": [
+        {
+          "id": "monthly",
+          "period": "2026-10",
+          "baseline": "2025-10",
+          "published": "2026-11-05",
+          "url": "https://www.suezcanal.gov.eg/Arabic/MediaCenter/News/Pages/Sca_5-11-2026-%283%29.aspx",
+          "rounding": "net tonnage to nearest million; revenue in million USD",
+          "scope": "all transits"
+        },
+        {
+          "id": "container-segment",
+          "period": "2026-07/2026-09",
+          "published": "2026-10-13",
+          "url": "https://www.suezcanal.gov.eg/English/MediaCenter/News/Pages/Sca_13-10-2026.aspx",
+          "scope": "Medium and mega container vessels covered in announcement"
+        },
+        {
+          "id": "single-day",
+          "period": "2026-09-16",
+          "published": "2026-09-16",
+          "url": "https://www.suezcanal.gov.eg/English/MediaCenter/News/Pages/Sca_16-9-2026_2.aspx",
+          "scope": "one day, not a series"
+        }
+      ]
+    }
+  ],
+  "unavailable": [
+    "official 2026 daily series",
+    "official 2026 weekly series",
+    "official 2026 annual total",
+    "ship-level official register"
+  ]
+}

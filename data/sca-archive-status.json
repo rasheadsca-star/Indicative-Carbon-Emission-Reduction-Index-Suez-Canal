@@ -1,0 +1,31 @@
+{
+  "schema": "ceri-sc-sca-archive-check-v1",
+  "checkedAt": "2026-11-14T08:42:41.965Z",
+  "sourceUrl": "https://www.suezcanal.gov.eg/English/Downloads/Pages/default.aspx?folder=Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B",
+  "fetchOk": true,
+  "httpStatus": 200,
+  "latestPublishedYear": 2025,
+  "publishedYears": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "status": "ARCHIVE_LISTING_READ",
+  "note": "Archive listing only; no verified daily, weekly or monthly series are inferred.",
+  "errors": []
+}

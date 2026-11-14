@@ -22,7 +22,7 @@ export function createAisstreamProvider({ apiKey = process.env.AISSTREAM_API_KEY
       if (typeof WebSocketImpl !== "function") throw Error("WebSocket implementation unavailable");
       stopped = false;
       const open = () => {
-        ws = new WebSocketImpl(url);
+        ws = new WebSocketImpl(url,{perMessageDeflate:true});
         ws.onopen = () => {
           backoff = 1000;
           ws.send(JSON.stringify({ APIKey: apiKey, BoundingBoxes: [SUEZ_BBOX], FilterMessageTypes: ["PositionReport", "StandardClassBPositionReport", "ExtendedClassBPositionReport"] }));

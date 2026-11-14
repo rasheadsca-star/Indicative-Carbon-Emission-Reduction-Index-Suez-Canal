@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {mkdtemp,rm,stat,readFile} from "node:fs/promises";
+import {mkdtemp,rm,stat,readFile,writeFile} from "node:fs/promises";
+import {checkTrialHeartbeat} from "./trial-healthcheck.mjs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {openPrivateTrial} from "./trial-store.mjs";
@@ -96,4 +97,16 @@ test("synthetic private journal can retain invalid telemetry counts without pret
  assert.equal(r.checkedHours,1);
  assert.equal(r.checksPerElapsedHour,1/168);
  assert.equal(r.coverage.sourceGeographicCoverageRate,null);
+});
+
+test("Docker heartbeat proves collector liveness only, not AIS geographical coverage",async()=>{
+ await withPrivate(async directory=>{
+  assert.deepEqual(await checkTrialHeartbeat(directory,{nowMs:BASE}),{ok:false,reason:"NO_HEARTBEAT"});
+  await writeFile(join(directory,"heartbeat-2026-11-14.ndjson"),
+    JSON.stringify({at:new Date(BASE+60000).toISOString(),transport:"CONNECTED_BUT_SILENT"})+"\n");
+  const healthy=await checkTrialHeartbeat(directory,{nowMs:BASE+120000});
+  assert.equal(healthy.ok,true);
+  assert.match(healthy.reason,/COVERAGE_UNVERIFIED/);
+  assert.equal((await checkTrialHeartbeat(directory,{nowMs:BASE+3600000})).reason,"HEARTBEAT_STALE");
+ });
 });

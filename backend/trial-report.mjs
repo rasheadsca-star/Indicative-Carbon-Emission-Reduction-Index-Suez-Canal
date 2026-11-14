@@ -15,7 +15,7 @@ export function createTrialAccumulator(manifest,{nowMs=Date.now()}={}){
  if(!Number.isFinite(start)||end-start!==TRIAL_HOURS*H)throw Error("Invalid seven-day manifest");
  const heartbeatSlots=new Set(),positionSlots=new Set(),flowingSlots=new Set(),
        distinctPerHour=new Map(),transitIds=new Set(),directions={Northbound:0,Southbound:0};
- let positionRecords=0,heartbeatRecords=0,candidateRecords=0,invalidRows=0;
+ let positionRecords=0,heartbeatRecords=0,candidateRecords=0,invalidRows=0,processStarts=0,compressionEnabled=null;
  function slot(at){
    const ts=Date.parse(at||"");
    if(!Number.isFinite(ts)||ts<start||ts>=end||ts>nowMs+120000)return null;
@@ -27,6 +27,8 @@ export function createTrialAccumulator(manifest,{nowMs=Date.now()}={}){
    if(i===null){invalidRows++;return;}
    if(type==="heartbeat"){
      heartbeatRecords++;heartbeatSlots.add(i);
+     if(item.processStart===true)processStarts++;
+     if(typeof item.compressionEnabled==="boolean")compressionEnabled=item.compressionEnabled;
      if(item.transport==="FLOWING")flowingSlots.add(i);
    }else if(type==="position"){
      if(typeof item.mmsi!=="string"||!/^[2-7]\d{8}$/.test(item.mmsi)){
@@ -66,6 +68,7 @@ export function createTrialAccumulator(manifest,{nowMs=Date.now()}={}){
      candidateTransitsInPrivateStore:transitIds.size,
      aisInferredCandidatesByDirection:directions,
      healthRows:heartbeatRecords,candidateJournalRows:candidateRecords,invalidRows,
+     processStarts,collectorRestarts:Math.max(0,processStarts-1),compressionEnabled,
      coverage,
      hourly,
      decision:"SOURCE_DIAGNOSTIC_ONLY_NOT_OPERATIONAL",

@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - 'decision-room.html'
+      - 'voyage-evidence.html'
+      - 'src/ais-sca-voyage-pipeline.mjs'
+      - 'src/ais-sca-voyage-pipeline.test.mjs'
       - 'src/ais-quality-history.mjs'
       - 'src/ais-quality-history.test.mjs'
       - 'src/official-traffic-insights.mjs'
@@ -37,5 +40,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: node --test src/ais-quality-history.test.mjs src/official-traffic-insights.test.mjs src/voyage-audit.test.mjs tests/decision-room.test.mjs
+      - run: node --test src/ais-quality-history.test.mjs src/official-traffic-insights.test.mjs src/voyage-audit.test.mjs src/ais-sca-voyage-pipeline.test.mjs tests/decision-room.test.mjs
       - run: node --check scripts/ais-source-quality.mjs

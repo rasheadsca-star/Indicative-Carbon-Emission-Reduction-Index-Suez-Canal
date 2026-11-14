@@ -1,0 +1,136 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CERI-SC — غرفة القرار: نتائج ومصادر واختبار الوقود</title>
+<style>
+:root{color-scheme:dark;font-family:"Segoe UI",Tahoma,Arial,sans-serif;--bg:#061c24;--card:#10323e;--line:#385c65;--ink:#eef8f7;--muted:#abc6cd;--aqua:#3cdec0;--amber:#f3ca7a}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--ink);margin:0;line-height:1.75}
+header,main,footer{max-width:1240px;margin:auto;padding:20px 25px}
+header{border-bottom:1px solid var(--line)}h1{font-size:clamp(23px,3vw,36px);margin:.3rem 0}h2{font-size:20px}
+a{color:var(--aqua)}.lead{color:var(--muted)}
+section{margin:18px 0;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:21px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px}
+.metric{border:1px solid var(--line);border-radius:10px;padding:15px;background:#092731}
+.metric strong{font-size:26px;display:block;color:var(--aqua);direction:ltr;text-align:right}
+.metric small{display:block;color:var(--muted);line-height:1.6}
+.warning{background:#46371f;border:1px solid #9f7834;color:#ffe6ad;border-radius:9px;padding:12px}
+label{display:block;font-size:13px;color:var(--muted)}
+input{display:block;width:100%;margin:4px 0 8px;padding:9px;border-radius:7px;background:#061f28;border:1px solid #5d8189;color:white;font-size:16px;direction:ltr}
+button{padding:11px 16px;background:var(--aqua);border:0;border-radius:7px;color:#002924;font:inherit;font-weight:700;cursor:pointer}
+pre{white-space:pre-wrap;overflow-wrap:anywhere}small{color:var(--muted)}#errors{color:#ffa99d}
+table{border-collapse:collapse;width:100%;min-width:550px}td,th{border-bottom:1px solid var(--line);text-align:right;padding:10px}
+.scroll{overflow:auto}.status{font-size:14px;color:var(--amber)}.subnav{display:flex;gap:15px;flex-wrap:wrap}
+@media print{body{color:#000;background:#fff}section,.metric{background:#fff;color:#000;border-color:#aaa}.metric strong{color:#000}button{display:none}}
+</style></head><body>
+<header>
+<nav class="subnav"><a href="./">المنصة الرئيسية V9</a><a href="./official-statistics.html">التقارير الرسمية</a><a href="./ais-lab/">تشخيص AIS</a><a href="./ais-lab/reconcile.html">مطابقة العبور</a></nav>
+<h1>غرفة القرار الملاحية والبيئية</h1>
+<p class="lead">ثلاثة مسارات مستقلة: بيانات الهيئة المنشورة، جودة رصد AIS، وحساب رحلة محددة بمعادلات قابلة لإعادة الإنتاج. لا يُجمع أي منها في رقم واحد دون مطابقة.</p>
+</header><main>
+<section><h2>1 — نتائج الحركة والجدوى من بيانات رسمية مؤرخة</h2>
+<p id="officialDate" class="status">تحميل البيانات الموثقة...</p><div id="officialCards" class="grid"></div>
+<p id="officialInterpretation"></p><a id="officialSource" href="./official-statistics.html">مصدر إحصاءات الهيئة</a>
+</section>
+<section><h2>2 — صحة الرصد الإقليمي: آخر 24 ساعة و7 أيام</h2>
+<div class="warning">عدد MMSI في لقطة AIS لا يساوي عدد السفن العابرة. قد تظهر السفينة في لقطات كثيرة؛ لا تُجمع اللقطات ولا تُحوَّل إلى إجمالي يومي. تغطية Open Waters لمنطقة القناة لم تُعاير رسميًا.</div>
+<p id="aisStatus" class="status">تحميل نتائج الفحوص الدورية...</p>
+<div id="aisCards" class="grid"></div><p id="aisInterpretation"></p>
+<p><a href="./ais-lab/">افتح مرصد AIS</a> · <a href="./data/ais-quality-summary.json">ملف جودة العينات</a></p>
+</section>
+<section><h2>3 — نتيجة هندسية قابلة لإعادة الحساب لرحلة واحدة</h2>
+<p class="warning"><strong>تجربة حسابية فقط:</strong> القيم المبدئية في النموذج **أرقام افتراضية للاختبار** وليست رحلة سفينة فعلية أو قياسًا في القناة. غيّرها ببيانات رحلة موثقة. لا تُصدر هذه الوحدة شهادة ولا تُطبق Well-to-Wake أو حساب CH₄/N₂O.</p>
+<div class="grid" id="inputs">
+<label>مسافة طريق السويس (ميل بحري)<input id="suezDistanceNm" type="number" step="1" value="6000" min="1"></label>
+<label>مسافة طريق الرأس (ميل بحري)<input id="capeDistanceNm" type="number" step="1" value="11000" min="1"></label>
+<label>السرعة (عقدة)<input id="speedKn" type="number" step="0.1" value="20" min="0.1"></label>
+<label>استهلاك البحر (طن وقود/يوم)<input id="seaBurnTonnesDay" type="number" step="0.1" value="100" min="0.1"></label>
+<label>عبور/انتظار السويس الإضافي (ساعة)<input id="suezExtraHours" type="number" step="0.1" value="14" min="0"></label>
+<label>انتظار الطريق البديل (ساعة)<input id="capeExtraHours" type="number" step="0.1" value="0" min="0"></label>
+<label>معدل وقود الانتظار (طن/يوم)<input id="standbyBurnTonnesDay" type="number" step="0.1" value="12" min="0"></label>
+<label>معامل CO₂ للاحتراق (طن CO₂/طن وقود)<input id="combustionCO2TonnesPerTonne" type="number" step="0.001" value="3.114" min="0.01"></label>
+<label>حساسية الاستهلاك ± (%)<input id="burnSensitivityPct" type="number" step="1" value="10" min="0" max="60"></label>
+</div>
+<p><button id="compute" type="button">حساب المقارنة</button> <button id="export" type="button" disabled>تصدير تقرير الحساب JSON</button></p>
+<div id="errors" role="alert"></div>
+<div id="resultCards" class="grid"></div><p id="modelStatus" class="status">لم يُحسب السيناريو بعد.</p>
+<p><small>فرق الوفورات = طريق الرأس ناقص طريق السويس؛ القيم السالبة تعني أفضلية طريق الرأس في هذا السيناريو. التفاوت الناتج عن ±% حساسية حسابية وليس نطاق ثقة إحصائيًا. للمقارنة الفعلية يجب توفير مسار حقيقي، ووقود السفينة، وتوقيت الرحلة، ومصدر المعاملات.</small></p>
+</section>
+<section><h2>4 — قرار استخدام النتائج</h2>
+<div class="scroll"><table><thead><tr><th>المؤشر</th><th>حالة البيانات</th><th>الاستخدام المسموح</th></tr></thead><tbody>
+<tr><td>البيانات الشهرية المعلنة من الهيئة</td><td>مؤرخة ومنسوبة إلى بيان رسمي</td><td>تحليل تغير الحركة والحمولة والإيرادات للفترة المعلنة</td></tr>
+<tr><td>اللقطات المجمعة لمصدر AIS</td><td>جزئية، متداخلة، وغير معايرة</td><td>تشخيص التغطية فقط</td></tr>
+<tr><td>فرق وقود وانبعاثات رحلة واحدة</td><td>سيناريو مدخلات غير موثقة</td><td>اختبار هندسي وحساسية، لا اعتماد أو حوافز</td></tr>
+<tr><td>شهادة عبور خضراء / وفر انبعاثات مؤسسي</td><td>بوابة اعتماد غير مستوفاة</td><td>ممنوع إصدار رقم معتمد حاليًا</td></tr>
+</tbody></table></div></section>
+</main><footer>آخرية المصدر أهم من شكل اللوحة · Results are source-bounded, no inferred passage counts</footer>
+<script type="module">
+import {computeVoyageScenario} from "./src/voyage-audit.mjs";
+import {analyzeAnnouncements} from "./sca-stats/announcements-2026.mjs";
+const $=id=>document.getElementById(id);
+const fmt=(n,d=0)=>n===null||!Number.isFinite(n)?"غير متاح":n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+function card(container,label,value,explain){
+ const b=document.createElement("div");b.className="metric";
+ const l=document.createElement("small");l.textContent=label;
+ const v=document.createElement("strong");v.textContent=value;
+ const x=document.createElement("small");x.textContent=explain;
+ b.append(l,v,x);container.appendChild(b);
+}
+async function official(){
+ try{
+  const r=await fetch("./data/sca-2026-official-announcements.json",{cache:"no-store"});
+  if(!r.ok)throw Error("HTTP "+r.status);
+  const data=await r.json(),a=analyzeAnnouncements(data);
+  $("officialDate").textContent="أكتوبر 2026 مقابل أكتوبر 2025 · تاريخ البيان "+a.publicationDate+" · أحدث شهر موثّق في قاعدة هذه اللوحة";
+  const out=$("officialCards");out.replaceChildren();
+  card(out,"عدد السفن",fmt(a.vessels.now),"زيادة "+fmt(a.vessels.absolute)+" سفينة (+ "+fmt(a.vessels.derivedPct,1)+"%)");
+  card(out,"الحمولة الصافية",fmt(a.netTonnage.now)+" مليون طن","أعلنت الهيئة +"+a.reportedPct.netTonnage+"% (الأرقام الإجمالية مدوّرة)");
+  card(out,"إيرادات القناة","$"+fmt(a.revenue.now)+"M","نمو "+fmt(a.revenue.derivedPct,1)+"% على أساس أرقام مدوّرة");
+  card(out,"متوسط الحمولة للسفينة (تقريبي)",fmt(a.netTonnagePerVesselApprox.now/1000,1)+" ألف طن","ليس DWT أو حمولة فعلية لكل سفينة");
+  card(out,"سفن الحاويات المتوسطة والعملاقة",fmt(a.container.now),"يوليو–سبتمبر 2026 مقابل "+fmt(a.container.prev)+" خلال الفترة المقابلة");
+  card(out,"وفورات CO₂ المعتمدة","غير متاحة","تحتاج بيانات رحلة ووقود ومقارنة مستقلة");
+  $("officialSource").href=a.sourceUrl;
+  $("officialInterpretation").textContent="قراءة تحليلية: تعافٍ ملاحـي خلال أكتوبر 2026، مع نمو الحمولة والإيرادات أسرع من عدد السفن. لا يُثبت ذلك بمفرده سبب التغير، ولا مقدار وفر الانبعاثات.";
+ }catch(e){$("officialDate").textContent="تعذر قراءة المؤشرات الرسمية: "+e.message}
+}
+async function quality(){
+ try{
+  const r=await fetch("./data/ais-quality-summary.json?ts="+Date.now(),{cache:"no-store"});
+  if(!r.ok)throw Error("لم يُنتج التقرير الدوري بعد");
+  const data=await r.json();
+  if(data.status!=="UNVERIFIED_COVERAGE"||!data.last24h||!data.last7d)throw Error("ملف فحص غير معروف");
+  const container=$("aisCards");container.replaceChildren();
+  const p24=data.last24h,p7=data.last7d,age=Math.round((Date.now()-Date.parse(data.assessedAt))/60000);
+  card(container,"عينات AIS خلال 24 ساعة",fmt(p24.samples),"صالحة "+fmt(p24.usableSamples)+" · فاشلة "+fmt(p24.failures));
+  card(container,"متوسط MMSI لكل لقطة (24 ساعة)",fmt(p24.snapshotMean,1),"ليس عدد عبور القناة");
+  card(container,"أقصى MMSI في لقطة (24 ساعة)",fmt(p24.snapshotMax),"قد تكون نفس السفن في لقطات متكررة");
+  card(container,"عينات خلال 7 أيام",fmt(p7.samples),"صالحة "+fmt(p7.usableSamples)+" · ليست سجل عبور");
+  card(container,"نسبة تغطية عبور القناة","غير متاحة","لا يوجد مرجع سفن رسمي مطابق بنفس الزمن والنطاق");
+  $("aisStatus").textContent="آخر تقرير: "+data.assessedAt+" UTC · عمره "+fmt(age)+" دقيقة · "+(age>150||age<0?"حالة قديمة؛ لا تعتمد":"تشخيص دوري غير معتمد");
+  $("aisInterpretation").textContent=(p24.samples<12?"العينات خلال 24 ساعة غير كافية للحكم على انتظام المصدر. ":"")+
+    "حتى مع اكتمال الفحوص لا يمكن اعتبار عدد MMSI الفريد لكل لقطة عبورًا يوميًا؛ يلزم سجل AIS مستمر ومطابقة الهيئة.";
+ }catch(e){$("aisStatus").textContent="لا توجد حتى الآن سلسلة AIS دورية موثوقة يمكن الحكم عليها: "+e.message}
+}
+let last=null;
+$("compute").addEventListener("click",()=>{
+ $("errors").textContent="";$("resultCards").replaceChildren();last=null;$("export").disabled=true;
+ const fields=["suezDistanceNm","capeDistanceNm","speedKn","seaBurnTonnesDay","suezExtraHours","capeExtraHours","standbyBurnTonnesDay","combustionCO2TonnesPerTonne","burnSensitivityPct"];
+ const input=Object.fromEntries(fields.map(k=>[k,document.getElementById(k).value.trim()===""?NaN:Number(document.getElementById(k).value)]));
+ try{
+   const a=computeVoyageScenario(input);
+   last={generatedAt:new Date().toISOString(),input,output:a,inputEvidence:"USER_INPUTS_NOT_AUTHENTICATED"};
+   const c=$("resultCards");
+   card(c,"وقود طريق السويس",fmt(a.suez.fuelTonnes,2)+" طن","يشمل البحر وفترة الانتظار المدخلة");
+   card(c,"وقود رأس الرجاء الصالح",fmt(a.cape.fuelTonnes,2)+" طن","يشمل البحر والانتظار المدخل");
+   card(c,"وفر الوقود (الرأس - السويس)",fmt(a.deltaFuelTonnes,2)+" طن","سيناريو افتراضي وليس وفورات سفينة مقاسة");
+   card(c,"وفر CO₂ التشغيلي المباشر",fmt(a.deltaCO2Tonnes,2)+" طن CO₂","Tank-to-Wake احتراق فقط");
+   card(c,"وفر الزمن",fmt(a.deltaHours,1)+" ساعة","لا يشمل تأخيرات غير مدخلة");
+   card(c,"نطاق حساسية CO₂",fmt(a.sensitivity.lowerCO2Tonnes,1)+" إلى "+fmt(a.sensitivity.upperCO2Tonnes,1),"افتراض ±"+input.burnSensitivityPct+"% وليس نطاق ثقة");
+   $("modelStatus").textContent="نتيجة حسابية قابلة لإعادة الإنتاج؛ حالة الأدلة: UNVERIFIED_USER_SCENARIO. لا تعمم على جميع السفن أو تصدر شهادة.";
+   $("export").disabled=false;
+ }catch(e){$("errors").textContent=e.message;$("modelStatus").textContent="فشل التحقق من المدخلات؛ لا توجد نتيجة."}
+});
+$("export").addEventListener("click",()=>{
+ if(!last)return;
+ const url=URL.createObjectURL(new Blob([JSON.stringify(last,null,2)],{type:"application/json"}));
+ const a=document.createElement("a");a.href=url;a.download="ceri-single-voyage-unverified.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+});
+$("compute").click();official();quality();
+</script></body></html>

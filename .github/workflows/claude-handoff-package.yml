@@ -1,0 +1,54 @@
+name: Build complete Claude Handoff ZIP
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'CLAUDE_HANDOFF/**'
+      - 'scripts/build-claude-handoff.py'
+      - '.github/workflows/claude-handoff-package.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'CLAUDE_HANDOFF/**'
+      - 'scripts/build-claude-handoff.py'
+      - '.github/workflows/claude-handoff-package.yml'
+permissions:
+  contents: read
+jobs:
+  package:
+    name: Create and verify full-source ZIP
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Create complete source/data/assets handoff
+        run: python scripts/build-claude-handoff.py
+      - name: Independently inspect ZIP and content manifest
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,zipfile
+          p="dist/CERI-SC-CLAUDE-HANDOFF.zip"
+          with zipfile.ZipFile(p) as z:
+              names=z.namelist()
+              m=json.loads(z.read("CERI-SC-CLAUDE-HANDOFF/PACKAGE-METADATA.json"))
+              manifest=z.read("CERI-SC-CLAUDE-HANDOFF/MANIFEST-SHA256.txt").decode()
+              assert m["source_files"] >= 60, "unexpectedly incomplete package"
+              assert m["source_files"] == len(manifest.splitlines())
+              assert m["sha256_manifest_sha256"] == hashlib.sha256(manifest.encode()).hexdigest()
+              assert any(n.endswith("next/green-transition-logo.png") for n in names)
+              assert any(n.endswith("index.html") for n in names)
+              assert any(n.endswith("CLAUDE_HANDOFF/CLAUDE_MASTER_PROMPT.md") for n in names)
+              assert z.testzip() is None
+              print(json.dumps(m,ensure_ascii=False,indent=2))
+          PY
+      - name: Upload complete Claude handoff archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: CERI-SC-CLAUDE-COMPLETE-${{ github.sha }}
+          path: dist/CERI-SC-CLAUDE-HANDOFF.zip
+          retention-days: 90
+          if-no-files-found: error

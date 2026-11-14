@@ -78,7 +78,6 @@ export function computeIMOActivityScenario({year,assignments,imo,sca,annual}){
    if(!Object.hasOwn(groupCounts,scaType)){rejected.push({row:idx+1,reason:"UNKNOWN_SCA_GROUP"});continue}
    const signature=[scaType,entry.imoShipType,entry.sizeCategory].join("|");
    if(seen.has(signature)){rejected.push({row:idx+1,reason:"DUPLICATE_CLASS_ASSIGNMENT"});continue}
-   seen.add(signature);
    const klass=map.get(key(entry.imoShipType,entry.sizeCategory));
    if(!klass){rejected.push({row:idx+1,reason:"UNKNOWN_IMO_TYPE_SIZE"});continue}
    const mapped=SCA_GROUP_MAP[scaType];
@@ -102,6 +101,7 @@ export function computeIMOActivityScenario({year,assignments,imo,sca,annual}){
    const next=(shares.get(scaType)||0)+fraction;
    if(next>1+1e-9){rejected.push({row:idx+1,reason:"SHARES_EXCEED_100_PERCENT"});continue}
    shares.set(scaType,next);
+   seen.add(signature);
    // Fraction of ship-years equivalent to this passage activity.
    const passageCount=groupCounts[scaType].passages*fraction;
    const annualTimeFraction=hours/HOURS_PER_YEAR;

@@ -25,3 +25,27 @@ test("unreconciled historical totals fail closed",()=>{
  const corrupt=JSON.parse(JSON.stringify(hist));corrupt.annual["2025"].vessels=999;
  assert.throws(()=>buildTrafficInsights(corrupt,announced),/Monthly sum/);
 });
+// DEF-004 regression: a later monthly release must be ingestible without code edits.
+// The November record below is SYNTHETIC test data (values invented), never shipped to data/.
+const synthNov=()=>{const d=JSON.parse(JSON.stringify(announced));
+ Object.assign(d.monthlyComparison,{period:"2026-11",baseline:"2025-11",publicationDate:"2026-12-05",
+  current:{vessels:1500,netTonnageMillionRounded:90,revenueMillionUsd:730},
+  baselineValues:{vessels:1160,netTonnageMillionRounded:48,revenueMillionUsd:380}});return d;};
+test("a non-October month is analysed against the same month in the official tables",()=>{
+ const x=buildTrafficInsights(hist,synthNov());
+ assert.equal(x.latestMonth.month,"November");
+ assert.equal(x.latestMonth.period,"2026-11");
+ assert.equal(x.latestMonth.comparedTo2024.base,1000);
+ assert.equal(x.latestMonth.comparedTo2024.baseYear,2024);
+ assert.equal(x.signal,"NOVEMBER_VESSEL_COUNT_ABOVE_2024_AND_2025");
+});
+test("announcement baseline that contradicts the annual-report month fails closed",()=>{
+ const d=synthNov();d.monthlyComparison.baselineValues.vessels=1159;
+ assert.throws(()=>buildTrafficInsights(hist,d),/November 2025 baseline conflict/);
+});
+test("mismatched baseline month and pre-period publication date are rejected",()=>{
+ const d=synthNov();d.monthlyComparison.baseline="2025-10";
+ assert.throws(()=>buildTrafficInsights(hist,d),/Unexpected reporting periods/);
+ const e=synthNov();e.monthlyComparison.publicationDate="2026-10-30";
+ assert.throws(()=>buildTrafficInsights(hist,e),/Publication date/);
+});

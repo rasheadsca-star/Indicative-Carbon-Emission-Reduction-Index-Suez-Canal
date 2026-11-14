@@ -10,7 +10,7 @@ export const TRIAL_HOURS=TRIAL_DAYS*24;
 const validDate=ms=>Number.isFinite(ms)&&ms>Date.UTC(2025,0,1);
 const iso=ms=>new Date(ms).toISOString();
 
-export async function openPrivateTrial({directory,projectDir=process.cwd(),now=()=>Date.now(),providerId="aisstream"}={}){
+export async function openPrivateTrial({directory,projectDir=process.cwd(),now=()=>Date.now(),providerId="aisstream",mustExist=false}={}){
  if(typeof directory!=="string"||!directory.trim())throw Error("AIS_PRIVATE_DATA_DIR must be specified");
  if(!/^[a-z][a-z0-9_-]{1,50}$/i.test(providerId))throw Error("Invalid provider ID");
  const dest=resolve(directory),project=await realpath(resolve(projectDir));
@@ -24,6 +24,7 @@ export async function openPrivateTrial({directory,projectDir=process.cwd(),now=(
  try{manifest=JSON.parse(await readFile(manifestPath,"utf8"))}
  catch(e){
    if(e.code!=="ENOENT")throw Error("Cannot parse existing private trial manifest");
+   if(mustExist)throw Error("No existing private trial manifest; collection has not started");
    const start=now();
    if(!validDate(start))throw Error("Invalid trial start timestamp");
    manifest={schema:"ceri-sc-private-ais-trial-v1",providerId,startedAt:iso(start),

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CERI-SC — إحصاءات قناة السويس الرسمية</title>
+<style>
+:root{color-scheme:dark;font-family:Tahoma,Arial,sans-serif}*{box-sizing:border-box}
+body{background:#061e26;color:#f3fbfc;margin:0;line-height:1.75}
+header,main,footer{padding:20px;max-width:1150px;margin:auto}
+a{color:#64e6c5}h1{font-size:1.65rem}h2{font-size:1.15rem}
+.panel{background:#11313c;border:1px solid #315963;border-radius:12px;padding:20px;margin:16px 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.card{background:#164250;padding:15px;border-radius:9px}
+strong.big{display:block;font-size:1.55rem}
+table{width:100%;border-collapse:collapse;min-width:560px}td,th{padding:8px;border-bottom:1px solid #345e67;text-align:right}
+.scroller{overflow:auto}input,button,select{font:inherit;padding:8px;margin:6px 0}
+button{background:#20c997;color:#09231f;border:0;border-radius:6px;cursor:pointer;font-weight:bold}
+.warn{background:#443521;color:#ffe9bc;padding:12px;border-radius:8px}small{color:#abc7c9}
+code{direction:ltr;unicode-bidi:isolate}#error{white-space:pre-wrap;color:#ffb6aa}
+</style></head><body>
+<header><a href="./ais-lab/">← مرصد AIS</a> · <a href="./">المنصة الأساسية</a>
+<h1>بيانات هيئة قناة السويس — التقرير الإحصائي المرجعي</h1>
+<p>إحصاءات منشورة رسميًا، مع الفصل بين بيانات السنة والشهر، والبيانات اليومية أو الأسبوعية غير المتاحة أو غير المتحقق منها.</p></header>
+<main>
+<section class="panel">
+<div class="warn"><strong>حالة تحديث البيانات:</strong> أحدث فترة متحققة داخل قاعدة هذا التقرير هي ديسمبر 2025. لم يتم تأكيد سلسلة رسمية قابلة للسحب تلقائيًا لعام 2026. الأعداد الشهرية ليست رصدًا لحظيًا.</div>
+<p>المصدر: <a href="https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2025.pdf" target="_blank" rel="noopener noreferrer">النشرة السنوية لهيئة قناة السويس 2025 — جدول (2)</a> |
+<a href="https://www.suezcanal.gov.eg/English/Downloads/pages/default.aspx?folder=Navigation+Reports%2FAnnual+Reports%E2%80%8B%E2%80%8B%E2%80%8B" target="_blank" rel="noopener noreferrer">أرشيف النشرات الرسمية</a>.</p>
+<div id="status" role="status">جاري تحميل النشرة المرجعية...</div>
+</section>
+<section class="panel">
+<h2>1 — المؤشرات السنوية المنشورة</h2><div class="cards" id="annualCards"></div>
+<p><small>الحمولة الصافية بوحدة ألف طن صافٍ حسب النشرة الرسمية. لا تخلط مع حمولة البضائع أو DWT.</small></p>
+</section>
+<section class="panel">
+<h2>2 — المقارنة الشهرية الرسمية</h2>
+<label>السنة <select id="year"><option>2025</option><option>2024</option></select></label>
+<div class="scroller"><table><thead><tr><th>الشهر</th><th>عدد السفن</th><th>الحمولة الصافية (ألف طن)</th><th>التغير عن نفس شهر السنة الماضية</th></tr></thead><tbody id="monthlyRows"></tbody></table></div>
+<p id="monthlyInsight"></p>
+</section>
+<section class="panel">
+<h2>3 — اليوم والأسبوع</h2>
+<div class="warn">لا توجد حاليًا سلسلة يومية رسمية موثقة داخل هذا التطبيق. لذلك لا نعرض رسومًا أو مجاميع أسبوعية رسمية غير موجودة.</div>
+<p>للتدقيق فقط، يمكن إدخال ملف محلي يتضمن <code>date,vessels,source</code> وحساب مجموع أسبوع من سبعة أيام كاملة. <strong>هذه البيانات تظل «مُدخلة من المستخدم وغير موثقة» مهما كان وصف الملف.</strong></p>
+<p><input type="file" id="dailyFile" accept=".csv,text/csv" aria-label="ملف بيانات يومية"/>
+<label>بداية فترة السبعة أيام <input id="weekStart" type="date" value="2026-11-01"/></label>
+<button id="analyze" type="button">اختبار اكتمال الأسبوع</button></p>
+<div id="weeklyResult" role="status">لم تُرفع بيانات يومية.</div><div id="error" role="alert"></div>
+</section>
+<section class="panel">
+<h2>4 — بوابة الثقة والربط بالمحرك</h2>
+<p>نشرة الهيئة مرجع إحصائي معتمد للنطاق والفترة التي نشرتها؛ لكن ذلك لا يثبت هوية كل سفينة أو كمية وقودها أو انبعاثاتها. لا يجوز تحويل المتوسط الشهري إلى أعداد يومية فعلية، ولا توزيع أنواع السفن أو توليد وفورات CO₂ دون بيانات الرحلات.</p>
+</section>
+</main><footer><small>CERI-SC · Official published statistics, with data-period limitation and no invented daily records.</small></footer>
+<script type="module">
+import {validatePublishedSeries,annualTrends,monthlyTrends,weeklyFromDaily} from "./sca-stats/official-stats.mjs";
+import {readCsv} from "./ais-lab/reconciliation.mjs";
+const $=id=>document.getElementById(id);
+const number=x=>x===null||x===undefined?"غير متاح":new Intl.NumberFormat("en-US").format(x);
+let data;
+function showYear(){
+  const year=Number($("year").value);
+  const rows=monthlyTrends(data,year);
+  $("monthlyRows").replaceChildren();
+  for(const item of rows){
+    const tr=document.createElement("tr");
+    for(const v of [item.period,number(item.vessels),number(item.netTonnageThousands),item.yoyChangePct===null?"لا توجد مقارنة":item.yoyChangePct.toFixed(1)+"%"]){
+      const td=document.createElement("td");td.textContent=v;tr.appendChild(td);
+    }
+    $("monthlyRows").appendChild(tr);
+  }
+  $("monthlyInsight").textContent=rows.length?"كل شهر يمثل قيمة منشورة، وليس متوسطًا يوميًا أو تغطية AIS.":"لا تتوفر بيانات هذه السنة.";
+}
+try{
+  const response=await fetch("./data/sca-official-monthly-2024-2025.json",{cache:"no-store"});
+  if(!response.ok)throw Error("المصدر المحلي غير متاح");
+  data=await response.json();validatePublishedSeries(data);
+  for(const row of annualTrends(data)){
+    const el=document.createElement("div");el.className="card";
+    const title=document.createElement("div");title.textContent=String(row.year);
+    const v=document.createElement("strong");v.className="big";v.textContent=number(row.vessels)+" سفينة";
+    const net=document.createElement("div");net.textContent=number(row.netTonnageThousands)+" ألف طن صافٍ";
+    const delta=document.createElement("small");delta.textContent=row.changeVesselsPct===null?"لا توجد مقارنة بالعام السابق في هذا الجدول":"التغير السنوي "+row.changeVesselsPct.toFixed(1)+"%";
+    el.append(title,v,net,delta);$("annualCards").appendChild(el);
+  }
+  $("status").textContent="تم التحقق حسابيًا من تطابق المجاميع الشهرية 2024 و2025 مع النشرة السنوية 2025. لا يوجد مصدر يومي آلي متصل.";
+  $("year").addEventListener("change",showYear);showYear();
+}catch(e){$("status").textContent="خطأ بيانات المصدر: "+String(e.message||e)}
+$("analyze").addEventListener("click",async()=>{
+  $("error").textContent="";$("weeklyResult").textContent="";
+  const file=$("dailyFile").files?.[0];
+  if(!file){$("error").textContent="ارفع ملف CSV أولًا.";return}
+  if(file.size>5_000_000){$("error").textContent="الملف أكبر من 5 MB.";return}
+  try{
+    const records=readCsv(await file.text(),["date","vessels","source"]).map(r=>({
+      date:r.date,vessels:/^(0|[1-9]\d*)$/.test(r.vessels)?Number(r.vessels):NaN,source:r.source
+    }));
+    const result=weeklyFromDaily(records,$("weekStart").value);
+    $("weeklyResult").textContent="الفترة: "+result.start+" إلى "+result.end+
+      " | أيام بها بيانات: "+result.coveredDays+"/7"+
+      " | المجموع: "+number(result.vesselCount)+
+      " | حالة البيانات: "+result.dataStatus+
+      ". ملحوظة: "+result.note;
+  }catch(e){$("error").textContent=String(e.message||e)}
+});
+</script></body></html>

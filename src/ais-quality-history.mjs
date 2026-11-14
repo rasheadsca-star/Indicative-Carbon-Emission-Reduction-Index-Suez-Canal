@@ -39,7 +39,7 @@ export function evaluateQuality(history,now=new Date()){
   if(!Number.isFinite(t))throw Error("Invalid evaluation time");
   const within=h=>samples.filter(x=>{
     const age=t-Date.parse(x.checkedAt);
-    return age>=0&&age<=h*3600000;
+    return age>=0&&age<h*3600000; // Half-open window prevents counting both hourly endpoints
   });
   const periods=[{hours:24,key:"last24h"},{hours:168,key:"last7d"}];
   const out={status:"UNVERIFIED_COVERAGE",assessedAt:new Date(t).toISOString(),sampleCount:samples.length,
@@ -54,7 +54,18 @@ export function evaluateQuality(history,now=new Date()){
       snapshotMean:mean,snapshotMedian:median,snapshotMax:nums.length?nums.at(-1):null,
       latestCheckedAt:latest?.checkedAt||null,stale:!latest||(t-Date.parse(latest.checkedAt)>150*60000),
       transitCount:null,coverageRate:null,
+      // Hourly scheduled collection: estimate its execution coverage only after a
+      // complete observation window has elapsed; it is NOT AIS geographic coverage.
+      scheduledHourlyChecks:hours,
+      scheduleWindowMature:samples.some(x=>{
+        const age=t-Date.parse(x.checkedAt);
+        return age>=hours*3600000 && age<=45*24*3600000;
+      }),
+      collectionRunRatio:null,
       assessment:arr.length===0?"NO_SAMPLES":usable.length===0?"NO_USABLE_SNAPSHOT":"REGIONAL_SAMPLE_ONLY"};
+    if(out[key].scheduleWindowMature){
+      out[key].collectionRunRatio=Math.min(1,arr.length/hours);
+    }
   }
   return out;
 }

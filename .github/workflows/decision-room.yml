@@ -5,6 +5,8 @@ on:
       - 'decision-room.html'
       - 'src/ais-quality-history.mjs'
       - 'src/ais-quality-history.test.mjs'
+      - 'src/official-traffic-insights.mjs'
+      - 'src/official-traffic-insights.test.mjs'
       - 'src/voyage-audit.mjs'
       - 'src/voyage-audit.test.mjs'
       - 'scripts/ais-source-quality.mjs'
@@ -35,5 +37,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: node --test src/ais-quality-history.test.mjs src/voyage-audit.test.mjs tests/decision-room.test.mjs
+      - run: node --test src/ais-quality-history.test.mjs src/official-traffic-insights.test.mjs src/voyage-audit.test.mjs tests/decision-room.test.mjs
       - run: node --check scripts/ais-source-quality.mjs

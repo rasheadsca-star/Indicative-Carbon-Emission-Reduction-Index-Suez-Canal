@@ -27,7 +27,10 @@ table{border-collapse:collapse;width:100%;min-width:550px}td,th{border-bottom:1p
 </header><main>
 <section><h2>1 — نتائج الحركة والجدوى من بيانات رسمية مؤرخة</h2>
 <p id="officialDate" class="status">تحميل البيانات الموثقة...</p><div id="officialCards" class="grid"></div>
-<p id="officialInterpretation"></p><a id="officialSource" href="./official-statistics.html">مصدر إحصاءات الهيئة</a>
+<p id="officialInterpretation"></p>
+<div class="grid" id="historicalCards" aria-label="Historical official comparisons"></div>
+<p id="historicalInterpretation"></p>
+<a id="historicalSource" href="./official-statistics.html">التقرير السنوي الرسمي لعام 2025</a> · <a id="officialSource" href="./official-statistics.html">مصدر إحصاءات الهيئة</a>
 </section>
 <section><h2>2 — صحة الرصد الإقليمي: آخر 24 ساعة و7 أيام</h2>
 <div class="warning">عدد MMSI في لقطة AIS لا يساوي عدد السفن العابرة. قد تظهر السفينة في لقطات كثيرة؛ لا تُجمع اللقطات ولا تُحوَّل إلى إجمالي يومي. تغطية Open Waters لمنطقة القناة لم تُعاير رسميًا.</div>
@@ -47,6 +50,9 @@ table{border-collapse:collapse;width:100%;min-width:550px}td,th{border-bottom:1p
 <label>معدل وقود الانتظار (طن/يوم)<input id="standbyBurnTonnesDay" type="number" step="0.1" value="12" min="0"></label>
 <label>معامل CO₂ للاحتراق (طن CO₂/طن وقود)<input id="combustionCO2TonnesPerTonne" type="number" step="0.001" value="3.114" min="0.01"></label>
 <label>حساسية الاستهلاك ± (%)<input id="burnSensitivityPct" type="number" step="1" value="10" min="0" max="60"></label>
+<label>مرجع المسافات (رابط أو وصف)<input id="distanceSource" type="text" placeholder="مثال: دراسة مسار بتاريخ محدد"></label>
+<label>مرجع الاستهلاك (رابط أو وصف)<input id="fuelSource" type="text" placeholder="مثال: سجل استهلاك السفينة"></label>
+<label>مرجع معامل الانبعاث (رابط أو وصف)<input id="factorSource" type="text" placeholder="مثال: IMO factor and fuel specification"></label>
 </div>
 <p><button id="compute" type="button">حساب المقارنة</button> <button id="export" type="button" disabled>تصدير تقرير الحساب JSON</button></p>
 <div id="errors" role="alert"></div>
@@ -64,6 +70,7 @@ table{border-collapse:collapse;width:100%;min-width:550px}td,th{border-bottom:1p
 <script type="module">
 import {computeVoyageScenario} from "./src/voyage-audit.mjs";
 import {analyzeAnnouncements} from "./sca-stats/announcements-2026.mjs";
+import {buildTrafficInsights} from "./src/official-traffic-insights.mjs";
 const $=id=>document.getElementById(id);
 const fmt=(n,d=0)=>n===null||!Number.isFinite(n)?"غير متاح":n.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
 function card(container,label,value,explain){
@@ -87,6 +94,25 @@ async function official(){
   card(out,"سفن الحاويات المتوسطة والعملاقة",fmt(a.container.now),"يوليو–سبتمبر 2026 مقابل "+fmt(a.container.prev)+" خلال الفترة المقابلة");
   card(out,"وفورات CO₂ المعتمدة","غير متاحة","تحتاج بيانات رحلة ووقود ومقارنة مستقلة");
   $("officialSource").href=a.sourceUrl;
+  try{
+    const h=await fetch("./data/sca-official-monthly-2024-2025.json",{cache:"no-store"});
+    if(!h.ok)throw Error("HTTP "+h.status);
+    const historical=await h.json(),insights=buildTrafficInsights(historical,data);
+    const annual=insights.annual,oct=insights.october,container=$("historicalCards");
+    container.replaceChildren();
+    card(container,"عدد السفن 2025 مقابل 2024",fmt(annual.vessels.current),
+      fmt(annual.vessels.absolute)+" سفينة · "+fmt(annual.vessels.changePct,2)+"%");
+    card(container,"الحمولة الصافية 2025",fmt(annual.netTonnes.current/1e6,3)+" مليون طن",
+      fmt(annual.netTonnes.changePct,2)+"% مقارنة بـ2024");
+    card(container,"متوسط الحمولة الصافية للسفينة 2025",fmt(annual.netTonnesPerVessel.current,0)+" طن صافٍ",
+      "التغير عن 2024: +"+fmt(annual.netTonnesPerVessel.changePct,2)+"% · متوسط حسابي، ليس GT أو DWT");
+    card(container,"أكتوبر 2026 مقارنة بأكتوبر 2024",fmt(oct.comparedTo2024.current)+" سفينة",
+      "مقابل "+fmt(oct.comparedTo2024.base)+" · +"+fmt(oct.comparedTo2024.changePct,1)+"%");
+    $("historicalInterpretation").textContent="تحليل إضافي من بيانات الهيئة: عدد السفن انخفض 3.44% خلال 2025، بينما انخفضت الحمولة الصافية نحو 0.47% فقط؛ لذلك ارتفع متوسط الحمولة الصافية للسفينة. وفي أكتوبر 2026 تجاوز العدد مستويَي أكتوبر 2024 و2025. لا يُثبت هذا وحده حجم الانبعاثات المتجنبة.";
+    $("historicalSource").href=annual.sourceUrl;
+  }catch(e){
+    $("historicalInterpretation").textContent="تعذر تأكيد المقارنة التاريخية؛ لا يمكن عرض نتيجة: "+e.message;
+  }
   $("officialInterpretation").textContent="قراءة تحليلية: تعافٍ ملاحـي خلال أكتوبر 2026، مع نمو الحمولة والإيرادات أسرع من عدد السفن. لا يُثبت ذلك بمفرده سبب التغير، ولا مقدار وفر الانبعاثات.";
  }catch(e){$("officialDate").textContent="تعذر قراءة المؤشرات الرسمية: "+e.message}
 }
@@ -102,6 +128,8 @@ async function quality(){
   card(container,"متوسط MMSI لكل لقطة (24 ساعة)",fmt(p24.snapshotMean,1),"ليس عدد عبور القناة");
   card(container,"أقصى MMSI في لقطة (24 ساعة)",fmt(p24.snapshotMax),"قد تكون نفس السفن في لقطات متكررة");
   card(container,"عينات خلال 7 أيام",fmt(p7.samples),"صالحة "+fmt(p7.usableSamples)+" · ليست سجل عبور");
+  card(container,"انتظام تشغيل الفحص بالساعة (24 ساعة)",p24.collectionRunRatio===null||p24.collectionRunRatio===undefined?"قيد التجميع":fmt(p24.collectionRunRatio*100,1)+"%",
+    "يظهر بعد اكتمال نافذة 24 ساعة، وليس قياسًا لتغطية حركة السفن");
   card(container,"نسبة تغطية عبور القناة","غير متاحة","لا يوجد مرجع سفن رسمي مطابق بنفس الزمن والنطاق");
   $("aisStatus").textContent="آخر تقرير: "+data.assessedAt+" UTC · عمره "+fmt(age)+" دقيقة · "+(age>150||age<0?"حالة قديمة؛ لا تعتمد":"تشخيص دوري غير معتمد");
   $("aisInterpretation").textContent=(p24.samples<12?"العينات خلال 24 ساعة غير كافية للحكم على انتظام المصدر. ":"")+
@@ -115,7 +143,12 @@ $("compute").addEventListener("click",()=>{
  const input=Object.fromEntries(fields.map(k=>[k,document.getElementById(k).value.trim()===""?NaN:Number(document.getElementById(k).value)]));
  try{
    const a=computeVoyageScenario(input);
-   last={generatedAt:new Date().toISOString(),input,output:a,inputEvidence:"USER_INPUTS_NOT_AUTHENTICATED"};
+   const evidence={distanceSource:$("distanceSource").value.trim(),fuelSource:$("fuelSource").value.trim(),factorSource:$("factorSource").value.trim()};
+   const evidenceCompleteness=Object.values(evidence).filter(Boolean).length;
+   last={schema:"ceri-sc-single-voyage-audit-v2",generatedAt:new Date().toISOString(),
+     input,output:a,evidence,
+     evidenceCompleteness:evidenceCompleteness+"/3",inputEvidence:"USER_REFERENCES_NOT_INDEPENDENTLY_VERIFIED",verified:false};
+
    const c=$("resultCards");
    card(c,"وقود طريق السويس",fmt(a.suez.fuelTonnes,2)+" طن","يشمل البحر وفترة الانتظار المدخلة");
    card(c,"وقود رأس الرجاء الصالح",fmt(a.cape.fuelTonnes,2)+" طن","يشمل البحر والانتظار المدخل");
@@ -123,7 +156,7 @@ $("compute").addEventListener("click",()=>{
    card(c,"وفر CO₂ التشغيلي المباشر",fmt(a.deltaCO2Tonnes,2)+" طن CO₂","Tank-to-Wake احتراق فقط");
    card(c,"وفر الزمن",fmt(a.deltaHours,1)+" ساعة","لا يشمل تأخيرات غير مدخلة");
    card(c,"نطاق حساسية CO₂",fmt(a.sensitivity.lowerCO2Tonnes,1)+" إلى "+fmt(a.sensitivity.upperCO2Tonnes,1),"افتراض ±"+input.burnSensitivityPct+"% وليس نطاق ثقة");
-   $("modelStatus").textContent="نتيجة حسابية قابلة لإعادة الإنتاج؛ حالة الأدلة: UNVERIFIED_USER_SCENARIO. لا تعمم على جميع السفن أو تصدر شهادة.";
+   $("modelStatus").textContent="نتيجة حسابية قابلة لإعادة الإنتاج. مراجع المدخلات المتاحة: "+last.evidenceCompleteness+". هذه المراجع يدخلها المستخدم ولا يتحقق التطبيق من صحتها. حالة النتيجة: UNVERIFIED_USER_SCENARIO. لا تعمم على الأسطول أو تصدر شهادة.";
    $("export").disabled=false;
  }catch(e){$("errors").textContent=e.message;$("modelStatus").textContent="فشل التحقق من المدخلات؛ لا توجد نتيجة."}
 });

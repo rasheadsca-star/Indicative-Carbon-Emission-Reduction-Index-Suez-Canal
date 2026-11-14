@@ -50,7 +50,7 @@ const dom = new JSDOM(html, {
 
 await new Promise((resolve) => setTimeout(resolve, 120));
 assert.equal(dom.window.document.querySelectorAll("#nav button").length, 6);
-assert.match(dom.window.document.querySelector("#main").textContent, /Suez Canal traffic|حركة الملاحة الرسمية/);
+assert.match(dom.window.document.querySelector("#main").textContent, /Official Suez Canal intelligence|مؤشرات قناة السويس الرسمية/);
 assert.doesNotMatch(dom.window.document.querySelector("#main").textContent, /PRO-RATA YEAR-TO-DATE/);
 assert.doesNotMatch(dom.window.document.querySelector("#main").textContent, /19\.2M|60,553|1,841,825/);
 assert.match(html, /renderOfficialCurrentYear\(M,yr\)/);

@@ -1,0 +1,164 @@
+{
+  "schema": "ceri-sc-sca-official-type-breakdown-v1",
+  "publisher": "Suez Canal Authority",
+  "period": "2023–2025 annual",
+  "scope": "Transits by ship type (passages) and net tonnage (thousand net tons), not unique vessels",
+  "sourceUrls": [
+    "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2024.pdf",
+    "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2025.pdf"
+  ],
+  "method": "Manual transcription of official SCA Annual Reports Table 3, direct cross-reconciliation to whole-fleet 2023–2025 annual totals",
+  "types": [
+    "Tankers",
+    "LNG Ships",
+    "Bulk Carr.",
+    "General Cargo",
+    "Container Ships",
+    "Ro/Ro",
+    "Car Carr.",
+    "Passenger Ships",
+    "Other"
+  ],
+  "years": {
+    "2023": {
+      "publication": "2024 Annual Report, Table 3",
+      "sourceUrl": "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2024.pdf",
+      "shipCount": 26434,
+      "netTonnageThousands": 1568257,
+      "groups": {
+        "Tankers": {
+          "passages": 8435,
+          "netTonnageThousands": 416366
+        },
+        "LNG Ships": {
+          "passages": 819,
+          "netTonnageThousands": 91849
+        },
+        "Bulk Carr.": {
+          "passages": 7186,
+          "netTonnageThousands": 295127
+        },
+        "General Cargo": {
+          "passages": 2056,
+          "netTonnageThousands": 22512
+        },
+        "Container Ships": {
+          "passages": 5847,
+          "netTonnageThousands": 657033
+        },
+        "Ro/Ro": {
+          "passages": 207,
+          "netTonnageThousands": 7352
+        },
+        "Car Carr.": {
+          "passages": 1077,
+          "netTonnageThousands": 66368
+        },
+        "Passenger Ships": {
+          "passages": 106,
+          "netTonnageThousands": 5480
+        },
+        "Other": {
+          "passages": 701,
+          "netTonnageThousands": 6170
+        }
+      }
+    },
+    "2024": {
+      "publication": "2025 Annual Report, Table 3",
+      "sourceUrl": "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2025.pdf",
+      "shipCount": 13213,
+      "netTonnageThousands": 524527,
+      "groups": {
+        "Tankers": {
+          "passages": 4954,
+          "netTonnageThousands": 243315
+        },
+        "LNG Ships": {
+          "passages": 119,
+          "netTonnageThousands": 13176
+        },
+        "Bulk Carr.": {
+          "passages": 4106,
+          "netTonnageThousands": 161250
+        },
+        "General Cargo": {
+          "passages": 1437,
+          "netTonnageThousands": 15094
+        },
+        "Container Ships": {
+          "passages": 1748,
+          "netTonnageThousands": 74803
+        },
+        "Ro/Ro": {
+          "passages": 154,
+          "netTonnageThousands": 5242
+        },
+        "Car Carr.": {
+          "passages": 122,
+          "netTonnageThousands": 6595
+        },
+        "Passenger Ships": {
+          "passages": 19,
+          "netTonnageThousands": 497
+        },
+        "Other": {
+          "passages": 554,
+          "netTonnageThousands": 4555
+        }
+      }
+    },
+    "2025": {
+      "publication": "2025 Annual Report, Table 3",
+      "sourceUrl": "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2025.pdf",
+      "shipCount": 12758,
+      "netTonnageThousands": 522084,
+      "groups": {
+        "Tankers": {
+          "passages": 4991,
+          "netTonnageThousands": 246851
+        },
+        "LNG Ships": {
+          "passages": 282,
+          "netTonnageThousands": 30627
+        },
+        "Bulk Carr.": {
+          "passages": 3423,
+          "netTonnageThousands": 131914
+        },
+        "General Cargo": {
+          "passages": 1333,
+          "netTonnageThousands": 17824
+        },
+        "Container Ships": {
+          "passages": 1840,
+          "netTonnageThousands": 72453
+        },
+        "Ro/Ro": {
+          "passages": 176,
+          "netTonnageThousands": 5902
+        },
+        "Car Carr.": {
+          "passages": 179,
+          "netTonnageThousands": 11499
+        },
+        "Passenger Ships": {
+          "passages": 17,
+          "netTonnageThousands": 669
+        },
+        "Other": {
+          "passages": 517,
+          "netTonnageThousands": 4345
+        }
+      }
+    }
+  },
+  "notes": [
+    "2024 Annual Report reports 2024 tanker net ton 243313 vs 2025 Annual Report 243315; car carrier 6596 vs 6595; passenger 498 vs 497. The later 2025 table is used for all 2024 category totals so sums reconcile, and conflicts must remain visible.",
+    "Year 2023 data come from the 2024 Annual Report, Table 3.",
+    "Tankers group contains multiple tanker IMO fuel classes; LNG Ships category is not identical to Third IMO 2012 Liquefied gas tanker which also includes other gas carriers.",
+    "Car carrier -> Vehicle, Bulk Carr. -> Bulk carrier, General Cargo -> General cargo, Container Ships -> Container, and Ro/Ro -> Ro-Ro are broad heuristic alignment only; size-category breakdown is NOT supplied by these tables.",
+    "Count = canal passage events, not unique vessels in 2012 IMO annual fleet component model; do not multiply annual fuel per ship by passage count without converting passage-hours to annual activity and adding evidence.",
+    "2023–2025 type counts give full official passage-group coverage only. They do not provide historical canal hours, propulsion mode, HFO share, size-class mix or fuel measured, and cannot validate a claimed CO2 annual total."
+  ]
+}

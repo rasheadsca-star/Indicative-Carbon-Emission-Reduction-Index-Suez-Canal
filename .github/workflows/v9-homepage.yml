@@ -4,6 +4,9 @@ on:
     paths:
       - 'index.html'
       - 'tests/smoke.mjs'
+      - 'data/sca-2026-official-announcements.json'
+      - 'sca-stats/announcements-2026.mjs'
+      - 'sca-stats/announcements-2026.test.mjs'
       - '.github/workflows/v9-homepage.yml'
   push:
     branches: [main]
@@ -25,3 +28,4 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: node --test sca-stats/announcements-2026.test.mjs

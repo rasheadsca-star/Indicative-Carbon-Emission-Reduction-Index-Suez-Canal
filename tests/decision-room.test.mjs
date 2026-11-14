@@ -23,3 +23,14 @@ test("source uses no invalid claim that AIS snapshots equal transits",()=>{
  assert.doesNotMatch(html,/snapshotMean[^]*?\bactualTransits\s*=/);
  assert.match(html,/لا يساوي عدد السفن العابرة/);
 });
+
+test("decision room displays published historic insights and input provenance",()=>{
+ assert.match(html,/historicalCards/);
+ assert.match(html,/buildTrafficInsights/);
+ assert.match(html,/official-traffic-insights\.mjs/);
+ assert.match(html,/distanceSource/);
+ assert.match(html,/fuelSource/);
+ assert.match(html,/factorSource/);
+ assert.match(html,/USER_REFERENCES_NOT_INDEPENDENTLY_VERIFIED/);
+ assert.match(html,/collectionRunRatio/);
+});

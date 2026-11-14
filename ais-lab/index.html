@@ -49,6 +49,11 @@
     <p><small data-id="tierLimits">حدود مصدر البيانات لم تصل بعد</small> · <small data-id="snapshotMeta">نتيجة اللقطة لم تصل بعد</small></p>
     <p><small>تنبيه: عدد السفن في أول بطاقة يخص آخر 30 دقيقة فقط؛ بينما عدد MMSI المميز يخص رسائل جلسة المتصفح. كلاهما ليس تعدادًا يوميًا أو رصدًا على مدار 24 ساعة.</small></p>
   </section>
+  <section class="panel" style="border:1px solid #c89535" aria-label="مراقبة مستقلة لجودة المصدر">
+    <h3>فحص مستقل للمصدر — يعمل على خادم GitHub وفق جدول دوري</h3>
+    <p id="providerQuality" role="status">لم تُنشر نتيجة فحص الخادم بعد. لا يمكن استنتاج جودة تغطية القناة.</p>
+    <small>النتيجة عينة من مصدر AIS ولا تشمل جميع السفن. تأخر تشغيل الفحص أو غياب البيانات يعرض حالة غير معروفة، وليس صفرًا.</small>
+  </section>
   <div class="main-grid">
     <section class="panel" aria-label="خريطة رصد السفن">
       <div class="panelhead"><div><h3>الخريطة الملاحية التجريبية</h3><small>العلامات تمثل آخر موقع معروف، وليست موقعًا مؤكدًا في هذه اللحظة</small></div><small>© OpenStreetMap · Open Waters AIS</small></div>
@@ -103,5 +108,6 @@
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script type="module" src="./app.mjs"></script>
+<script type="module" src="./source-health.mjs"></script>
 </body>
 </html>

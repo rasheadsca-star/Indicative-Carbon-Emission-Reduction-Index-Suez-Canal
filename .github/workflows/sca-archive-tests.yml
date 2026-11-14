@@ -1,0 +1,27 @@
+name: SCA archive parser quality
+on:
+  pull_request:
+    paths:
+      - 'sca-stats/archive-parser.mjs'
+      - 'sca-stats/archive-parser.test.mjs'
+      - 'scripts/sca-annual-archive-watch.mjs'
+      - '.github/workflows/sca-archive-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'sca-stats/archive-parser.mjs'
+      - 'sca-stats/archive-parser.test.mjs'
+      - 'scripts/sca-annual-archive-watch.mjs'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check scripts/sca-annual-archive-watch.mjs
+      - run: node --test sca-stats/archive-parser.test.mjs

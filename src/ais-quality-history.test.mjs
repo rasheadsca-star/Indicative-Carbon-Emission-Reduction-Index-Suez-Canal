@@ -57,3 +57,13 @@ test("mature collection ratio measures hourly scheduler, not regional vessel cov
  assert.equal(q.last24h.collectionRunRatio,1/24);
  assert.equal(q.last24h.coverageRate,null);
 });
+
+test("two ad-hoc checks during same UTC hour count as one scheduled slot",()=>{
+ let h=appendQualitySample(null,sample("2026-11-13T10:00:00Z",1));
+ h=appendQualitySample(h,sample("2026-11-14T10:02:00Z",4));
+ h=appendQualitySample(h,sample("2026-11-14T10:20:00Z",9));
+ const q=evaluateQuality(h,"2026-11-14T10:30:00Z");
+ assert.equal(q.last24h.samples,2);
+ assert.equal(q.last24h.collectionRunRatio,1/24);
+ assert.equal(q.last24h.transitCount,null);
+});

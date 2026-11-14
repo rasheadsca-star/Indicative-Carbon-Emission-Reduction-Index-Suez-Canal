@@ -1632,8 +1632,8 @@ async function renderOfficialCurrentYear(M,yr){
   const heading=document.createElement('h2');heading.textContent=ar?'مؤشرات قناة السويس الرسمية — 2026':'Official Suez Canal intelligence — 2026';
   const explanation=document.createElement('p');
   explanation.textContent=ar
-    ?'بيانات أعلنتها هيئة قناة السويس رسميًا، وليست رصد AIS. أحدث شهر معلن هنا أكتوبر 2026. التحليل يفصل العدد والحمولة والإيرادات عن أي وفورات CO₂ غير مثبتة.'
-    :'Official SCA announcements, not AIS observations. Latest monthly result here: October 2026. Traffic, net tonnage and revenue are kept separate from unverified CO₂ savings.';
+    ?'بيانات أعلنتها هيئة قناة السويس رسميًا، وليست رصد AIS. تُعرض أحدث فترة وفق ملف المصدر. التحليل يفصل العدد والحمولة والإيرادات عن أي وفورات CO₂ غير مثبتة.'
+    :'Official SCA announcements, not AIS observations. The latest reported period is loaded from the data file. Traffic, net tonnage and revenue are kept separate from unverified CO₂ savings.';
   explanation.style.cssText='line-height:1.9;color:var(--txt)';
   const status=document.createElement('p');status.setAttribute('role','status');
   status.textContent=ar?'تحميل أحدث المؤشرات المنشورة...':'Loading the published indicators...';
@@ -1670,43 +1670,46 @@ async function renderOfficialCurrentYear(M,yr){
     const response=await fetch('./data/sca-2026-official-announcements.json',{cache:'no-store'});
     if(!response.ok)throw Error('Source HTTP '+response.status);
     const d=await response.json(),m=d.monthlyComparison,c=d.containerRecovery;
-    if(d.schema!=='ceri-sc-sca-2026-announcements-v1'||m.period!=='2026-10'||
-       m.baseline!=='2025-10'||m.current.vessels!==1490||m.baselineValues.vessels!==1128||
+    if(d.schema!=='ceri-sc-sca-2026-announcements-v1'||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(m.period)||
+       m.baseline!==(Number(m.period.slice(0,4))-1)+m.period.slice(4)||
+       !Number.isSafeInteger(m.current.vessels)||m.current.vessels<=0||
+       !Number.isSafeInteger(m.baselineValues.vessels)||m.baselineValues.vessels<=0||
        !m.sourceUrl.startsWith('https://www.suezcanal.gov.eg/')||
        !c.sourceUrl.startsWith('https://www.suezcanal.gov.eg/'))
       throw Error('Source data verification gate failed');
     if(!root.isConnected)return;
+    const monthLabel=m.period,baseLabel=m.baseline,pctReport=m.authorityReportedChangePct||{};
     cards.replaceChildren();
     const deltaPct=(newValue,oldValue)=>((newValue/oldValue-1)*100).toFixed(1);
     status.textContent=ar
-      ?'آخر بيان شهري موثق: أكتوبر 2026 · نشر 5 نوفمبر 2026 · مقارنة بأكتوبر 2025'
-      :'Latest official month: October 2026 · published 5 November 2026 · vs October 2025';
-    addCard(ar?'السفن العابرة — أكتوبر 2026':'October 2026 — transits',fmtInt(m.current.vessels),
-      '+'+fmtInt(m.current.vessels-m.baselineValues.vessels)+' / +'+deltaPct(m.current.vessels,m.baselineValues.vessels)+'% '+(ar?'مقابل أكتوبر 2025':'vs October 2025'));
+      ?'آخر بيان شهري موثق: '+monthLabel+' · نشر '+m.publicationDate+' · مقارنة بـ '+baseLabel
+      :'Latest official month: '+monthLabel+' · published '+m.publicationDate+' · vs '+baseLabel;
+    addCard(ar?'السفن العابرة — '+monthLabel:monthLabel+' — transits',fmtInt(m.current.vessels),
+      '+'+fmtInt(m.current.vessels-m.baselineValues.vessels)+' / +'+deltaPct(m.current.vessels,m.baselineValues.vessels)+'% '+(ar?'مقابل '+baseLabel:'vs '+baseLabel));
     addCard(ar?'الحمولة الصافية — مليون طن':'Net tonnage — million tons','≈ '+m.current.netTonnageMillionRounded+'M',
-      ar?'الهيئة أعلنت ارتفاعًا 86%؛ القيم بالمليون مدورة':'SCA reported +86%; million-ton inputs rounded');
+      ar?'التغير المعلن: '+(pctReport.netTonnage??'غير متاح')+'%؛ القيم مدورة':'SCA reported '+(pctReport.netTonnage??'N/A')+'%; rounded inputs');
     addCard(ar?'الإيرادات — مليون دولار':'Revenue — USD million','$'+fmtInt(m.current.revenueMillionUsd)+'M',
       '+'+fmtInt(m.current.revenueMillionUsd-m.baselineValues.revenueMillionUsd)+'M / +'+deltaPct(m.current.revenueMillionUsd,m.baselineValues.revenueMillionUsd)+'%');
     addCard(ar?'الحمولة الصافية لكل سفينة — تقريبي':'Net tons per transit — approximate',
       '≈ '+fmtInt(Math.round(m.current.netTonnageMillionRounded*1e6/m.current.vessels)),
       ar?'ناتج قسمة إجمالي الحمولة المدور على عدد السفن، وليس GT أو DWT':'Rounded net-ton aggregate / transits, not GT or DWT');
-    addCard(ar?'سفن الحاويات المتوسطة والعملاقة — يوليو–سبتمبر':'Medium/mega container vessels — Jul–Sep',
+    addCard(ar?'سفن الحاويات المتوسطة والعملاقة — '+c.period:'Medium/mega container vessels — '+c.period,
       fmtInt(c.current.vessels),
-      (ar?'مقابل ':'vs ')+fmtInt(c.baselineValues.vessels)+' '+(ar?'في 2025 · شريحة محددة':'in 2025 · defined segment'));
+      (ar?'مقابل ':'vs ')+fmtInt(c.baselineValues.vessels)+' '+(ar?'في '+c.baseline+' · شريحة محددة':'in '+c.baseline+' · defined segment'));
     addCard(ar?'وفورات CO₂ المعتمدة في 2026':'Certified avoided CO₂ in 2026',ar?'غير متاحة':'Not available',
       ar?'لا تنتج من حركة السفن أو الإيرادات وحدها':'Cannot be derived from counts/revenue alone');
     details.replaceChildren();
     const note=document.createElement('p');
     note.textContent=ar
-      ?'قراءة أولية: ارتفع عدد السفن في أكتوبر بنسبة '+deltaPct(m.current.vessels,m.baselineValues.vessels)+'%، بينما أعلنت الهيئة ارتفاع الحمولة 86% والإيرادات 94%. وهذا مؤشر لتعافٍ في الحركة وتحسن في الحجم/المزيج أو العائد؛ ولا يثبت بمفرده سبب كل تغير أو خفض انبعاثات.'
-      :'Interpretation: October traffic increased '+deltaPct(m.current.vessels,m.baselineValues.vessels)+'%; SCA reported +86% net tonnage and +94% revenue. This points to recovery and potential mix/yield changes, without proving causality or emissions benefits.';
+      ?'التغير في عدد السفن خلال '+monthLabel+': '+deltaPct(m.current.vessels,m.baselineValues.vessels)+'%. تغير الحمولة المعلن '+(pctReport.netTonnage??'غير متاح')+'%، والإيرادات '+(pctReport.revenue??'غير متاح')+'%. لا يثبت هذا سبب التغير أو خفض الانبعاثات.'
+      :'Traffic change in '+monthLabel+': '+deltaPct(m.current.vessels,m.baselineValues.vessels)+'%; reported tonnage '+(pctReport.netTonnage??'N/A')+'%, revenue '+(pctReport.revenue??'N/A')+'%. No causal or emissions claim.';
     details.appendChild(note);
     const sampled=document.createElement('p');
     sampled.textContent=ar
-      ?'مؤشر مستقل محدود: أعلنت الهيئة عبور '+d.singleDay.vessels+' سفينة في '+d.singleDay.date+'؛ هذا يوم واحد وليس سلسلة يومية. وبلغ عدد سفن الحاويات المحددة '+c.current.vessels+' مقابل '+c.baselineValues.vessels+' في يوليو–سبتمبر.'
+      ?'مؤشر مستقل محدود: أعلنت الهيئة عبور '+d.singleDay.vessels+' سفينة في '+d.singleDay.date+'؛ هذا يوم واحد وليس سلسلة يومية. وبلغ عدد سفن الحاويات المحددة '+c.current.vessels+' مقابل '+c.baselineValues.vessels+' خلال '+c.period+'.'
       :'Separate evidence: SCA reported '+d.singleDay.vessels+' vessels on '+d.singleDay.date+'; one day is not a daily series. Defined Jul–Sep container vessels: '+c.current.vessels+' versus '+c.baselineValues.vessels+'.';
     details.appendChild(sampled);
-    link(m.sourceUrl,ar?'مصدر نتائج أكتوبر — هيئة قناة السويس':'SCA October official announcement');
+    link(m.sourceUrl,ar?'مصدر نتائج '+monthLabel+' — هيئة قناة السويس':'SCA '+monthLabel+' official announcement');
     link(c.sourceUrl,ar?'مصدر تعافي سفن الحاويات':'SCA container-vessel announcement');
     link(d.singleDay.sourceUrl,ar?'مصدر العبور في 16 سبتمبر':'SCA September 16 daily statement');
   }catch(error){

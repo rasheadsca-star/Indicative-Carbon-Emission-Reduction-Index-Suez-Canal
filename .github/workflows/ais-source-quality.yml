@@ -7,6 +7,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/ais-source-quality.mjs'
+      - 'src/ais-quality-history.mjs'
+      - 'src/ais-quality-history.test.mjs'
       - '.github/workflows/ais-source-quality.yml'
 permissions:
   contents: write
@@ -23,23 +25,27 @@ jobs:
         with:
           node-version: '22'
       - name: Check diagnostic syntax
-        run: node --check scripts/ais-source-quality.mjs
+        run: node --check scripts/ais-source-quality.mjs && node --test src/ais-quality-history.test.mjs
       - name: Collect publicly accessible source health
         run: node scripts/ais-source-quality.mjs
       - name: Store metadata artifact
         uses: actions/upload-artifact@v4
         with:
           name: ais-source-quality
-          path: data/ais-source-health.json
+          path: |
+            data/ais-source-health.json
+            data/ais-quality-history.json
+            data/ais-quality-summary.json
           retention-days: 30
       - name: Commit public aggregate-only health status
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/ais-source-health.json
+          git add data/ais-source-health.json data/ais-quality-history.json data/ais-quality-summary.json
           if ! git diff --cached --quiet; then
             git commit -m "data: update AIS source quality (not official traffic)"
-            git push
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
 
   publish-status:

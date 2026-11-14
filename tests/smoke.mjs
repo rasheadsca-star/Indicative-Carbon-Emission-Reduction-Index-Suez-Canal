@@ -83,6 +83,17 @@ dom.window.openFeedback();
 assert.ok(dom.window.document.getElementById("feedbackModal").classList.contains("open"));
 const report = dom.window.buildDashboardPrintReport();
 assert.equal(report.querySelectorAll(".print-report-page").length, 4);
+// DEF-001: 2026 has no complete official annual total; it must not be annualised from a partial period.
+assert.match(report.textContent, /No complete official annual total exists for 2026/);
+assert.doesNotMatch(report.textContent, /12,300/);
+assert.doesNotMatch(html, /t:12300/);
+const seriesYears = dom.window.allYears("SG-RTM").map((a) => a.yr);
+assert.equal(seriesYears.at(-1), 2025);
+assert.ok(!seriesYears.includes(2026));
+const cum = dom.window.cumulative("SG-RTM");
+assert.equal(cum.at(-1).cum, seriesYears.reduce((s, y) => s + dom.window.calcYr(y, "SG-RTM").tR, 0));
+dom.window.document.querySelectorAll("#nav button")[2].click();
+assert.doesNotMatch(dom.window.document.querySelector("#main").textContent, /12,300/);
 assert.deepEqual(runtimeErrors, []);
 dom.window.close();
 

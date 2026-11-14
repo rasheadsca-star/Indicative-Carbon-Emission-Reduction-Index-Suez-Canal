@@ -545,14 +545,17 @@ function printDashboard(){
   }));
 }
 function buildDashboardPrintReport(){
-  const ar=lang==='ar',yr=+document.getElementById('ySel').value,res=calcYr(yr,'SG-RTM');
+  const ar=lang==='ar',selYr=+document.getElementById('ySel').value;
+  // Never print a fabricated full-year value for an incomplete year: fall back to the latest complete year and say so.
+  const incompleteSel=getYearTransit(selYr)===null,yr=incompleteSel?+seriesYears().at(-1):selYr,res=calcYr(yr,'SG-RTM');
+  const incompleteNote=incompleteSel?`<p class="print-note">${ar?`لا يوجد إجمالي سنوي رسمي مكتمل لعام ${selYr}؛ يعرض التقرير آخر سنة مكتملة (${yr}).`:`No complete official annual total exists for ${selYr}; this report shows the latest complete year (${yr}).`}</p>`:'';
   const all=allYears('SG-RTM'),cum=cumulative('SG-RTM'),asOf=new Date().toLocaleDateString(ar?'ar-EG':'en-GB');
   const low=res.low??res.tR,high=res.high??res.tR,range=res.official?fmtCompact(res.tR):`${fmtCompact(low)}–${fmtCompact(high)}`;
   const sourceRows=all.map((a,i)=>`<tr><td>${a.yr}</td><td>${fmt(a.res.tot)}</td><td>${fmtCompact(a.res.tR)}</td><td>${a.res.official?(ar?'معلن رسميًا':'Officially announced'):(ar?'مؤشر توضيحي':'Illustrative index')}</td><td>${fmtCompact(cum[i].cum)}</td></tr>`).join('');
   const page=(n,title,body)=>`<section class="print-report-page"><header><b>CERI-SC V9.0</b><span>${ar?'صفحة':'Page'} ${n}/4 · ${asOf}</span></header><h1>${title}</h1>${body}<footer>${ar?'مؤشر توضيحي لدعم القرار — وليس بيان MRV معتمدًا':'Indicative decision-support index — not an approved MRV statement'}</footer></section>`;
   const report=document.createElement('div');report.id='dashboardPrintReport';report.dir=ar?'rtl':'ltr';
   report.innerHTML=
-    page(1,ar?'الملخص التنفيذي للمؤشر':'Index Executive Summary',`<div class="print-hero"><span>${yr}</span><strong>≈ ${fmtCompact(res.tR)} tCO₂</strong><small>${ar?'النطاق التوضيحي':'Indicative range'}: ${range} tCO₂</small></div><div class="print-grid"><article><b>${ar?'عدد العبور':'Vessel transits'}</b><strong>${fmt(res.tot)}</strong></article><article><b>${ar?'حالة البيانات':'Data status'}</b><strong>${res.official?(ar?'قيمة معلنة':'Announced value'):(ar?'قيمة نموذجية':'Modelled value')}</strong></article><article><b>${ar?'متوسط سنوي/يوم':'Annual daily average'}</b><strong>${fmtCompact(res.tR/365)} tCO₂</strong></article><article><b>${ar?'أساس الحساب':'Calculation basis'}</b><strong>${res.official?(ar?'المصدر الرسمي':'Official source'):(ar?'متوسط مرجعي 2021/2023':'2021/2023 reference band')}</strong></article></div>${officialReferenceMarkup()}`)+
+    page(1,ar?'الملخص التنفيذي للمؤشر':'Index Executive Summary',`${incompleteNote}<div class="print-hero"><span>${yr}</span><strong>≈ ${fmtCompact(res.tR)} tCO₂</strong><small>${ar?'النطاق التوضيحي':'Indicative range'}: ${range} tCO₂</small></div><div class="print-grid"><article><b>${ar?'عدد العبور':'Vessel transits'}</b><strong>${fmt(res.tot)}</strong></article><article><b>${ar?'حالة البيانات':'Data status'}</b><strong>${res.official?(ar?'قيمة معلنة':'Announced value'):(ar?'قيمة نموذجية':'Modelled value')}</strong></article><article><b>${ar?'متوسط سنوي/يوم':'Annual daily average'}</b><strong>${fmtCompact(res.tR/365)} tCO₂</strong></article><article><b>${ar?'أساس الحساب':'Calculation basis'}</b><strong>${res.official?(ar?'المصدر الرسمي':'Official source'):(ar?'متوسط مرجعي 2021/2023':'2021/2023 reference band')}</strong></article></div>${officialReferenceMarkup()}`)+
     page(2,ar?'السلسلة التاريخية وحالة المنهج':'Historical Series & Method Status',`<table><thead><tr><th>${ar?'السنة':'Year'}</th><th>${ar?'العبور':'Transits'}</th><th>${ar?'القيمة المركزية':'Central value'}</th><th>${ar?'الحالة':'Status'}</th><th>${ar?'التراكمي':'Cumulative'}</th></tr></thead><tbody>${sourceRows}</tbody></table><p class="print-note">${ar?'القيم غير المعلنة نطاقات توضيحية مشتقة من معدلي 2021 و2023، ولا تُعامل كجرد انبعاثات مقاس.':'Unannounced years are illustrative values derived from the 2021 and 2023 reference rates and are not measured emissions inventories.'}</p>`)+
     page(3,ar?'خارطة طريق التحول الأخضر':'Green Transition Roadmap',`<div class="print-roadmap"><article><b>${ar?'قصير الأجل 2025–2028':'Short term 2025–2028'}</b><p>${ar?'خط أساس معتمد، سجل مصادر، حوكمة البيانات، تجارب B20 والطاقة الشمسية، ومنهج MRV تشغيلي.':'Approved baseline, source register, data governance, B20 and solar pilots, and an operational MRV method.'}</p></article><article><b>${ar?'متوسط الأجل 2029–2032':'Medium term 2029–2032'}</b><p>${ar?'توسيع MRV والتحقق المستقل، كهربة الأسطول، تجارب وقود منخفض الكربون، وربط بيانات الرحلات والطاقة.':'Scale MRV and independent verification, fleet electrification, low-carbon fuel trials, and connect voyage and energy data.'}</p></article><article><b>${ar?'طويل الأجل 2033–2050':'Long term 2033–2050'}</b><p>${ar?'بنية وقود أخضر وممرات شحن خضراء وقرارات استثمار مرحلية مرتبطة بنتائج التحقق.':'Green-fuel infrastructure, green shipping corridors and staged investment decisions linked to verified results.'}</p></article></div><p class="print-note">${ar?'المعالم أهداف حوكمة وتنفيذ؛ وليست وعود خفض غير مشروطة.':'Milestones are governance and delivery objectives, not unconditional reduction promises.'}</p>`)+
     page(4,ar?'المنهجية والمصادر والحوكمة':'Methodology, Sources & Governance',`<div class="print-method"><h2>${ar?'حدود الاستخدام':'Use boundary'}</h2><p>${ar?'السلسلة السنوية مستقلة عن المسار. محاكي السفينة الواحدة فقط يستخدم الموانئ والمسافات ومدخلات التشغيل. لا تُجمع الانبعاثات المتجنبة مع إزالة الكربون في رقم أداء واحد.':'The annual series is route-independent. Only the single-vessel simulator uses ports, distances and operating inputs. Avoided emissions and carbon removals are not aggregated into one performance figure.'}</p><h2>${ar?'طبقات دورة الحياة':'Lifecycle layers'}</h2><p>${ar?'تُعرض عوامل الاحتراق المباشر Tank-to-Wake منفصلة عن افتراضات Well-to-Tank والميثان والانبعاثات الأخرى.':'Direct Tank-to-Wake factors are separated from Well-to-Tank, methane and other lifecycle assumptions.'}</p><h2>${ar?'بوابات الاعتماد':'Approval gates'}</h2><ul><li>${ar?'مالك بيانات ومصدر وإصدار لكل سجل':'Owner, source and version for every record'}</li><li>${ar?'مراجعة ثم اعتماد قبل النشر الرسمي':'Review and approval before official publication'}</li><li>${ar?'سجل تغييرات قابل للتتبع':'Traceable audit log'}</li></ul></div><div class="print-sources"><a href="${OFFICIAL_AVOIDED_CO2[2021].sourceUrl}">SCA 2021</a><a href="${OFFICIAL_AVOIDED_CO2[2023].sourceUrl}">SCA / UNCTAD 2023</a><a href="https://www.imo.org/en/ourwork/environment/pages/lifecycle-ghg---carbon-intensity-guidelines.aspx">IMO lifecycle GHG guidance</a></div>`);
@@ -560,11 +563,11 @@ function buildDashboardPrintReport(){
 }
 
 function hasManualOverride(yr){const o=manualOverrides[String(yr)]||{};return o.vessels!==undefined&&Number.isSafeInteger(Number(o.vessels))&&Number(o.vessels)>=0;}
-function getYearTransit(yr){const o=manualOverrides[String(yr)]||{};return o.vessels!==undefined&&Number.isSafeInteger(Number(o.vessels))&&Number(o.vessels)>=0?+o.vessels:Y[yr].t;}
+function getYearTransit(yr){const o=manualOverrides[String(yr)]||{};return o.vessels!==undefined&&Number.isSafeInteger(Number(o.vessels))&&Number(o.vessels)>=0?+o.vessels:(Number.isSafeInteger(Y[yr]?.t)?Y[yr].t:null);}
 function getYearSource(yr){const o=manualOverrides[String(yr)]||{};return hasManualOverride(yr)?(o.source||((lang==='ar'?'إدخال يدوي للمستخدم':'Manual user input'))):Y[yr].src;}
 function openManualModal(){
   const yr=+document.getElementById('ySel').value,o=manualOverrides[String(yr)]||{};
-  document.getElementById('manualVessels').value=o.vessels!==undefined&&Number.isSafeInteger(+o.vessels)?o.vessels:Y[yr].t;
+  document.getElementById('manualVessels').value=o.vessels!==undefined&&Number.isSafeInteger(+o.vessels)?o.vessels:(Y[yr].t??'');
   document.getElementById('manualReduction').value='';document.getElementById('manualReduction').disabled=true;
   document.getElementById('manualSource').value=o.source||'';
   document.getElementById('manualYearText').innerHTML=(lang==='ar'?'<b>السنة المختارة:</b> ':'<b>Selected year:</b> ')+yr+(hasManualOverride(yr)?' <span class="manual-indicator">'+(lang==='ar'?'بيانات يدوية':'MANUAL DATA')+'</span>':'');
@@ -1194,7 +1197,9 @@ const Y={
   2023:{t:26434,src:"SCA Annual Report 2025 historical series"},
   2024:{t:13213,src:"SCA Annual Report 2024"},
   2025:{t:12758,src:"SCA Annual Report 2025"},
-  2026:{t:12300,src:"Indicative annualised projection from 1,315 SCA-reported transits through 8 Feb 2026"}
+  // 2026 has no complete official annual total. The former 12,300 value was a 39-day (1 Jan–8 Feb) annualisation
+  // and is excluded: annual/cumulative series must not manufacture full-year traffic from partial-period data.
+  2026:{t:null,incomplete:true,src:"No complete official 2026 annual total — see official monthly announcements"}
 };
 const OFFICIAL_AVOIDED_CO2={
   2021:{
@@ -1320,7 +1325,7 @@ const SCA_YEARS_LABEL={
   2015:'2015',2016:'2016',2017:'2017',2018:'2018',2019:'2019',
   2020:'2020 (COVID)',2021:'2021 (Ever Given)',2022:'2022 (Record)',
   2023:'2023 (All-time Record)',2024:'2024 (Official)',2025:'2025 (Official)',
-  2026:'2026 (Indicative projection)'
+  2026:'2026 (Incomplete year — official monthly announcements only)'
 };
 
 // ═══ DIAL GAUGE BUILDER ═══
@@ -1514,8 +1519,10 @@ function calcYr(yr,rk){
     sourceUrl:scenario?'':(annual.sourceUrl||''),
     rate:annual.rate,routeIndependent:true,manual:scenario};
 }
-function allYears(rk){return Object.keys(Y).map(yr=>({yr:+yr,res:calcYr(yr,rk)}));}
-function cumulative(rk){let c=0,low=0,high=0;return Object.keys(Y).map(yr=>{const r=calcYr(yr,rk);c+=r.tR;low+=r.low;high+=r.high;return{yr:+yr,cum:c,low,high};});}
+// Only years with a complete annual vessel total (official or explicitly user-entered scenario) enter annual/cumulative series.
+function seriesYears(){return Object.keys(Y).filter(yr=>getYearTransit(yr)!==null);}
+function allYears(rk){return seriesYears().map(yr=>({yr:+yr,res:calcYr(yr,rk)}));}
+function cumulative(rk){let c=0,low=0,high=0;return seriesYears().map(yr=>{const r=calcYr(yr,rk);c+=r.tR;low+=r.low;high+=r.high;return{yr:+yr,cum:c,low,high};});}
 
 // ═══ LIVE COUNTER ═══
 let liveTimer=null,liveDisplay=0;
@@ -1763,7 +1770,7 @@ function renderP0(M,res,yr,rk){
   const routePct    = Math.min(100, soFarVal / MAX_2023 * 100);
 
   // Cumulative across ALL years in dataset up to selected year
-  const cumUpToYr = Object.keys(Y)
+  const cumUpToYr = seriesYears()
     .filter(y => +y <= yr)
     .reduce((s, y) => s + calcYr(+y, rk).tR, 0);
 
@@ -1913,7 +1920,7 @@ function renderP0(M,res,yr,rk){
     const tickEl2  = document.getElementById('cum-tick2');
 
     // Arc fill: show as 82% of arc (proportional to years elapsed / max span)
-    const arcFill = Math.min(0.95, (Object.keys(Y).filter(y=>+y<=yr).length / Object.keys(Y).length));
+    const arcFill = Math.min(0.95, (seriesYears().filter(y=>+y<=yr).length / seriesYears().length));
     if(cumArc) cumArc.style.strokeDashoffset = (100*(1-arcFill)).toFixed(2);
 
     // Dot position on arc
@@ -2142,7 +2149,7 @@ function updFuel(){
 // Baseline confirmed on 24 June 2026:
 //   • B20 biofuel avoided emissions: 1,624 tCO₂.
 //   • Tree-per-Ship first-phase indicative absorption: 340 tCO₂.
-// Both components continue to increase with time. The tree component represents
+// Both values are ANCHORED (they do not increase with elapsed time). The tree component represents
 // carbon absorption/removal, while the B20 component represents avoided emissions.
 // The combined indicator is illustrative and is not a measured or MRV-verified result.
 const YEAR_MS = 365.25*24*3600*1000;

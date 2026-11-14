@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+const app=await readFile(new URL("./app.mjs",import.meta.url),"utf8");
+const html=await readFile(new URL("./index.html",import.meta.url),"utf8");
+assert.match(app,/feedStats\.frames\+\+/);
+assert.match(app,/sessionMmsi\.add\(v\.mmsi\)/);
+assert.match(app,/Socket connected — AIS coverage unverified/);
+assert.match(app,/feedStats\.snapshotFeatures=data\.features\.length/);
+assert.match(app,/els\.liveMessages\.textContent = fmt\.format\(feedStats\.frames\)/);
+assert.match(html,/data-id="diagnostics"/);
+assert.match(html,/data-id="coverageWarning"/);
+assert.match(html,/data-id="sessionVessels"/);
+assert.match(html,/لا يمثل عدد سفن القناة/);
+assert.doesNotMatch(app,/status\("AIS connected"/);
+console.log("AIS diagnostic UI regressions passed");

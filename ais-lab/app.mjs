@@ -13,6 +13,22 @@ let connected = false;
 let map = null, markers = null;
 let lastLive = 0, lastSnapshot = 0, lastError = "";
 let attribution = "Open Waters AIS — source attribution per vessel. Licensing varies by upstream source.";
+const feedStats={frames:0,invalid:0,outside:0,duplicate:0,rejected:0,accepted:0,positions:0,snapshotFeatures:0,snapshotAccepted:0,providerErrors:0};
+const sessionMmsi=new Set();
+let subscriptionState="Not started",connectionStarted=0;
+function renderDiagnostics(){
+  const min=connectionStarted?Math.floor((Date.now()-connectionStarted)/60000):0;
+  if(els.diagnostics)els.diagnostics.textContent=
+    "Frames "+feedStats.frames+" | unique MMSI "+sessionMmsi.size+" | position reports "+feedStats.positions+
+    " | accepted "+feedStats.accepted+" | snapshot "+feedStats.snapshotAccepted+"/"+feedStats.snapshotFeatures+
+    " | outside "+feedStats.outside+" | duplicates "+feedStats.duplicate+
+    " | invalid "+feedStats.invalid+" | other rejected "+feedStats.rejected+
+    " | provider errors "+feedStats.providerErrors+" | subscription "+subscriptionState;
+  if(els.coverageWarning)els.coverageWarning.textContent=
+    (feedStats.frames===0 || (min>=5 && sessionMmsi.size<5))
+    ?"تنبيه: تغطية AIS محدودة أو غير مثبتة. الرقم المعروض عينة من المواقع التي وصلت المتصفح وليس إجمالي السفن العابرة أو عدد سفن الأمس."
+    :"تنبيه: رصد AIS جزئي وغير موثق ببيانات عبور الهيئة؛ عدد السفن هنا ليس إجمالي المرور.";
+}
 const fmt = new Intl.NumberFormat("en-US");
 const shortClock = t => t ? new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Cairo", dateStyle: "short", timeStyle: "short" }).format(new Date(t)) : "—";
 const ageText = t => !t ? "—" : (Math.max(0, Math.floor((Date.now() - t) / 60_000)) + " min ago");
@@ -72,7 +88,9 @@ function render() {
   els.north.textContent = fmt.format(s.atNorth);
   els.south.textContent = fmt.format(s.atSouth);
   els.transits.textContent = fmt.format(s.inferredTransits);
-  els.liveMessages.textContent = fmt.format(s.liveMessages);
+  els.liveMessages.textContent = fmt.format(feedStats.frames);
+  if(els.sessionVessels)els.sessionVessels.textContent=fmt.format(sessionMmsi.size);
+  renderDiagnostics();
   els.lastEvent.textContent = lastLive ? shortClock(lastLive) : "No live position yet";
   els.lastSnapshot.textContent = lastSnapshot ? shortClock(lastSnapshot) : "Not loaded";
   els.freshness.textContent = s.newest ? ageText(s.newest) : "No fresh positions";
@@ -116,18 +134,28 @@ function acceptFrame(raw) {
   let event;
   try { event = JSON.parse(raw); } catch { return; }
   if (event.type === "error") {
+    feedStats.providerErrors++;
+    subscriptionState="Provider rejected or reported an error";
     lastError = "Provider: " + String(event.error || "unknown error").slice(0,180);
     status("Provider error", "error");
     render(); return;
   }
   if (event.type === "welcome") {
     els.tier.textContent = String(event.role || "anonymous") + " tier";
+    if(els.tierLimits)els.tierLimits.textContent="Rate "+(event.limits?.rate??"unknown")+"/s, area "+(event.limits?.area??"unknown")+" square degrees";
     return;
   }
   if (event.type !== "event") return;
+  feedStats.frames++;
   const v = normalizeEvent(event);
-  if (!v) return;
+  if (!v){feedStats.invalid++;render();return;}
+  sessionMmsi.add(v.mmsi);
   const outcome = tracker.ingest(v, true);
+  if(outcome.accepted)feedStats.accepted++;
+  else if(outcome.reason==="outside")feedStats.outside++;
+  else if(outcome.reason==="duplicate")feedStats.duplicate++;
+  else feedStats.rejected++;
+  if(outcome.accepted && v.isPositionReport && !v.synthesized)feedStats.positions++;
   if (outcome.accepted && v.isPositionReport && !v.synthesized) lastLive = Date.now();
   if (outcome.completed) showMessage("Potential AIS passage inferred for MMSI " + outcome.completed.mmsi + " — independent verification required.");
   render();
@@ -145,10 +173,14 @@ async function loadSnapshot() {
     if (!r.ok) throw new Error("snapshot HTTP " + r.status);
     const data = await r.json();
     if (data.type !== "FeatureCollection" || !Array.isArray(data.features)) throw new Error("unexpected snapshot response");
-    for (const f of data.features) {
-      const v = normalizeSnapshot(f);
-      if (v) tracker.ingest(v, false);
+    feedStats.snapshotFeatures=data.features.length;
+    feedStats.snapshotAccepted=0;
+    for (const feature of data.features) {
+      const vessel=normalizeSnapshot(feature);
+      if(vessel && tracker.ingest(vessel,false).accepted)feedStats.snapshotAccepted++;
     }
+    if(els.snapshotMeta)els.snapshotMeta.textContent="Snapshot: "+feedStats.snapshotAccepted+" accepted from "+feedStats.snapshotFeatures+
+      (data.truncated?" (truncated upstream)":"");
     if (data.attribution && typeof data.attribution === "object") {
       const providers = Object.entries(data.attribution).map(([k, val]) => k + ": " + String(val)).slice(0, 12);
       if (providers.length) attribution = providers.join(" | ");
@@ -167,15 +199,18 @@ async function loadSnapshot() {
 function connect() {
   if (stopped) return;
   status("Connecting to AIS", "pending");
+  subscriptionState="Connecting";
   const ws = new WebSocket(SOCKET_URL);
   socket = ws;
   ws.addEventListener("open", () => {
     if (stopped || socket !== ws) { ws.close(); return; }
     reconnectCount = 0;
     connected = true;
-    status("AIS connected", "connected");
+    connectionStarted=Date.now();
+    status("Socket connected — AIS coverage unverified", "connected");
     lastError = "";
     ws.send(JSON.stringify({ type: "subscribe", bbox: [AIS_BBOX] }));
+    subscriptionState="Subscription sent; not independently acknowledged";
     showMessage("AIS live feed connected. Observations are incomplete and depend on upstream coverage.");
     render();
   });
@@ -190,6 +225,7 @@ function connect() {
     if (socket !== ws) return;
     connected = false;
     socket = null;
+    subscriptionState="Disconnected";
     if (stopped) { status("Paused", "idle"); return; }
     reconnectCount++;
     const delay = Math.min(60000, 5000 * 2 ** Math.min(reconnectCount - 1, 4));
@@ -244,6 +280,7 @@ els.export.addEventListener("click", downloadCsv);
 els.reset.addEventListener("click", () => {
   if (!window.confirm("Clear all browser-session observations and inferred passages?")) return;
   tracker.reset(); lastLive = 0; lastSnapshot = 0;
+  sessionMmsi.clear();for(const key of Object.keys(feedStats))feedStats[key]=0;
   showMessage("Session data cleared. No external data was modified."); render();
 });
 for (const el of [search,els.type,els.zone]) el.addEventListener(el === search ? "input" : "change", render);

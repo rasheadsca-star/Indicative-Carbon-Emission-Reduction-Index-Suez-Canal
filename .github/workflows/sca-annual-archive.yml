@@ -1,0 +1,67 @@
+name: SCA Official Annual Archive Monitor
+on:
+  schedule:
+    - cron: '33 6 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/sca-annual-archive-watch.mjs'
+      - '.github/workflows/sca-annual-archive.yml'
+permissions:
+  contents: write
+concurrency:
+  group: sca-annual-archive
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check scripts/sca-annual-archive-watch.mjs && node --test sca-stats/archive-parser.test.mjs
+      - run: node scripts/sca-annual-archive-watch.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sca-official-archive-check
+          path: data/sca-archive-status.json
+          retention-days: 30
+      - name: Commit source-check status
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/sca-archive-status.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: check latest SCA published annual report"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+  publish:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - uses: actions/deploy-pages@v4
+        id: deployment

@@ -25,6 +25,12 @@ code{direction:ltr;unicode-bidi:isolate}#error{white-space:pre-wrap;color:#ffb6a
 <p>المصدر: <a href="https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2025.pdf" target="_blank" rel="noopener noreferrer">النشرة السنوية لهيئة قناة السويس 2025 — جدول (2)</a> |
 <a href="https://www.suezcanal.gov.eg/English/Downloads/pages/default.aspx?folder=Navigation+Reports%2FAnnual+Reports%E2%80%8B%E2%80%8B%E2%80%8B" target="_blank" rel="noopener noreferrer">أرشيف النشرات الرسمية</a>.</p>
 <div id="status" role="status">جاري تحميل النشرة المرجعية...</div>
+<div class="panel" style="background:#08232d;margin-top:12px">
+<strong>حالة أرشيف تقارير الهيئة (فحص مستقل)</strong>
+<p id="archiveStatus" role="status">لم تصل نتيجة الفحص بعد؛ يرجى مراجعة الأرشيف الرسمي مباشرة.</p>
+<a href="https://www.suezcanal.gov.eg/English/Downloads/Pages/default.aspx?folder=Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B" target="_blank" rel="noopener noreferrer">فتح الرابط الأصلي للأرشيف الرسمي</a>
+<p><small>هذا الفحص يتحقق من وجود التقارير المنشورة فقط، ولا يحدّث أرقام الحركة الشهرية تلقائيًا، ولا يوفر أعدادًا يومية.</small></p>
+</div>
 </section>
 <section class="panel">
 <h2>1 — المؤشرات السنوية المنشورة</h2><div class="cards" id="annualCards"></div>
@@ -56,6 +62,31 @@ import {readCsv} from "./ais-lab/reconciliation.mjs";
 const $=id=>document.getElementById(id);
 const number=x=>x===null||x===undefined?"غير متاح":new Intl.NumberFormat("en-US").format(x);
 let data;
+async function checkArchive(){
+  const el=$("archiveStatus");
+  try{
+    const response=await fetch("./data/sca-archive-status.json?ts="+Date.now(),{cache:"no-store"});
+    if(!response.ok)throw Error("No report check available");
+    const report=await response.json();
+    const age=Date.now()-Date.parse(report.checkedAt);
+    if(!Number.isFinite(age)||age<0||age>48*3600*1000){
+      el.textContent="نتيجة فحص الأرشيف قديمة أو غير موثوقة زمنيًا؛ لا يمكن تأكيد أحدث إصدار.";return;
+    }
+    if(report.status!=="ARCHIVE_LISTING_READ"||!Number.isInteger(report.latestPublishedYear)){
+      el.textContent="تعذر التحقق الآلي من فهرس التقارير. راجع رابط الهيئة مباشرة.";return;
+    }
+    const newest=report.latestPublishedYear;
+    const currentLast=2025;
+    el.textContent="آخر تقرير سنوي ظاهر في الأرشيف: "+newest+
+      " | آخر فحص: "+report.checkedAt+
+      (newest>currentLast
+        ?" | يوجد إصدار أحدث من قاعدة CERI-SC. يلزم استخراج بياناته ومراجعتها قبل تحديث الحسابات."
+        :" | لا توجد نشرة سنوية أحدث من قاعدة CERI-SC وفق هذه المراجعة.");
+  }catch{
+    el.textContent="لم نتمكن من قراءة فحص الأرشيف. غياب النتيجة ليس دليلًا على عدم صدور تقرير جديد.";
+  }
+}
+checkArchive();
 function showYear(){
   const year=Number($("year").value);
   const rows=monthlyTrends(data,year);

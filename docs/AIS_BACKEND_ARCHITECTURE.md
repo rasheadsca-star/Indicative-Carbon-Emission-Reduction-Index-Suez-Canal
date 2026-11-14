@@ -1,6 +1,6 @@
 # CERI-SC durable AIS ingestion — architecture and deployment guide (WP2)
 
-**Status 2026-11-14: design + tested core modules. NOT DEPLOYED. No licensed provider, no server, no SCA register.**
+**Status 2026-11-14: tested core modules and a reproducible private 7-day pilot collector are available. NOT DEPLOYED LIVE. No licensed provider connection, no approved always-on server, no SCA register.**
 GitHub Pages stays a static front end. GitHub Actions cron stays a periodic diagnostic. Neither is 24/7 monitoring.
 
 ## 1. Components
@@ -28,6 +28,8 @@ GitHub Pages stays a static front end. GitHub Actions cron stays a periodic diag
 | `backend/replay.mjs` | Offline NDJSON replay → candidate CSV usable by `ais-lab/reconcile.html` | Yes |
 | `backend/providers/aisstream.mjs` | WebSocket connector, server-side key, backoff | Fake socket only — never run live |
 | `backend/schema.sql` | PostgreSQL tables incl. provenance and reconciliation guards | Not executed |
+| `backend/trial-collector.mjs`, `trial-store.mjs`, `trial-report.mjs` | Private seven-day source trial; durable journal and aggregate-only diagnostics | Synthetic CI tests; NO live source |
+| `compose.ais-trial.yml` | Non-root, no-public-ports trial on an always-on private Docker host | Docker build tested; not started |
 
 ## 2. Transit FSM rules (versioned; change requires new `fsm_version`)
 - Zones from `ais-lab/core.mjs#classifyZone` (single source). **Provisional**: north approach 31.28–31.65 N; south approach 29.70–30.04 N / ≥32.40 E; canal = ≤13 km from centreline 30.04–31.28 N. The canal zone includes Port Said, East Port Said and Ismailia berths → port calls surface as `LONG_DWELL` or `CANAL_VISIT`, not as normal transits. Replace with SCA/IHO chart polygons before any trial.
@@ -69,3 +71,7 @@ GitHub Pages stays a static front end. GitHub Actions cron stays a periodic diag
 node backend/replay.mjs capture.ndjson --adapter aisstream --provider trial-1 --out transits.csv
 # then upload transits.csv + an authenticated SCA reference CSV in ais-lab/reconcile.html
 ```
+
+
+## 7-day private coverage pilot (new)
+Deployment prerequisites, rights gating, Docker/secret setup, liveness checks and acceptance criteria are in [AIS_SEVEN_DAY_TRIAL.md](AIS_SEVEN_DAY_TRIAL.md). Nothing in that pilot enables public real-time ship feeds or institutional emission certification. It does not create or approve source-account credentials or a server.

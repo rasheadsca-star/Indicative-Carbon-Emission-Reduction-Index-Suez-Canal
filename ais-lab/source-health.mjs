@@ -13,6 +13,7 @@ function describe(data,now=Date.now()){
     (data.errors?.length?" | ملاحظات المصدر: "+data.errors.join("; "):"")+
     " | هذا ليس عدد السفن العابرة.";
 }
+async function refreshSourceHealth(){
 try{
   const res=await fetch("../data/ais-source-health.json?ts="+Date.now(),{cache:"no-store"});
   if(!res.ok)throw Error("no diagnostic published");
@@ -21,3 +22,7 @@ try{
 }catch{
   target.textContent="الفحص المستقل لم ينشر بيانات بعد، أو تعذر تحميلها. لا يوجد دليل على سلامة التغطية.";
 }
+}
+refreshSourceHealth();
+setInterval(refreshSourceHealth, 5*60*1000);
+

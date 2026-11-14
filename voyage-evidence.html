@@ -54,7 +54,10 @@ table{border-collapse:collapse;width:100%;min-width:580px}th,td{padding:10px;tex
 <input id="operatingFile" type="file" accept=".csv,text/csv">
 <small>يتضمن المسافات والسرعة واستهلاك الوقود ومصادر القيم</small></label>
 </div>
-<p><a href="./examples/voyage-operating-template.csv">تحميل قالب سجل التشغيل — بيانات افتراضية توضيحية</a></p>
+<p class="warning"><strong>للتجربة فقط:</strong> يمكنك استخدام الملفات الثلاثة الاصطناعية التالية بالترتيب. لا تشير أرقام MMSI أو الأوقات أو القيم إلى سفينة حقيقية، ولا يجوز الاعتماد على نتيجة الاختبار في تقارير الهيئة.</p>
+<p><a href="./examples/voyage-ais-synthetic.csv">1 — ملف AIS تجريبي</a> ·
+<a href="./examples/voyage-reference-synthetic.csv">2 — ملف عبور مرجعي تجريبي</a> ·
+<a href="./examples/voyage-operating-template.csv">3 — ملف تشغيل تجريبي</a></p>
 <p>أعمدة التشغيل الإلزامية: <code>MMSI, Direction, Exit UTC, Suez Distance Nm, Cape Distance Nm, Speed Kn, Sea Burn Tonnes Day, Suez Extra Hours, Cape Extra Hours, Standby Burn Tonnes Day, Combustion EF, Burn Sensitivity Pct, Distance Source, Fuel Source, Factor Source</code>.</p>
 <label>هامش الوقت بين خروج AIS وخروج السجل المرجعي (بالدقيقة)
 <input id="tolerance" type="number" min="1" max="360" step="1" value="180"></label>

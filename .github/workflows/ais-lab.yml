@@ -24,8 +24,10 @@ jobs:
           node --check ais-lab/core.mjs
           node --check ais-lab/app.mjs
           node --check ais-lab/source-health.mjs
+          node --check ais-lab/reconciliation.mjs
+          node --check sca-stats/official-stats.mjs
           node --check scripts/ais-source-quality.mjs
       - name: Test AIS transit engine
-        run: node --test ais-lab/core.test.mjs ais-lab/diagnostics.test.mjs
+        run: node --test ais-lab/core.test.mjs ais-lab/diagnostics.test.mjs ais-lab/reconciliation.test.mjs sca-stats/official-stats.test.mjs
       - name: Verify separated UI route
         run: test -f ais-lab/index.html && test -f index.html && test -f worker.js

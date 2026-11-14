@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CERI-SC — مطابقة سجلات AIS والعبور</title>
+<style>
+:root{color-scheme:dark;font-family:Tahoma,Arial,sans-serif}
+*{box-sizing:border-box}body{background:#071f26;color:#f1f8f7;margin:0;line-height:1.75}
+main,header,footer{max-width:1080px;margin:auto;padding:20px}
+a{color:#64dbbc}.panel{padding:20px;border:1px solid #3b6366;background:#10333c;border-radius:12px;margin:16px 0}
+h1{font-size:1.6rem}h2{font-size:1.2rem}
+input,button{font:inherit;margin:7px 0;padding:9px}
+button{background:#34dbb1;color:#052724;border:0;border-radius:6px;cursor:pointer;font-weight:bold}
+button:disabled{opacity:.45;cursor:default}
+.warning{background:#453520;color:#ffedbd;padding:14px;border-radius:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.metric{padding:16px;background:#164450;border-radius:8px}
+.metric strong{display:block;font-size:1.8rem}
+.error{color:#ffadad;white-space:pre-wrap}
+pre{white-space:pre-wrap;overflow-wrap:anywhere}
+small{color:#b8ced0}code{direction:ltr;unicode-bidi:isolate}
+</style></head><body>
+<header><a href="./">← مرصد AIS</a>
+<h1>تدقيق مطابقة سجلات الرصد والعبور</h1>
+<p>مقارنة محلية لسجل عبور محتمل مستنتج من AIS وسجل عبور مرجعي مستقل. لا تُرفع الملفات إلى خادم ولا تُحفظ في المتصفح.</p>
+</header>
+<main>
+<div class="warning"><strong>حدود النتائج:</strong> لا يعني رفع سجل يُنسب إلى الهيئة التحقق من صحته. المطابقة البنيوية والزمنية لا تثبت صحة الحركة أو دقة تغطية AIS. لا تصدر هذه الوحدة أي شهادة أو حساب انبعاثات.</div>
+<section class="panel">
+<h2>1 — رفع ملفَّي المقارنة</h2>
+<div class="grid">
+<label>سجل AIS التجريبي بصيغة CSV (من زر تصدير المرصد)
+<input type="file" id="aisFile" accept=".csv,text/csv"></label>
+<label>سجل العبور المرجعي بصيغة CSV
+<input type="file" id="referenceFile" accept=".csv,text/csv"></label>
+</div>
+<p>أعمدة سجل AIS المطلوبة: <code>MMSI, Direction, Exit UTC</code>. وأعمدة السجل المرجعي: <code>MMSI, Direction, Exit UTC, Source</code>.</p>
+<p>الاتجاه <code>Northbound</code> أو <code>Southbound</code>؛ الوقت بتوقيت UTC بصيغة ISO 8601 المنتهية بـ <code>Z</code>. لا تستخدم البيانات الشخصية أو السرية على تطبيق عام.</p>
+<label>هامش مطابقة وقت الخروج (دقيقة)
+<input type="number" id="tolerance" min="1" max="360" step="1" value="180"></label>
+<p><button id="run" type="button">تنفيذ المطابقة المحلية</button>
+<button id="download" type="button" disabled>تصدير تقرير إجمالي دون أسماء أو MMSI</button></p>
+<div id="errors" class="error" role="alert"></div>
+</section>
+<section class="panel"><h2>2 — النتائج</h2>
+<p id="state" role="status">لم تبدأ المقارنة بعد.</p>
+<div class="grid">
+<div class="metric">حالات AIS المستنتجة<strong id="aisCount">—</strong></div>
+<div class="metric">حالات السجل المرجعي<strong id="referenceCount">—</strong></div>
+<div class="metric">الحالات المطابقة<strong id="matched">—</strong></div>
+<div class="metric">نسبة مطابقة المرجع<strong id="referenceMatch">—</strong></div>
+</div>
+<p id="unmatched"></p>
+<p class="warning">نسبة مطابقة المرجع ليست Recall معتمدًا؛ لا تُستخدم لتقدير جودة التغطية حتى يثبت اكتمال السجل المرجعي وصحة هوية السفن والأوقات ومصدر AIS.</p>
+</section>
+<section class="panel"><h2>3 — الخطوة التالية</h2>
+<p>لا تُصدر مؤشرات تشغيلية معتمدة قبل إحضار سجل عبور مرجعي موثق من الهيئة، وتغطية AIS مرخصة ومستمرة، ومعايرة البوابات والمطابقة على فترة تحقق محددة.</p>
+</section>
+</main><footer><small>CERI-SC · Browser-only reconciliation / no server upload / no verified emission savings</small></footer>
+<script type="module">
+import {reconcilePassages} from "./reconciliation.mjs";
+const $=id=>document.getElementById(id);
+let report=null;
+$("run").addEventListener("click",async()=>{
+  report=null;$("download").disabled=true;$("errors").textContent="";
+  const a=$("aisFile").files?.[0],b=$("referenceFile").files?.[0];
+  if(!a||!b){$("errors").textContent="اختر الملفين أولًا.";return}
+  if(a.size>5_000_000||b.size>5_000_000){$("errors").textContent="الملف أكبر من 5 MB.";return}
+  try{
+    const result=reconcilePassages(await a.text(),await b.text(),{toleranceMinutes:Number($("tolerance").value)});
+    if(!result.ok){$("errors").textContent=result.errors.map(x=>(x.file||"") + " line "+x.line+": "+x.message).join("\n");return}
+    report={generatedAt:new Date().toISOString(),verified:false,status:result.verification,
+      toleranceMinutes:result.toleranceMinutes,aisCount:result.aisCount,
+      referenceCount:result.referenceCount,matched:result.matched,
+      referenceMatchRate:result.referenceMatchRate,aisMatchRate:result.aisMatchRate,
+      limitation:result.warning};
+    $("aisCount").textContent=result.aisCount;
+    $("referenceCount").textContent=result.referenceCount;
+    $("matched").textContent=result.matched;
+    $("referenceMatch").textContent=result.referenceMatchRate===null?"غير متاح":(100*result.referenceMatchRate).toFixed(1)+"%";
+    $("unmatched").textContent="غير مطابق في AIS: "+result.unmatchedAIS.length+" | غير مطابق في المرجع: "+result.unmatchedReferences.length;
+    $("state").textContent="مطابقة محلية مكتملة؛ مصدر الملف المرجعي غير موثق من التطبيق.";
+    $("download").disabled=false;
+  }catch(e){$("errors").textContent="تعذر التحقق: "+String(e.message||e)}
+});
+$("download").addEventListener("click",()=>{
+  if(!report)return;
+  const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="ceri-sc-reconciliation-unverified.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+</script></body></html>

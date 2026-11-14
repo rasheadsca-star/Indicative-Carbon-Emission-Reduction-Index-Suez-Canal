@@ -1,0 +1,27 @@
+name: V9 Homepage Regression Gate
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'tests/smoke.mjs'
+      - '.github/workflows/v9-homepage.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tests/smoke.mjs'
+      - '.github/workflows/v9-homepage.yml'
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test

@@ -42,3 +42,18 @@ test("bad metadata rejected",()=>{
  fake.snapshot.recentFeatureCount=1;
  assert.equal(normalizeQualitySample(fake).hasSnapshot,false);
 });
+test("hourly check reliability remains unavailable before a complete observation window",()=>{
+ const h=appendQualitySample(null,sample("2026-11-14T10:00:00Z",3));
+ const q=evaluateQuality(h,"2026-11-14T10:05:00Z");
+ assert.equal(q.last24h.collectionRunRatio,null);
+ assert.equal(q.last24h.scheduleWindowMature,false);
+ assert.equal(q.last24h.coverageRate,null);
+});
+test("mature collection ratio measures hourly scheduler, not regional vessel coverage",()=>{
+ let h=appendQualitySample(null,sample("2026-11-13T10:00:00Z",1));
+ h=appendQualitySample(h,sample("2026-11-14T10:00:00Z",2));
+ const q=evaluateQuality(h,"2026-11-14T10:00:00Z");
+ assert.equal(q.last24h.scheduleWindowMature,true);
+ assert.equal(q.last24h.collectionRunRatio,1/24);
+ assert.equal(q.last24h.coverageRate,null);
+});

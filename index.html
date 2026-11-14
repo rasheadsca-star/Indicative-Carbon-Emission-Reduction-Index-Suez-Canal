@@ -557,32 +557,30 @@ function buildDashboardPrintReport(){
   return report;
 }
 
-function hasManualOverride(yr){const o=manualOverrides[String(yr)]||{};return Number.isFinite(+o.vessels)||Number.isFinite(+o.reduction);}
-function getYearTransit(yr){const o=manualOverrides[String(yr)]||{};return Number.isFinite(+o.vessels)&&+o.vessels>=0?+o.vessels:Y[yr].t;}
+function hasManualOverride(yr){const o=manualOverrides[String(yr)]||{};return o.vessels!==undefined&&Number.isSafeInteger(Number(o.vessels))&&Number(o.vessels)>=0;}
+function getYearTransit(yr){const o=manualOverrides[String(yr)]||{};return o.vessels!==undefined&&Number.isSafeInteger(Number(o.vessels))&&Number(o.vessels)>=0?+o.vessels:Y[yr].t;}
 function getYearSource(yr){const o=manualOverrides[String(yr)]||{};return hasManualOverride(yr)?(o.source||((lang==='ar'?'إدخال يدوي للمستخدم':'Manual user input'))):Y[yr].src;}
 function openManualModal(){
   const yr=+document.getElementById('ySel').value,o=manualOverrides[String(yr)]||{};
-  document.getElementById('manualVessels').value=Number.isFinite(+o.vessels)?o.vessels:Y[yr].t;
-  document.getElementById('manualReduction').value=Number.isFinite(+o.reduction)?o.reduction:'';
+  document.getElementById('manualVessels').value=o.vessels!==undefined&&Number.isSafeInteger(+o.vessels)?o.vessels:Y[yr].t;
+  document.getElementById('manualReduction').value='';document.getElementById('manualReduction').disabled=true;
   document.getElementById('manualSource').value=o.source||'';
   document.getElementById('manualYearText').innerHTML=(lang==='ar'?'<b>السنة المختارة:</b> ':'<b>Selected year:</b> ')+yr+(hasManualOverride(yr)?' <span class="manual-indicator">'+(lang==='ar'?'بيانات يدوية':'MANUAL DATA')+'</span>':'');
   document.getElementById('manualModal').classList.add('open');
 }
 function closeManualModal(){document.getElementById('manualModal').classList.remove('open');}
 function applyManualData(){
-  const yr=+document.getElementById('ySel').value;
-  const vesselsRaw=document.getElementById('manualVessels').value.trim();
-  const reductionRaw=document.getElementById('manualReduction').value.trim();
+  const yr=Number(document.getElementById('ySel').value);
+  const raw=document.getElementById('manualVessels').value.trim();
   const source=document.getElementById('manualSource').value.trim();
-  const vessels=vesselsRaw===''?null:Number(vesselsRaw);
-  const reduction=reductionRaw===''?null:Number(reductionRaw);
-  if((vessels!==null&&(!Number.isFinite(vessels)||vessels<0))||(reduction!==null&&(!Number.isFinite(reduction)||reduction<0))){
-    alert(lang==='ar'?'أدخل أرقامًا صحيحة غير سالبة.':'Enter valid non-negative numbers.');return;
+  if(!/^[0-9]+$/.test(raw)||!Number.isSafeInteger(Number(raw))){
+    alert(lang==='ar'?'يجب إدخال عدد سفن صحيح وغير سالب.':'Enter a non-negative integer vessel count.');return;
   }
-  const o={};
-  if(vessels!==null&&vessels!==Y[yr].t)o.vessels=Math.round(vessels);
-  if(reduction!==null)o.reduction=Math.round(reduction);
-  if(source)o.source=source;
+  const count=Number(raw),o={};
+  if(count!==Y[yr].t){
+    if(!source){alert(lang==='ar'?'يلزم مصدر بيانات السيناريو.':'Provide scenario data provenance.');return;}
+    o.vessels=count;o.source=source;
+  }
   if(Object.keys(o).length)manualOverrides[String(yr)]=o;else delete manualOverrides[String(yr)];
   storeSet('localStorage',MANUAL_STORE_KEY,JSON.stringify(manualOverrides));
   closeManualModal();render();
@@ -955,7 +953,24 @@ ${rcSensitivityMarkup(data)}
 ${rcSourcesMarkup(data)}
 <div class="vessel-warning">⚠ ${R.method}</div>`;}
 function rcCalculate(){const R=rcText(),result=document.getElementById('rcResults');if(!result)return;const depId=document.getElementById('rcDeparture')?.value,arrId=document.getElementById('rcArrival')?.value,dist=vsRouteDistances(depId,arrId),fuelId=document.getElementById('rcFuelType')?.value||'HFO',fuelInfo=VS_FUELS[fuelId]||VS_FUELS.HFO,ef=document.getElementById('rcEf');if(ef)ef.value=`${fuelInfo.ef.toFixed(3)} tCO₂/t`;const imo=(document.getElementById('rcImo')?.value||'').replace(/\D/g,''),imoOK=vsValidIMO(imo),help=document.getElementById('rcImoHelp');if(help){help.textContent=imoOK?`✓ ${R.valid}`:`⚠ ${R.invalid}`;help.style.color=imoOK?'var(--accent)':'var(--cape)';}if(!dist){result.innerHTML=`<div class="single-vessel-empty"><div><span>🧭</span>${R.invalidRoute}</div></div>`;rcSaveState();return;}
-const speed=Math.max(.1,rcNum('rcSpeed',18)),refSpeed=Math.max(.1,rcNum('rcRefSpeed',20)),mainBase=Math.max(0,rcNum('rcMainFuel',105)),aux=Math.max(0,rcNum('rcAuxFuel',8)),load=Math.min(100,Math.max(0,rcNum('rcLoad',85))),weather=Math.max(0,rcNum('rcSeaMargin',8)),fouling=Math.min(5,Math.max(0,Math.round(rcNum('rcFouling',2)))),boundary=document.getElementById('rcEmissionBoundary')?.value||'TTW',upstream=Math.max(0,rcNum('rcUpstreamFactor',18)),methaneSlip=fuelId==='LNG'?Math.max(0,rcNum('rcMethaneSlip',0)):0,transitHours=Math.max(0,rcNum('rcTransitHours',14)),canalFuel=Math.max(0,rcNum('rcCanalFuel',10)),fuelPrice=Math.max(0,rcNum('rcFuelPrice',fuelInfo.price)),charter=Math.max(0,rcNum('rcCharter',45000)),toll=Math.max(0,rcNum('rcToll',500000));const foulingFactors=[1,1.02,1.05,1.09,1.14,1.20],loadFactor=.70+.30*(load/100),mainDaily=mainBase*Math.pow(speed/refSpeed,3)*(1+weather/100)*foulingFactors[fouling]*loadFactor;function routeCalc(nm,isSuez){const seaDays=nm/(speed*24),transitDays=isSuez?transitHours/24:0,totalDays=seaDays+transitDays,seaFuel=(mainDaily+aux)*seaDays,transitFuel=isSuez?canalFuel*transitDays:0,totalFuel=seaFuel+transitFuel,ttw=totalFuel*fuelInfo.ef,upstreamCO2=boundary==='WTW'?ttw*(upstream/100):0,methaneCO2e=boundary==='WTW'?totalFuel*(methaneSlip/100)*27.2:0,co2=ttw+upstreamCO2+methaneCO2e,cost=totalFuel*fuelPrice+totalDays*charter+(isSuez?toll:0);return{nm,totalDays,totalFuel,co2,ttw,upstreamCO2,methaneCO2e,cost};}const s=routeCalc(dist.suez,true),c=routeCalc(dist.cape,false),dNm=c.nm-s.nm,dDays=c.totalDays-s.totalDays,dFuel=c.totalFuel-s.totalFuel,dCO2=c.co2-s.co2,costAdv=c.cost-s.cost,redPct=c.co2>0?dCO2/c.co2*100:0;let quality=35;quality+=imoOK?18:0;quality+=(document.getElementById('rcShipName')?.value||'').trim()?8:0;quality+=mainBase>0&&refSpeed>0?15:0;quality+=dist.exact?12:7;quality+=document.getElementById('rcEnginePower')?.value?5:0;quality+=document.getElementById('rcBuildYear')?.value?3:0;quality=Math.min(100,quality);const data={s,c,dist,dep:VS_PORTS[depId],arr:VS_PORTS[arrId],ship:(document.getElementById('rcShipName')?.value||'—').trim(),imo,imoOK,boundary,upstream,methaneSlip,dNm,dDays,dFuel,dCO2,costAdv,redPct,quality,suezPreferred:costAdv>1000,capePreferred:costAdv<-1000};result.innerHTML=rcResultsMarkup(data);const ts=document.getElementById('rcTimestamp');if(ts)ts.textContent=`${R.calculated}: ${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-GB')}`;rcSaveState();}
+const requestedBoundary=document.getElementById('rcEmissionBoundary')?.value||'TTW';
+if(requestedBoundary==='WTW'){
+  result.innerHTML='<div class="vessel-warning error" role="alert">'+
+    (lang==='ar'
+      ? 'لا يمكن حساب Well-to-Wake بشكل موثوق من نسبة زيادة عامة على CO₂ الاحتراق. يلزم معامل دورة حياة موثق لكل مسار إنتاج وقود، مع CH₄ وN₂O. اختر Tank-to-Wake لإظهار حساب CO₂ التشغيلي التوضيحي فقط.'
+      : 'Well-to-Wake is unavailable without verified fuel-pathway lifecycle factors including CH₄ and N₂O. A generic percentage uplift of combustion CO₂ is not a valid WtW calculation. Select Tank-to-Wake for an indicative combustion-CO₂-only scenario.')+
+    '</div>';
+  window._lastRCScenario=null;return;
+}
+const speed=Math.max(.1,rcNum('rcSpeed',18)),refSpeed=Math.max(.1,rcNum('rcRefSpeed',20)),mainBase=Math.max(0,rcNum('rcMainFuel',105)),aux=Math.max(0,rcNum('rcAuxFuel',8)),load=Math.min(100,Math.max(0,rcNum('rcLoad',85))),weather=Math.max(0,rcNum('rcSeaMargin',8)),fouling=Math.min(5,Math.max(0,Math.round(rcNum('rcFouling',2)))),boundary=document.getElementById('rcEmissionBoundary')?.value||'TTW',upstream=Math.max(0,rcNum('rcUpstreamFactor',18)),methaneSlip=fuelId==='LNG'?Math.max(0,rcNum('rcMethaneSlip',0)):0,transitHours=Math.max(0,rcNum('rcTransitHours',14)),canalFuel=Math.max(0,rcNum('rcCanalFuel',10)),fuelPrice=Math.max(0,rcNum('rcFuelPrice',fuelInfo.price)),charter=Math.max(0,rcNum('rcCharter',45000)),toll=Math.max(0,rcNum('rcToll',500000));const foulingFactors=[1,1.02,1.05,1.09,1.14,1.20],loadFactor=.70+.30*(load/100),mainDaily=mainBase*Math.pow(speed/refSpeed,3)*(1+weather/100)*foulingFactors[fouling]*loadFactor;function routeCalc(nm,isSuez){const seaDays=nm/(speed*24),transitDays=isSuez?transitHours/24:0,totalDays=seaDays+transitDays,seaFuel=(mainDaily+aux)*seaDays,transitFuel=isSuez?canalFuel*transitDays:0,totalFuel=seaFuel+transitFuel,ttw=totalFuel*fuelInfo.ef,upstreamCO2=boundary==='WTW'?ttw*(upstream/100):0,methaneCO2e=boundary==='WTW'?totalFuel*(methaneSlip/100)*27.2:0,co2=ttw+upstreamCO2+methaneCO2e,cost=totalFuel*fuelPrice+totalDays*charter+(isSuez?toll:0);return{nm,totalDays,totalFuel,co2,ttw,upstreamCO2,methaneCO2e,cost};}const s=routeCalc(dist.suez,true),c=routeCalc(dist.cape,false),dNm=c.nm-s.nm,dDays=c.totalDays-s.totalDays,dFuel=c.totalFuel-s.totalFuel,dCO2=c.co2-s.co2,costAdv=c.cost-s.cost,redPct=c.co2>0?dCO2/c.co2*100:0;let quality=35;quality+=imoOK?18:0;quality+=(document.getElementById('rcShipName')?.value||'').trim()?8:0;quality+=mainBase>0&&refSpeed>0?15:0;quality+=dist.exact?12:7;quality+=document.getElementById('rcEnginePower')?.value?5:0;quality+=document.getElementById('rcBuildYear')?.value?3:0;quality=Math.min(100,quality);const data={s,c,dist,dep:VS_PORTS[depId],arr:VS_PORTS[arrId],ship:(document.getElementById('rcShipName')?.value||'—').trim(),imo,imoOK,boundary,upstream,methaneSlip,dNm,dDays,dFuel,dCO2,costAdv,redPct,quality,suezPreferred:costAdv>1000,capePreferred:costAdv<-1000};result.innerHTML=rcResultsMarkup(data);
+const audit=document.createElement('div');
+audit.className='info-box';audit.style.cssText='margin-top:12px;line-height:1.75';
+audit.textContent=(lang==='ar'
+  ? 'بوابة التحقق: النتيجة سيناريو هندسي توضيحي Tank-to-Wake CO₂ فقط، وليست انبعاثات مقاسة أو شهادات معتمدة. فروق المسافة محسوبة من نقاط مسار/مرجع، واستهلاك الوقود مبني على مدخلات المستخدم وقانون السرعة التكعيبي المبسط. استبعدت انبعاثات المنبع وCH₄ وN₂O. '
+  : 'Audit boundary: indicative Tank-to-Wake combustion CO₂ scenario only; not measured, certified or independent MRV. Route distances use reference waypoints, sea fuel uses editable inputs and a simplified cube-law speed assumption. Upstream GHG, CH₄ and N₂O are excluded. ')+
+  'Route savings (Cape − Suez): '+dNm.toFixed(0)+' NM; '+dFuel.toFixed(2)+' t fuel; '+dCO2.toFixed(2)+' tCO₂.';
+result.appendChild(audit);
+const ts=document.getElementById('rcTimestamp');if(ts)ts.textContent=`${R.calculated}: ${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-GB')}`;rcSaveState();}
 function initRouteCompareSingleVessel(){document.querySelectorAll('#singleVesselPage input,#singleVesselPage select').forEach(el=>{el.addEventListener('input',rcCalculate);el.addEventListener('change',rcCalculate);});const imo=document.getElementById('rcImo');imo?.addEventListener('input',()=>queueVesselLookup('rc'));imo?.addEventListener('change',()=>queueVesselLookup('rc'));imo?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookupVesselByIMO('rc');}});document.getElementById('rcShipType')?.addEventListener('change',rcApplyShipDefaults);document.getElementById('rcFuelType')?.addEventListener('change',rcFuelChanged);rcCalculate();}
 function updatePageContextControls(){
   const single=pg===1;
@@ -1201,7 +1216,15 @@ const ILLUSTRATIVE_RATE_LOW=Math.min(...OFFICIAL_PER_VESSEL_RATES);
 const ILLUSTRATIVE_RATE_HIGH=Math.max(...OFFICIAL_PER_VESSEL_RATES);
 function annualIllustrativeReduction(yr){
   const official=OFFICIAL_AVOIDED_CO2[yr];
-  if(official)return{value:official.value,low:official.value,high:official.value,official:true,rate:official.value/getYearTransit(yr),label:official.label,status:'official-announced',sourceName:official.sourceName,sourceUrl:official.sourceUrl};
+  if(official){
+    if(hasManualOverride(yr)){
+      const transits=getYearTransit(yr),rate=official.value/Y[yr].t,estimate=Math.round(transits*rate);
+      return{value:estimate,low:Math.round(estimate*0.8),high:Math.round(estimate*1.2),official:false,rate,
+        label:'User scenario using announced per-transit proxy; ±20% sensitivity assumption (not calibrated uncertainty)',
+        status:'user-scenario/modelled-impact',sourceName:getYearSource(yr),sourceUrl:''};
+    }
+    return{value:official.value,low:official.value,high:official.value,official:true,rate:official.value/Y[yr].t,label:official.label,status:'official-announced',sourceName:official.sourceName,sourceUrl:official.sourceUrl};
+  }
   const projected=+yr===2026;
   const transits=getYearTransit(yr);
   return{
@@ -1480,14 +1503,14 @@ function calcYr(yr,rk){
     bt.forEach(x=>{x.tot=Math.round(x.tot*scale);x.ps=x.n?Math.round(x.tot/x.n):0;});
   }
   bt.sort((a,b)=>b.tot-a.tot);
-  const o=manualOverrides[String(yr)]||{};
-  if(Number.isFinite(+o.reduction)&&+o.reduction>=0&&tR>0){
-    const target=+o.reduction,scale=target/tR;
-    bt.forEach(x=>{x.tot=Math.round(x.tot*scale);x.ps=Math.round(x.ps*scale);});
-    tR=Math.round(target);tC=tR;
-  }
-  const manualReduction=Number.isFinite(+o.reduction)&&+o.reduction>=0;
-  return{tR:Math.round(tR),low:manualReduction?Math.round(tR):annual.low,high:manualReduction?Math.round(tR):annual.high,tS:0,tC:Math.round(tC),ap:tot>0?(tR/tot).toFixed(1):'0',bt,tot,src:annual.label,trafficSrc:getYearSource(yr),official:annual.official,status:manualReduction?'manual-override':annual.status,sourceName:annual.sourceName||'',sourceUrl:annual.sourceUrl||'',rate:annual.rate,routeIndependent:true,manual:hasManualOverride(yr)};
+  const scenario=hasManualOverride(yr);
+  return{tR:Math.round(tR),low:annual.low,high:annual.high,tS:0,tC:Math.round(tC),
+    ap:tot>0?(tR/tot).toFixed(1):'0',bt,tot,src:annual.label,trafficSrc:getYearSource(yr),
+    official:scenario?false:annual.official,
+    status:scenario?'user-scenario/modelled-impact':annual.status,
+    sourceName:scenario?getYearSource(yr):(annual.sourceName||''),
+    sourceUrl:scenario?'':(annual.sourceUrl||''),
+    rate:annual.rate,routeIndependent:true,manual:scenario};
 }
 function allYears(rk){return Object.keys(Y).map(yr=>({yr:+yr,res:calcYr(yr,rk)}));}
 function cumulative(rk){let c=0,low=0,high=0;return Object.keys(Y).map(yr=>{const r=calcYr(yr,rk);c+=r.tR;low+=r.low;high+=r.high;return{yr:+yr,cum:c,low,high};});}

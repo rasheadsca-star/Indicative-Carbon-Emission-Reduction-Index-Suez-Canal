@@ -78,7 +78,7 @@ export function createTrialAccumulator(manifest,{nowMs=Date.now()}={}){
 export async function readPrivateTrialReport({directory,nowMs=Date.now()}={}){
  // Use opening guard and existing manifest. Never auto-create a meaningful trial
  // just because a report is requested.
- const store=await openPrivateTrial({directory,now:()=>nowMs});
+ const store=await openPrivateTrial({directory,now:()=>nowMs,mustExist:true});
  const aggregate=createTrialAccumulator(store.manifest,{nowMs});
  for(const type of ["heartbeat","position","candidate"]){
    const files=await store.listFiles(type);

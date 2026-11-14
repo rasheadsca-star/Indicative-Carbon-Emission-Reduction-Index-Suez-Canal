@@ -1,9 +1,9 @@
 {
   "schema": "ceri-sc-official-sca-summary-v1",
   "dataStatus": "published-official-source-transcribed-not-api",
-  "method": "Manually transcribed from Suez Canal Authority 2025 Annual Report Table 2 (p.5) with year totals crosschecked against Table 1; not a live official API",
+  "method": "2023 monthly from official 2024 Annual Report Table 2; 2024/2025 monthly from official 2025 Annual Report Table 2; all years crosschecked against published annual totals. No live API.",
   "sourceUrl": "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2025.pdf",
-  "verifiedTable": "2025 annual report, Table 2, MONTHLY TRAFFIC (2024, 2025)",
+  "verifiedTable": "2024 and 2025 Annual Reports, Table 2 monthly traffic",
   "lastPublishedPeriod": "2025-12",
   "measurement": "Ships transiting canal, Net Ton in thousands",
   "units": {
@@ -26,6 +26,56 @@
     }
   },
   "monthly": {
+    "2023": [
+      [
+        2155,
+        123540
+      ],
+      [
+        1959,
+        113787
+      ],
+      [
+        2191,
+        129104
+      ],
+      [
+        2298,
+        133430
+      ],
+      [
+        2396,
+        142924
+      ],
+      [
+        2162,
+        130766
+      ],
+      [
+        2158,
+        134600
+      ],
+      [
+        2174,
+        136204
+      ],
+      [
+        2191,
+        132340
+      ],
+      [
+        2345,
+        138427
+      ],
+      [
+        2267,
+        136935
+      ],
+      [
+        2138,
+        116200
+      ]
+    ],
     "2024": [
       [
         1362,
@@ -132,5 +182,6 @@
     "No verified weekly or daily history imported",
     "Do not infer daily counts from monthly average or AIS counts",
     "Source report copyright/use terms must be respected for institutional republication"
-  ]
+  ],
+  "extraSourceUrl2023": "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2024.pdf"
 }

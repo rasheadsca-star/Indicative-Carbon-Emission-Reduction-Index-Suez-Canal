@@ -1594,60 +1594,91 @@ function render(){
  */
 async function renderOfficialCurrentYear(M,yr){
   M.replaceChildren();
-  const ar=lang==='ar';
-  const section=document.createElement('section');section.className='cd';
-  section.style.cssText='padding:24px;margin:14px 0;border:1px solid var(--border);border-radius:15px;';
-  const title=document.createElement('h2');title.textContent=ar?'حركة الملاحة الرسمية — آخر بيانات منشورة تم التحقق منها':'Suez Canal traffic — latest verified published period';
-  const lead=document.createElement('p');lead.style.cssText='line-height:1.85;color:var(--txt);';
-  lead.textContent=ar?'لا توجد بيانات عبور رسمية لعام '+yr+' متصلة بهذا المحرك. لهذا أوقفنا عرض تقديرات CO₂ اليومية والشهرية والسنوية والتراكمية المتغيرة زمنيًا باعتبارها نتائج محدثة.':'No verified official traffic data for '+yr+' is connected to this engine. Current-year rolling, daily, monthly and cumulative CO₂ headline estimates are therefore withheld.';
-  const status=document.createElement('p');status.textContent=ar?'تحميل آخر سلسلة رسمية موثقة...':'Loading last documented official dataset...';
-  status.setAttribute('role','status');
-  const actions=document.createElement('div');actions.style.cssText='display:flex;flex-wrap:wrap;gap:12px;margin:14px 0;';
-  for(const pair of [
-    ['./official-statistics.html',ar?'افتح الإحصاءات الرسمية السنوية والشهرية':'Open official annual/monthly statistics'],
-    ['./ais-lab/',ar?'شاهد جودة تغطية AIS (غير رسمي)':'View AIS coverage (not official)']
-  ]){
-    const link=document.createElement('a');link.href=pair[0];link.textContent=pair[1];
-    link.style.cssText='display:inline-block;padding:10px 15px;border:1px solid var(--accent);color:var(--txt);border-radius:9px;text-decoration:none;font-weight:700;';
-    actions.appendChild(link);
-  }
-  section.append(title,lead,status,actions);
-  M.appendChild(section);
-  const audit=document.createElement('section');audit.className='cd';audit.style.cssText='padding:20px;margin:12px 0;line-height:1.8;';
-  audit.textContent=ar?'قاعدة التحقق: قيمة الانبعاثات المتجنبة لا تُحسب من عدد السفن وحده، ولا يجوز اعتماد متوسط تاريخي للسفينة لقياس 2026. المطلوب: بيانات عبور يومية موثقة، ومسارات السفن الفعلية، واستهلاك الوقود ومعاملات الانبعاثات ومراجعة عدم اليقين.':'Verification gate: ship count alone cannot establish avoided CO₂. Historical average per ship is not a measured 2026 reduction; route, fuel, GHG factors and uncertainty need independent validation.';
-  M.appendChild(audit);
+  const ar=lang==='ar',fmtInt=n=>Number(n).toLocaleString('en-US');
+  const root=document.createElement('section');root.className='cd';
+  root.style.cssText='padding:24px;margin:15px 0;border:1px solid var(--border);border-radius:15px';
+  const heading=document.createElement('h2');heading.textContent=ar?'مؤشرات قناة السويس الرسمية — 2026':'Official Suez Canal intelligence — 2026';
+  const explanation=document.createElement('p');
+  explanation.textContent=ar
+    ?'بيانات أعلنتها هيئة قناة السويس رسميًا، وليست رصد AIS. أحدث شهر معلن هنا أكتوبر 2026. التحليل يفصل العدد والحمولة والإيرادات عن أي وفورات CO₂ غير مثبتة.'
+    :'Official SCA announcements, not AIS observations. Latest monthly result here: October 2026. Traffic, net tonnage and revenue are kept separate from unverified CO₂ savings.';
+  explanation.style.cssText='line-height:1.9;color:var(--txt)';
+  const status=document.createElement('p');status.setAttribute('role','status');
+  status.textContent=ar?'تحميل أحدث المؤشرات المنشورة...':'Loading the published indicators...';
+  const cards=document.createElement('div');
+  cards.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px;margin:17px 0';
+  const details=document.createElement('div');details.style.cssText='line-height:1.8;padding:14px;background:var(--card);border-radius:10px';
+  const links=document.createElement('div');links.style.cssText='display:flex;gap:12px;flex-wrap:wrap;margin:18px 0';
+  const link=(href,label)=>{
+    const a=document.createElement('a');a.href=href;a.textContent=label;
+    a.target=href.startsWith('http')?'_blank':'_self';
+    a.rel='noopener noreferrer';
+    a.style.cssText='color:var(--accent);text-decoration:underline;font-weight:600';
+    links.appendChild(a);
+  };
+  const addCard=(label,value,foot)=>{
+    const el=document.createElement('div');el.style.cssText='padding:17px;border:1px solid var(--border);border-radius:12px;background:var(--card)';
+    const l=document.createElement('small');l.style.cssText='display:block;color:var(--dim);margin-bottom:9px';l.textContent=label;
+    const v=document.createElement('strong');v.style.cssText='display:block;color:var(--accent);font-size:29px';v.textContent=value;
+    const b=document.createElement('small');b.style.cssText='display:block;color:var(--dim);margin-top:8px';b.textContent=foot;
+    el.append(l,v,b);cards.appendChild(el);
+  };
+  root.append(heading,explanation,status,cards,details,links);M.appendChild(root);
+  addCard(ar?'حركة 2026 الرسمية الحالية':'Current-year official total',ar?'لا تتوفر سلسلة سنوية كاملة':'No complete annual series',ar?'لا يصح استنتاجها من أكتوبر':'No extrapolation from October');
+  addCard(ar?'وفورات CO₂ المثبتة لعام 2026':'Verified 2026 CO₂ savings',ar?'غير متاحة':'Not available',ar?'يلزم نموذج رحلات ووقود مدقق':'Validated fuel/route model required');
+  link('./official-statistics.html',ar?'السلسلة الرسمية 2023–2025':'Official 2023–2025 history');
+  link('./ais-lab/',ar?'جودة تغطية AIS':'AIS coverage diagnostics');
+  const insights=document.createElement('section');insights.className='cd';
+  insights.style.cssText='padding:18px;margin:12px 0;line-height:1.8';
+  insights.textContent=ar
+    ?'قواعد التحليل: بيانات الشهر لا تعني إجمالي السنة، وبيانات يوم واحد لا تعني متوسطًا يوميًا، ومقارنة الأحجام والإيرادات لا تثبت انخفاض الانبعاثات. النسب الحسابية المستخرجة من ملايين الأطنان المدورة تقريبية.'
+    :'Validation: a month is not a full year; a single day does not establish a daily trend; traffic and revenue growth do not prove avoided emissions. Ratios from rounded tonnages are approximate.';
+  M.appendChild(insights);
   try{
-    const response=await fetch('./data/sca-official-monthly-2024-2025.json',{cache:'no-store'});
-    if(!response.ok)throw Error('HTTP '+response.status);
-    const d=await response.json();
-    const y2024=d?.annual?.['2024'],y2025=d?.annual?.['2025'];
-    if(d.schema!=='ceri-sc-official-sca-summary-v1'||!d.sourceUrl?.startsWith('https://www.suezcanal.gov.eg/')||
-       !Number.isSafeInteger(y2024?.vessels)||!Number.isSafeInteger(y2025?.vessels)||
-       !Array.isArray(d.monthly?.['2025'])||d.monthly['2025'].length!==12||
-       d.monthly['2025'].reduce((sum,item)=>sum+Number(item[0]),0)!==y2025.vessels)
-       throw Error('Published annual/monthly source reconciliation failed');
-    if(!section.isConnected)return;
-    status.textContent=ar?'المصدر: النشرة السنوية الرسمية لهيئة قناة السويس 2025؛ أحدث شهر في السلسلة: ديسمبر 2025.':'Source: SCA Annual Report 2025; latest month in this verified series: December 2025.';
-    const row=document.createElement('div');row.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:15px 0;';
-    const values=[
-      [ar?'السفن العابرة 2024':'2024 transits',y2024.vessels.toLocaleString('en-US')],
-      [ar?'السفن العابرة 2025':'2025 transits',y2025.vessels.toLocaleString('en-US')],
-      [ar?'التغير في عدد السفن 2025 / 2024':'2025 vs 2024 traffic',((y2025.vessels/y2024.vessels-1)*100).toFixed(2)+'%'],
-      [ar?'العبور الرسمي لعام '+yr:'Official transits for '+yr,ar?'غير متاح':'Not available'],
-      [ar?'وفورات CO₂ المعتمدة لعام '+yr:'Verified CO₂ savings for '+yr,ar?'غير متاحة':'Not available']
-    ];
-    for(const [label,value] of values){
-      const card=document.createElement('div');card.style.cssText='border:1px solid var(--border);border-radius:12px;padding:15px;background:var(--card);';
-      const small=document.createElement('div');small.style.cssText='font-size:12px;color:var(--dim);margin-bottom:8px;';small.textContent=label;
-      const big=document.createElement('strong');big.style.cssText='display:block;font-size:25px;color:var(--accent);';big.textContent=value;
-      card.append(small,big);row.appendChild(card);
-    }
-    section.insertBefore(row,actions);
-    const source=document.createElement('a');source.href=d.sourceUrl;source.target='_blank';source.rel='noopener noreferrer';
-    source.textContent=ar?'قراءة التقرير الأصلي الصادر عن الهيئة':'Read original SCA annual report';
-    section.appendChild(source);
+    const response=await fetch('./data/sca-2026-official-announcements.json',{cache:'no-store'});
+    if(!response.ok)throw Error('Source HTTP '+response.status);
+    const d=await response.json(),m=d.monthlyComparison,c=d.containerRecovery;
+    if(d.schema!=='ceri-sc-sca-2026-announcements-v1'||m.period!=='2026-10'||
+       m.baseline!=='2025-10'||m.current.vessels!==1490||m.baselineValues.vessels!==1128||
+       !m.sourceUrl.startsWith('https://www.suezcanal.gov.eg/')||
+       !c.sourceUrl.startsWith('https://www.suezcanal.gov.eg/'))
+      throw Error('Source data verification gate failed');
+    if(!root.isConnected)return;
+    cards.replaceChildren();
+    const deltaPct=(newValue,oldValue)=>((newValue/oldValue-1)*100).toFixed(1);
+    status.textContent=ar
+      ?'آخر بيان شهري موثق: أكتوبر 2026 · نشر 5 نوفمبر 2026 · مقارنة بأكتوبر 2025'
+      :'Latest official month: October 2026 · published 5 November 2026 · vs October 2025';
+    addCard(ar?'السفن العابرة — أكتوبر 2026':'October 2026 — transits',fmtInt(m.current.vessels),
+      '+'+fmtInt(m.current.vessels-m.baselineValues.vessels)+' / +'+deltaPct(m.current.vessels,m.baselineValues.vessels)+'% '+(ar?'مقابل أكتوبر 2025':'vs October 2025'));
+    addCard(ar?'الحمولة الصافية — مليون طن':'Net tonnage — million tons','≈ '+m.current.netTonnageMillionRounded+'M',
+      ar?'الهيئة أعلنت ارتفاعًا 86%؛ القيم بالمليون مدورة':'SCA reported +86%; million-ton inputs rounded');
+    addCard(ar?'الإيرادات — مليون دولار':'Revenue — USD million','$'+fmtInt(m.current.revenueMillionUsd)+'M',
+      '+'+fmtInt(m.current.revenueMillionUsd-m.baselineValues.revenueMillionUsd)+'M / +'+deltaPct(m.current.revenueMillionUsd,m.baselineValues.revenueMillionUsd)+'%');
+    addCard(ar?'الحمولة الصافية لكل سفينة — تقريبي':'Net tons per transit — approximate',
+      '≈ '+fmtInt(Math.round(m.current.netTonnageMillionRounded*1e6/m.current.vessels)),
+      ar?'ناتج قسمة إجمالي الحمولة المدور على عدد السفن، وليس GT أو DWT':'Rounded net-ton aggregate / transits, not GT or DWT');
+    addCard(ar?'سفن الحاويات المتوسطة والعملاقة — يوليو–سبتمبر':'Medium/mega container vessels — Jul–Sep',
+      fmtInt(c.current.vessels),
+      (ar?'مقابل ':'vs ')+fmtInt(c.baselineValues.vessels)+' '+(ar?'في 2025 · شريحة محددة':'in 2025 · defined segment'));
+    addCard(ar?'وفورات CO₂ المعتمدة في 2026':'Certified avoided CO₂ in 2026',ar?'غير متاحة':'Not available',
+      ar?'لا تنتج من حركة السفن أو الإيرادات وحدها':'Cannot be derived from counts/revenue alone');
+    details.replaceChildren();
+    const note=document.createElement('p');
+    note.textContent=ar
+      ?'قراءة أولية: ارتفع عدد السفن في أكتوبر بنسبة '+deltaPct(m.current.vessels,m.baselineValues.vessels)+'%، بينما أعلنت الهيئة ارتفاع الحمولة 86% والإيرادات 94%. وهذا مؤشر لتعافٍ في الحركة وتحسن في الحجم/المزيج أو العائد؛ ولا يثبت بمفرده سبب كل تغير أو خفض انبعاثات.'
+      :'Interpretation: October traffic increased '+deltaPct(m.current.vessels,m.baselineValues.vessels)+'%; SCA reported +86% net tonnage and +94% revenue. This points to recovery and potential mix/yield changes, without proving causality or emissions benefits.';
+    details.appendChild(note);
+    const sampled=document.createElement('p');
+    sampled.textContent=ar
+      ?'مؤشر مستقل محدود: أعلنت الهيئة عبور '+d.singleDay.vessels+' سفينة في '+d.singleDay.date+'؛ هذا يوم واحد وليس سلسلة يومية. وبلغ عدد سفن الحاويات المحددة '+c.current.vessels+' مقابل '+c.baselineValues.vessels+' في يوليو–سبتمبر.'
+      :'Separate evidence: SCA reported '+d.singleDay.vessels+' vessels on '+d.singleDay.date+'; one day is not a daily series. Defined Jul–Sep container vessels: '+c.current.vessels+' versus '+c.baselineValues.vessels+'.';
+    details.appendChild(sampled);
+    link(m.sourceUrl,ar?'مصدر نتائج أكتوبر — هيئة قناة السويس':'SCA October official announcement');
+    link(c.sourceUrl,ar?'مصدر تعافي سفن الحاويات':'SCA container-vessel announcement');
+    link(d.singleDay.sourceUrl,ar?'مصدر العبور في 16 سبتمبر':'SCA September 16 daily statement');
   }catch(error){
-    if(section.isConnected)status.textContent=(ar?'تعذر تحميل أو التحقق من السلسلة الرسمية: ':'Official dataset unavailable or invalid: ')+error.message;
+    if(root.isConnected)status.textContent=(ar?'تعذر تأكيد بيانات 2026: ':'Unable to validate 2026 data: ')+error.message;
   }
 }
 

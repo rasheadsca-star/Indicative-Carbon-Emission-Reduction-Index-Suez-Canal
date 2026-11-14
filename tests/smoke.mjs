@@ -6,6 +6,7 @@ import { JSDOM, VirtualConsole } from "jsdom";
 const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../dashboard-v6.css", import.meta.url), "utf8");
 const worker = await readFile(new URL("../worker.js", import.meta.url), "utf8");
+const official2026 = await readFile(new URL("../data/sca-2026-official-announcements.json", import.meta.url), "utf8");
 
 for (const [index, match] of [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].entries()) {
   if (match[1].trim()) new vm.Script(match[1], { filename: `index-inline-${index}.js` });
@@ -40,18 +41,26 @@ const dom = new JSDOM(html, {
     window.requestAnimationFrame = (callback) => window.setTimeout(callback, 0);
     window.cancelAnimationFrame = (id) => window.clearTimeout(id);
     window.Response = Response;
-    window.fetch = async () => new Response(JSON.stringify({ ok: false, error: "test_fallback" }), { status: 503, headers: { "Content-Type": "application/json" } });
+    window.fetch = async (url) => String(url).includes("sca-2026-official-announcements.json")
+      ? new Response(official2026, { status: 200, headers: { "Content-Type": "application/json" } })
+      : new Response(JSON.stringify({ ok: false, error: "test_fallback" }), { status: 503, headers: { "Content-Type": "application/json" } });
     Object.defineProperty(window.navigator, "serviceWorker", { value: { register: async () => ({}) }, configurable: true });
   },
 });
 
 await new Promise((resolve) => setTimeout(resolve, 120));
 assert.equal(dom.window.document.querySelectorAll("#nav button").length, 6);
-assert.match(dom.window.document.querySelector("#main").textContent, /Suez Canal traffic|حركة الملاحة الرسمية/);
+assert.match(dom.window.document.querySelector("#main").textContent, /Official Suez Canal intelligence|مؤشرات قناة السويس الرسمية/);
 assert.doesNotMatch(dom.window.document.querySelector("#main").textContent, /PRO-RATA YEAR-TO-DATE/);
 assert.doesNotMatch(dom.window.document.querySelector("#main").textContent, /19\.2M|60,553|1,841,825/);
 assert.match(html, /renderOfficialCurrentYear\(M,yr\)/);
 assert.match(html, /official-statistics\.html/);
+assert.match(dom.window.document.querySelector("#main").textContent, /1,490/);
+assert.match(dom.window.document.querySelector("#main").textContent, /724/);
+assert.match(dom.window.document.querySelector("#main").textContent, /166/);
+assert.match(dom.window.document.querySelector("#main").textContent, /2026/);
+assert.match(dom.window.document.querySelector("#main").textContent, /CO₂/);
+assert.match(html, /sca-2026-official-announcements\.json/);
 dom.window.document.querySelectorAll("#nav button")[3].click();
 assert.match(dom.window.document.querySelector("#main").textContent, /Fuel Lifecycle Boundary/);
 dom.window.document.querySelectorAll("#nav button")[4].click();

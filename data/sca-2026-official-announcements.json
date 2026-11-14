@@ -1,0 +1,56 @@
+{
+  "schema": "ceri-sc-sca-2026-announcements-v1",
+  "lastVerifiedAnnouncementDate": "2026-11-05",
+  "sourceType": "SCA official press announcements, not an authenticated daily vessel registry or machine-readable statistical feed",
+  "monthlyComparison": {
+    "period": "2026-10",
+    "baseline": "2025-10",
+    "publicationDate": "2026-11-05",
+    "sourceUrl": "https://www.suezcanal.gov.eg/Arabic/MediaCenter/News/Pages/Sca_5-11-2026-%283%29.aspx",
+    "current": {
+      "vessels": 1490,
+      "netTonnageMillionRounded": 88,
+      "revenueMillionUsd": 724
+    },
+    "baselineValues": {
+      "vessels": 1128,
+      "netTonnageMillionRounded": 47,
+      "revenueMillionUsd": 373
+    },
+    "authorityReportedChangePct": {
+      "vessels": 32,
+      "netTonnage": 86,
+      "revenue": 94
+    },
+    "notes": "Rounded tonnage and revenue figures in public statement; computed ratios of rounded values need not reproduce the reported percent exactly."
+  },
+  "containerRecovery": {
+    "period": "2026-07/2026-09",
+    "baseline": "2025-07/2025-09",
+    "publicationDate": "2026-10-13",
+    "sourceUrl": "https://www.suezcanal.gov.eg/English/MediaCenter/News/Pages/Sca_13-10-2026.aspx",
+    "group": "Medium and mega container vessels covered in announcement",
+    "current": {
+      "vessels": 166,
+      "netTonnageMillionRounded": 29
+    },
+    "baselineValues": {
+      "vessels": 16,
+      "netTonnageMillionRounded": 2.4
+    }
+  },
+  "singleDay": {
+    "date": "2026-09-16",
+    "publicationDate": "2026-09-16",
+    "sourceUrl": "https://www.suezcanal.gov.eg/English/MediaCenter/News/Pages/Sca_16-9-2026_2.aspx",
+    "vessels": 39,
+    "netTonnageMillionRounded": 2.3,
+    "note": "One-day official announcement only. Not representative of a complete daily time series."
+  },
+  "dataLimitations": [
+    "October is an official announced month, not a verified full 2026 year-to-date dataset.",
+    "September 16 is one sampled day, not an official 2026 daily sequence.",
+    "Container vessel figures refer to a particular size segment and period; do not add to general totals.",
+    "No annual 2026 vessel, fuel, route savings, or verified CO2 emissions available from these announcements."
+  ]
+}

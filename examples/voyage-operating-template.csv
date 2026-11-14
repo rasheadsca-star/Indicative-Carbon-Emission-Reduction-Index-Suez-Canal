@@ -1,0 +1,2 @@
+MMSI,Direction,Exit UTC,Suez Distance Nm,Cape Distance Nm,Speed Kn,Sea Burn Tonnes Day,Suez Extra Hours,Cape Extra Hours,Standby Burn Tonnes Day,Combustion EF,Burn Sensitivity Pct,Distance Source,Fuel Source,Factor Source
+123456789,Southbound,2026-11-14T12:15:00Z,6000,11000,20,100,14,0,12,3.114,10,SYNTHETIC route assumptions,SYNTHETIC fuel assumptions,SYNTHETIC EF assumption

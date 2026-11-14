@@ -84,3 +84,41 @@ test("malformed frames do not create vessels",()=>{
   assert.equal(tr.ingest(mk("bad",BASE,30.67,32.33),true).accepted,false);
   assert.equal(tr.summary().observed,0);
 });
+
+test("long anchorage before entering canal is not mislabeled canal transit",()=>{
+ let now=BASE;
+ const tr=createTracker(()=>now);
+ const step=(h,lat,lon)=>{
+   now=BASE+h*3600000;
+   return tr.ingest(mk("999888777",now,lat,lon,{eventId:"synthetic-"+h}),true);
+ };
+ step(0,31.39,32.32);
+ step(70,31.39,32.32); // 70 h in approach/anchorage
+ step(72,30.91,32.315); // first canal fix
+ step(74,30.67,32.33);
+ const finish=step(79,29.92,32.57);
+ assert.equal(finish.completed?.direction,"Southbound");
+ assert.equal(finish.completed?.elapsedHours,79);
+ assert.equal(finish.completed?.canalHoursLower,2);
+ assert.equal(finish.completed?.canalHoursUpper,7);
+ assert.equal(finish.completed?.approachWaitUpperHours,72);
+ assert.equal(finish.completed?.elapsedMeaning,"APPROACH_TO_EXIT_INCLUDES_WAITING");
+ assert.ok(finish.completed?.flags.includes("LONG_APPROACH_WAIT_NOT_CANAL_TRANSIT"));
+});
+test("opposite gate without a canal fix cannot manufacture a crossing after long anchorage",()=>{
+ let now=BASE;const tr=createTracker(()=>now);
+ tr.ingest(mk("555666777",now,31.39,32.32),true);
+ now+=75*3600000;
+ const result=tr.ingest(mk("555666777",now,29.92,32.57),true);
+ assert.equal(result.completed,undefined);
+ assert.equal(tr.summary().inferredTransits,0);
+});
+test("canal passage records a bounded travel duration, not a falsely precise elapsed time",()=>{
+ let now=BASE;const tr=createTracker(()=>now);
+ const step=(h,lat,lon)=>{now=BASE+h*3600000;return tr.ingest(mk("321654987",now,lat,lon),true)};
+ step(0,31.39,32.32);step(4,30.91,32.315);step(8,30.67,32.33);
+ const r=step(12,29.92,32.57);
+ assert.equal(r.completed?.canalHoursLower,4);
+ assert.equal(r.completed?.canalHoursUpper,8);
+ assert.equal(r.completed?.elapsedHours,12);
+});

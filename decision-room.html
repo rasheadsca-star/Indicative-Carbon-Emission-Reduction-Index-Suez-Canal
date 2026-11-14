@@ -128,6 +128,8 @@ async function quality(){
   card(container,"متوسط MMSI لكل لقطة (24 ساعة)",fmt(p24.snapshotMean,1),"ليس عدد عبور القناة");
   card(container,"أقصى MMSI في لقطة (24 ساعة)",fmt(p24.snapshotMax),"قد تكون نفس السفن في لقطات متكررة");
   card(container,"عينات خلال 7 أيام",fmt(p7.samples),"صالحة "+fmt(p7.usableSamples)+" · ليست سجل عبور");
+  card(container,"انتظام تشغيل الفحص بالساعة (24 ساعة)",p24.collectionRunRatio===null||p24.collectionRunRatio===undefined?"قيد التجميع":fmt(p24.collectionRunRatio*100,1)+"%",
+    "يظهر بعد اكتمال نافذة 24 ساعة، وليس قياسًا لتغطية حركة السفن");
   card(container,"نسبة تغطية عبور القناة","غير متاحة","لا يوجد مرجع سفن رسمي مطابق بنفس الزمن والنطاق");
   $("aisStatus").textContent="آخر تقرير: "+data.assessedAt+" UTC · عمره "+fmt(age)+" دقيقة · "+(age>150||age<0?"حالة قديمة؛ لا تعتمد":"تشخيص دوري غير معتمد");
   $("aisInterpretation").textContent=(p24.samples<12?"العينات خلال 24 ساعة غير كافية للحكم على انتظام المصدر. ":"")+

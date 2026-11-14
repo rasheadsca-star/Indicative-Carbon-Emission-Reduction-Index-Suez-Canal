@@ -1,0 +1,50 @@
+name: Private AIS Seven-Day Trial - engineering checks
+on:
+  pull_request:
+    paths:
+      - 'backend/trial-*.mjs'
+      - 'backend/ais-trial.Dockerfile'
+      - 'backend/providers/aisstream.mjs'
+      - 'backend/providers.test.mjs'
+      - 'backend/trial.test.mjs'
+      - 'backend/ais-trial-*.mjs'
+      - 'compose.ais-trial.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'docs/AIS_SEVEN_DAY_TRIAL.md'
+      - '.github/workflows/ais-seven-day-trial.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'backend/trial-*.mjs'
+      - 'backend/ais-trial.Dockerfile'
+      - 'backend/providers/aisstream.mjs'
+      - 'backend/trial.test.mjs'
+      - 'compose.ais-trial.yml'
+      - 'package.json'
+      - 'package-lock.json'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install pinned dependencies
+        run: npm ci
+      - name: Full repo regression suite
+        run: npm test
+      - name: Check backend CLI syntax
+        run: |
+          node --check backend/trial-collector.mjs
+          node --check backend/trial-store.mjs
+          node --check backend/trial-report.mjs
+          node --check backend/trial-report-cli.mjs
+          node --check backend/trial-healthcheck.mjs
+      - name: Verify Docker image builds with production dependency
+        run: docker build -f backend/ais-trial.Dockerfile -t ceri-ais-trial:test .

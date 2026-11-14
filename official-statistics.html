@@ -32,8 +32,8 @@ code{direction:ltr;unicode-bidi:isolate}#error{white-space:pre-wrap;color:#ffb6a
 <p><small>هذا الفحص يتحقق من وجود التقارير المنشورة فقط، ولا يحدّث أرقام الحركة الشهرية تلقائيًا، ولا يوفر أعدادًا يومية.</small></p>
 </div>
 </section>
-<section class="panel"><h2>آخر مؤشرات ملاحية واقتصادية رسمية — أكتوبر 2026</h2>
-<p>نُشرت هذه الأرقام في 5 نوفمبر 2026؛ هي نتائج شهر أكتوبر، وليست إجمالي عام 2026.</p>
+<section class="panel"><h2>آخر مؤشرات ملاحية واقتصادية رسمية — أحدث شهر منشور</h2>
+<p>تُقرأ الفترة وتاريخ النشر من المصدر الرسمي؛ البيانات تخص الشهر المعلن، وليست إجمالي العام.</p>
 <div class="cards" id="current2026Cards"><div class="card">تحميل...</div></div><p id="current2026Insight"></p>
 <p><a href="https://www.suezcanal.gov.eg/Arabic/MediaCenter/News/Pages/Sca_5-11-2026-%283%29.aspx" target="_blank" rel="noopener noreferrer">المصدر الرسمي لنتائج أكتوبر 2026</a></p>
 </section>
@@ -98,15 +98,18 @@ async function render2026Announcements(){
     const r=await fetch("./data/sca-2026-official-announcements.json",{cache:"no-store"});
     if(!r.ok)throw Error("HTTP "+r.status);
     const d=await r.json(),m=d.monthlyComparison;
-    if(d.schema!=="ceri-sc-sca-2026-announcements-v1"||m.period!=="2026-10"||
-      m.current.vessels!==1490||m.baselineValues.vessels!==1128||
+    if(d.schema!=="ceri-sc-sca-2026-announcements-v1"||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(m.period)||
+      m.baseline!==(Number(m.period.slice(0,4))-1)+m.period.slice(4)||
+      !Number.isSafeInteger(m.current.vessels)||m.current.vessels<=0||
+      !Number.isSafeInteger(m.baselineValues.vessels)||m.baselineValues.vessels<=0||
       !m.sourceUrl.startsWith("https://www.suezcanal.gov.eg/"))throw Error("Source failed validation");
     container.replaceChildren();
+    const period=m.period,baseline=m.baseline,pct=m.authorityReportedChangePct||{};
     const metrics=[
-      ["السفن العابرة — أكتوبر 2026",m.current.vessels.toLocaleString("en-US"),"مقابل "+m.baselineValues.vessels.toLocaleString("en-US")+" في أكتوبر 2025"],
-      ["تغير أعداد السفن","+"+(100*(m.current.vessels/m.baselineValues.vessels-1)).toFixed(1)+"%","النسبة المعلنة: ≈ +32%"],
-      ["الحمولة الصافية","≈ "+m.current.netTonnageMillionRounded+" مليون طن","مقابل ≈ "+m.baselineValues.netTonnageMillionRounded+" مليون طن · أعلنت الهيئة +86%"],
-      ["الإيرادات",m.current.revenueMillionUsd+" مليون دولار","مقابل "+m.baselineValues.revenueMillionUsd+" مليون دولار · أعلنت الهيئة +94%"]
+      ["السفن العابرة — "+period,m.current.vessels.toLocaleString("en-US"),"مقابل "+m.baselineValues.vessels.toLocaleString("en-US")+" في "+baseline],
+      ["تغير أعداد السفن","+"+(100*(m.current.vessels/m.baselineValues.vessels-1)).toFixed(1)+"%","النسبة المعلنة: "+(pct.vessels??"غير متاحة")+"%"],
+      ["الحمولة الصافية","≈ "+m.current.netTonnageMillionRounded+" مليون طن","مقابل ≈ "+m.baselineValues.netTonnageMillionRounded+" مليون طن · التغير المعلن "+(pct.netTonnage??"غير متاح")+"%"],
+      ["الإيرادات",m.current.revenueMillionUsd+" مليون دولار","مقابل "+m.baselineValues.revenueMillionUsd+" مليون دولار · التغير المعلن "+(pct.revenue??"غير متاح")+"%"]
     ];
     for(const [label,value,note] of metrics){
       const card=document.createElement("div");card.className="card";
@@ -114,7 +117,7 @@ async function render2026Announcements(){
       const v=document.createElement("strong");v.className="big";v.textContent=value;
       const n=document.createElement("small");n.textContent=note;card.append(l,v,n);container.appendChild(card);
     }
-    insight.textContent="قراءة تحليلية: أكتوبر 2026 يشير إلى تعافي المرور وارتفاع الحمولة والإيرادات بنسب تفوق نمو عدد السفن. لا يمكن استخراج وفورات CO₂ من هذه الأرقام وحدها؛ أحدث سنة كاملة في قاعدة البيانات هي 2025.";
+    insight.textContent="المصدر المنشور: "+period+" مقابل "+baseline+"، تاريخ النشر: "+m.publicationDate+". تُستخدم هذه النتائج لتحليل حركة هذا الشهر فقط، ولا يمكن استخراج وفورات CO₂ منها وحدها. أحدث سنة كاملة في قاعدة البيانات هي 2025.";
   }catch(err){container.textContent="تعذر التحقق من مؤشرات 2026: "+err.message;insight.textContent="لا توجد نتيجة موثوقة يمكن عرضها دون المصدر."}
 }
 render2026Announcements();
@@ -129,7 +132,7 @@ function showYear(){
     }
     $("monthlyRows").appendChild(tr);
   }
-  $("monthlyInsight").textContent=rows.length?"كل شهر يمثل قيمة منشورة من نشرات الهيئة لعامَي 2024 و2025، وليس متوسطًا يوميًا أو تغطية AIS.":"لا تتوفر بيانات هذه السنة.";
+  $("monthlyInsight").textContent=rows.length?"كل شهر يمثل قيمة منشورة من التقارير السنوية التي تغطي حركة 2023–2025، وليس متوسطًا يوميًا أو تغطية AIS.":"لا تتوفر بيانات هذه السنة.";
 }
 try{
   const response=await fetch("./data/sca-official-monthly-2024-2025.json",{cache:"no-store"});

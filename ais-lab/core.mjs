@@ -179,36 +179,48 @@ export function createTracker(clock = () => Date.now()) {
       }
       const passage = entry.passage;
       if (zone === "north" || zone === "south") {
-        if (!passage || (passage.start === zone) || v.timestamp - passage.startedAt > MAX_TRANSIT_MS) {
-          if (!passage || passage.start !== zone || v.timestamp - passage.startedAt > MAX_TRANSIT_MS) {
-            entry.passage = { start: zone, startedAt: v.timestamp, canalSeen: false, canalPoints: 0 };
-          }
-        } else if (passage.canalSeen &&
-                   v.timestamp - passage.startedAt >= MIN_TRANSIT_MS &&
-                   v.timestamp - passage.startedAt <= MAX_TRANSIT_MS &&
-                   entry.completedAt !== passage.startedAt) {
-          const completion = {
-            mmsi: entry.mmsi, name: entry.name, shipType: entry.shipType,
-            direction: passage.start === "north" ? "Southbound" : "Northbound",
-            entryTime: passage.startedAt, exitTime: v.timestamp,
-            elapsedHours: +( (v.timestamp - passage.startedAt) / 3600000 ).toFixed(2),
-            canalPoints: passage.canalPoints, source: v.source,
-            status: "AIS-inferred; not official"
-          };
-          completions.unshift(completion);
-          if (completions.length > MAX_COMPLETIONS) completions.pop();
-          entry.completedAt = passage.startedAt;
-          entry.passage = null;
-          shrink();
-          return { accepted: true, completed: completion };
+        if (!passage) {
+          entry.passage={start:zone,startedAt:v.timestamp,firstCanalAt:null,lastCanalAt:null,canalSeen:false,canalPoints:0};
+        } else if (passage.start===zone) {
+          // Do not reset the clock on repeated approach/anchorage observations:
+          // the approach residence is NOT canal transit time.
         } else {
-          // A jump from the opposite gateway without valid interior evidence is not a transit.
-          entry.passage = { start: zone, startedAt: v.timestamp, canalSeen: false, canalPoints: 0 };
+          const elapsedSinceCanal=passage.firstCanalAt===null?null:v.timestamp-passage.firstCanalAt;
+          const canalLowerMs=passage.firstCanalAt===null?null:passage.lastCanalAt-passage.firstCanalAt;
+          if (passage.canalSeen&&elapsedSinceCanal!==null&&
+              elapsedSinceCanal>=MIN_TRANSIT_MS&&
+              canalLowerMs<=MAX_TRANSIT_MS&&
+              entry.completedAt!==passage.startedAt) {
+            const approachElapsedMs=passage.firstCanalAt-passage.startedAt;
+            const zoneToZoneMs=v.timestamp-passage.startedAt;
+            const flags=[];
+            if(approachElapsedMs>MAX_TRANSIT_MS)flags.push("LONG_APPROACH_WAIT_NOT_CANAL_TRANSIT");
+            if(elapsedSinceCanal>MAX_TRANSIT_MS)flags.push("LONG_CANAL_DWELL_OR_TRACK_GAP");
+            const completion={
+              mmsi:entry.mmsi,name:entry.name,shipType:entry.shipType,
+              direction:passage.start==="north"?"Southbound":"Northbound",
+              entryTime:passage.startedAt,exitTime:v.timestamp,
+              // Legacy elapsedHours retained for report consumers; explicitly
+              // classified as zone-to-zone (includes approach/anchorage waiting).
+              elapsedHours:+(zoneToZoneMs/3600000).toFixed(2),
+              elapsedMeaning:"APPROACH_TO_EXIT_INCLUDES_WAITING",
+              canalHoursLower:+(canalLowerMs/3600000).toFixed(2),
+              canalHoursUpper:+(elapsedSinceCanal/3600000).toFixed(2),
+              approachWaitUpperHours:+(approachElapsedMs/3600000).toFixed(2),
+              flags,canalPoints:passage.canalPoints,source:v.source,
+              status:"AIS-inferred; not official, canal hours are bounds"
+            };
+            completions.unshift(completion);
+            if(completions.length>MAX_COMPLETIONS)completions.pop();
+            entry.completedAt=passage.startedAt;entry.passage=null;
+            shrink();return {accepted:true,completed:completion};
+          }
+          // Opposite approach without bounded interior evidence is not a passage.
+          entry.passage={start:zone,startedAt:v.timestamp,firstCanalAt:null,lastCanalAt:null,canalSeen:false,canalPoints:0};
         }
-      } else if (zone === "canal" && passage &&
-                 v.timestamp >= passage.startedAt && v.timestamp - passage.startedAt <= MAX_TRANSIT_MS) {
-        passage.canalSeen = true;
-        passage.canalPoints++;
+      } else if(zone==="canal"&&passage&&v.timestamp>=passage.startedAt) {
+        if(passage.firstCanalAt===null)passage.firstCanalAt=v.timestamp;
+        passage.lastCanalAt=v.timestamp;passage.canalSeen=true;passage.canalPoints++;
       }
     }
     shrink();

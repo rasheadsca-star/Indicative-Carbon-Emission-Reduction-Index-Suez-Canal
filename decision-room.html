@@ -85,7 +85,7 @@ async function official(){
   const r=await fetch("./data/sca-2026-official-announcements.json",{cache:"no-store"});
   if(!r.ok)throw Error("HTTP "+r.status);
   const data=await r.json(),a=analyzeAnnouncements(data);
-  $("officialDate").textContent="أكتوبر 2026 مقابل أكتوبر 2025 · تاريخ البيان "+a.publicationDate+" · أحدث شهر موثّق في قاعدة هذه اللوحة";
+  $("officialDate").textContent=a.period+" مقابل "+a.baseline+" · تاريخ البيان "+a.publicationDate+" · أحدث شهر موثّق في قاعدة هذه اللوحة";
   const out=$("officialCards");out.replaceChildren();
   card(out,"عدد السفن",fmt(a.vessels.now),"زيادة "+fmt(a.vessels.absolute)+" سفينة (+ "+fmt(a.vessels.derivedPct,1)+"%)");
   card(out,"الحمولة الصافية",fmt(a.netTonnage.now)+" مليون طن","أعلنت الهيئة +"+a.reportedPct.netTonnage+"% (الأرقام الإجمالية مدوّرة)");
@@ -98,22 +98,22 @@ async function official(){
     const h=await fetch("./data/sca-official-monthly-2024-2025.json",{cache:"no-store"});
     if(!h.ok)throw Error("HTTP "+h.status);
     const historical=await h.json(),insights=buildTrafficInsights(historical,data);
-    const annual=insights.annual,oct=insights.october,container=$("historicalCards");
+    const annual=insights.annual,latest=insights.latestMonth,container=$("historicalCards");
     container.replaceChildren();
-    card(container,"عدد السفن 2025 مقابل 2024",fmt(annual.vessels.current),
+    card(container,"عدد السفن "+annual.year+" مقابل "+annual.comparison,fmt(annual.vessels.current),
       fmt(annual.vessels.absolute)+" سفينة · "+fmt(annual.vessels.changePct,2)+"%");
-    card(container,"الحمولة الصافية 2025",fmt(annual.netTonnes.current/1e6,3)+" مليون طن",
-      fmt(annual.netTonnes.changePct,2)+"% مقارنة بـ2024");
-    card(container,"متوسط الحمولة الصافية للسفينة 2025",fmt(annual.netTonnesPerVessel.current,0)+" طن صافٍ",
-      "التغير عن 2024: +"+fmt(annual.netTonnesPerVessel.changePct,2)+"% · متوسط حسابي، ليس GT أو DWT");
-    card(container,"أكتوبر 2026 مقارنة بأكتوبر 2024",fmt(oct.comparedTo2024.current)+" سفينة",
-      "مقابل "+fmt(oct.comparedTo2024.base)+" · +"+fmt(oct.comparedTo2024.changePct,1)+"%");
-    $("historicalInterpretation").textContent="تحليل إضافي من بيانات الهيئة: عدد السفن انخفض 3.44% خلال 2025، بينما انخفضت الحمولة الصافية نحو 0.47% فقط؛ لذلك ارتفع متوسط الحمولة الصافية للسفينة. وفي أكتوبر 2026 تجاوز العدد مستويَي أكتوبر 2024 و2025. لا يُثبت هذا وحده حجم الانبعاثات المتجنبة.";
+    card(container,"الحمولة الصافية "+annual.year,fmt(annual.netTonnes.current/1e6,3)+" مليون طن",
+      fmt(annual.netTonnes.changePct,2)+"% مقارنة بـ"+annual.comparison);
+    card(container,"متوسط الحمولة الصافية للسفينة "+annual.year,fmt(annual.netTonnesPerVessel.current,0)+" طن صافٍ",
+      "التغير عن "+annual.comparison+": +"+fmt(annual.netTonnesPerVessel.changePct,2)+"% · متوسط حسابي، ليس GT أو DWT");
+    card(container,latest.period+" مقارنة بـ "+latest.comparedTo2024.baseYear,fmt(latest.comparedTo2024.current)+" سفينة",
+      "مقابل "+fmt(latest.comparedTo2024.base)+" · "+fmt(latest.comparedTo2024.changePct,1)+"%");
+    $("historicalInterpretation").textContent="مقارنة "+annual.year+" بـ"+annual.comparison+": تغير السفن "+fmt(annual.vessels.changePct,2)+"% والحمولة الصافية "+fmt(annual.netTonnes.changePct,2)+"% ومتوسط الحمولة لكل سفينة "+fmt(annual.netTonnesPerVessel.changePct,2)+"%. شهر "+latest.period+" مسجل مستقلًا وفق مصدره. لا يُثبت ذلك وفورات الانبعاثات.";
     $("historicalSource").href=annual.sourceUrl;
   }catch(e){
     $("historicalInterpretation").textContent="تعذر تأكيد المقارنة التاريخية؛ لا يمكن عرض نتيجة: "+e.message;
   }
-  $("officialInterpretation").textContent="قراءة تحليلية: تعافٍ ملاحـي خلال أكتوبر 2026، مع نمو الحمولة والإيرادات أسرع من عدد السفن. لا يُثبت ذلك بمفرده سبب التغير، ولا مقدار وفر الانبعاثات.";
+  $("officialInterpretation").textContent="تحليل البيان "+a.period+": تغير عدد السفن "+fmt(a.vessels.derivedPct,1)+"% والحمولة الصافية "+fmt(a.netTonnage.derivedPct,1)+"% والإيرادات "+fmt(a.revenue.derivedPct,1)+"% محسوبة من إجماليات معلنة ومدوّرة. لا يمكن استنتاج سبب التغير أو وفورات الانبعاثات من هذه البيانات وحدها.";
  }catch(e){$("officialDate").textContent="تعذر قراءة المؤشرات الرسمية: "+e.message}
 }
 async function quality(){

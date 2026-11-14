@@ -125,7 +125,7 @@ function render() {
     const tr = document.createElement("tr");
     tr.append(makeCell(c.name || c.mmsi), makeCell(c.direction),
       makeCell(shortClock(c.entryTime)), makeCell(shortClock(c.exitTime)),
-      makeCell(c.elapsedHours + " h"), makeCell("Inferred only"));
+      makeCell(c.elapsedHours + " h"), makeCell(c.canalHoursLower+"–"+c.canalHoursUpper+" h"), makeCell(c.flags?.length?c.flags.join("; "):"Inferred only"));
     els.passageRows.appendChild(tr);
   }
   els.passageEmpty.hidden = s.completions.length !== 0;

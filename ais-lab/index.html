@@ -39,7 +39,15 @@
     <div class="metric"><small>المنطقة الشمالية</small><strong data-id="north">0</strong></div>
     <div class="metric"><small>المنطقة الجنوبية</small><strong data-id="south">0</strong></div>
     <div class="metric accent"><small>عبور محتمل خلال جلسة الرصد</small><strong data-id="transits">0</strong></div>
-    <div class="metric"><small>رسائل AIS المستقبلة في الجلسة</small><strong data-id="liveMessages">0</strong></div>
+    <div class="metric"><small>رسائل AIS المستقبلة في الجلسة (كل الأنواع)</small><strong data-id="liveMessages">0</strong></div>
+    <div class="metric"><small>أرقام MMSI المميزة منذ فتح الصفحة</small><strong data-id="sessionVessels">0</strong></div>
+  </section>
+  <section class="panel" style="border:2px solid #c89535" aria-label="تشخيص تغطية المصدر">
+    <h3>تشخيص تغطية AIS — لا يمثل عدد سفن القناة</h3>
+    <p data-id="coverageWarning" style="color:#815209;font-weight:700">لم تتحدد تغطية المصدر بعد. اتصال WebSocket لا يضمن استقبال مواقع السفن.</p>
+    <div data-id="diagnostics" style="direction:ltr;text-align:left;font-family:monospace;overflow-wrap:anywhere">No stream events received.</div>
+    <p><small data-id="tierLimits">حدود مصدر البيانات لم تصل بعد</small> · <small data-id="snapshotMeta">نتيجة اللقطة لم تصل بعد</small></p>
+    <p><small>تنبيه: عدد السفن في أول بطاقة يخص آخر 30 دقيقة فقط؛ بينما عدد MMSI المميز يخص رسائل جلسة المتصفح. كلاهما ليس تعدادًا يوميًا أو رصدًا على مدار 24 ساعة.</small></p>
   </section>
   <div class="main-grid">
     <section class="panel" aria-label="خريطة رصد السفن">

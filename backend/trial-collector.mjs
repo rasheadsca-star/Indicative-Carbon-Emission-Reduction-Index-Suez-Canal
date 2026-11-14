@@ -10,18 +10,20 @@ import {createHealthMonitor,normalizeAisMessage} from "./ais-provider.mjs";
 import {createTransitEngine} from "./transit-fsm.mjs";
 import {createAisstreamProvider} from "./providers/aisstream.mjs";
 import {pathToFileURL} from "node:url";
+import WebSocket from "ws";
 
 export function createTrialSession({store,now=()=>Date.now(),providerId="aisstream"}={}){
  if(!store?.append||!store?.drain)throw Error("Private journal required");
  const monitor=createHealthMonitor({clock:now,staleAfterMs:10*60000});
  const engine=createTransitEngine({clock:now});
- let failure=null,seq=Promise.resolve(),received=0;
+ let failure=null,seq=Promise.resolve(),received=0,compressionEnabled=null;
  function enqueue(task){
    const next=seq.then(task);
    seq=next.catch(err=>{failure=err});
    return next;
  }
  function onHealth(status){
+   if(status?.event==="subscription_confirmed")compressionEnabled=status.compressionEnabled;
    if(status?.event==="connect")monitor.onConnect();
    if(["disconnect","error"].includes(status?.event))monitor.onDisconnect();
  }
@@ -54,7 +56,7 @@ export function createTrialSession({store,now=()=>Date.now(),providerId="aisstre
      received:health.received,rejected:health.rejected,reconnects:health.reconnects,
      lastMessageAt:health.lastMessageAt,
      fsmInferredTransits:state.transits,
-     processStart,
+     processStart,compressionEnabled,
      coverage:"UNKNOWN_UNTIL_OFFICIAL_RECONCILIATION"});
    return {health,state,received};
  }
@@ -71,7 +73,7 @@ export async function runSevenDayTrial({env=process.env,now=()=>Date.now(),
  const store=await openPrivateTrial({directory:env.AIS_PRIVATE_DATA_DIR,now});
  const expires=Date.parse(store.manifest.endsAt);
  if(now()>=expires)throw Error("The seven-day trial window has elapsed. Review report before a new trial");
- const provider=createProvider({apiKey,idleReconnectMs:20*60_000});
+ const provider=createProvider({apiKey,WebSocketImpl:WebSocket,idleReconnectMs:20*60_000});
  const session=createTrialSession({store,now,providerId:provider.id});
  let stopped=false,heartbeatTimer=null,silenceTimer=null;
  const stop=async(reason)=>{

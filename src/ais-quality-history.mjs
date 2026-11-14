@@ -39,7 +39,7 @@ export function evaluateQuality(history,now=new Date()){
   if(!Number.isFinite(t))throw Error("Invalid evaluation time");
   const within=h=>samples.filter(x=>{
     const age=t-Date.parse(x.checkedAt);
-    return age>=0&&age<=h*3600000;
+    return age>=0&&age<h*3600000; // Half-open window prevents counting both hourly endpoints
   });
   const periods=[{hours:24,key:"last24h"},{hours:168,key:"last7d"}];
   const out={status:"UNVERIFIED_COVERAGE",assessedAt:new Date(t).toISOString(),sampleCount:samples.length,

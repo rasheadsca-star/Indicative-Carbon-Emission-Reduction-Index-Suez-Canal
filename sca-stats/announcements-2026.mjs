@@ -5,7 +5,11 @@
 export function analyzeAnnouncements(data){
   if(data?.schema!=="ceri-sc-sca-2026-announcements-v1")throw Error("Incorrect source schema");
   const m=data.monthlyComparison,c=data.containerRecovery,d=data.singleDay;
-  if(!m||m.period!=="2026-10"||m.baseline!=="2025-10"||!c||!d)throw Error("Unexpected reporting periods");
+  // DEF-004: accept any published month YYYY-MM compared with the SAME month of the previous year
+  // (was hard-wired to 2026-10, so the next SCA monthly release could not be ingested without code edits).
+  const pm=/^(\d{4})-(0[1-9]|1[0-2])$/.exec(m?.period||"");
+  if(!m||!pm||m.baseline!==`${+pm[1]-1}-${pm[2]}`||!c||!d)throw Error("Unexpected reporting periods");
+  if(!/^\d{4}-\d\d-\d\d$/.test(m.publicationDate||"")||m.publicationDate<m.period+"-01")throw Error("Publication date must not precede the reported month");
   for(const x of [m,c,d])if(typeof x.sourceUrl!=="string"||!x.sourceUrl.startsWith("https://www.suezcanal.gov.eg/"))throw Error("Missing official source URL");
   const positive=(n)=>Number.isFinite(n)&&n>0;
   for(const group of [m.current,m.baselineValues,c.current,c.baselineValues]){

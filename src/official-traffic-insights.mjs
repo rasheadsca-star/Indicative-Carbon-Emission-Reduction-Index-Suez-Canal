@@ -1,5 +1,6 @@
 import {validatePublishedSeries} from "../sca-stats/official-stats.mjs";
 import {analyzeAnnouncements} from "../sca-stats/announcements-2026.mjs";
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
 /**
  * Published SCA traffic data only. Cross-annual and monthly changes are
  * arithmetical comparisons, never estimates of transit counts or emissions.
@@ -8,9 +9,13 @@ export function buildTrafficInsights(historical,announcements){
   validatePublishedSeries(historical);
   const a=analyzeAnnouncements(announcements);
   const y24=historical.annual["2024"], y25=historical.annual["2025"];
-  const m24=historical.monthly["2024"][9],m25=historical.monthly["2025"][9];
-  if(m25[0]!==a.vessels.prev)throw Error("Official October 2025 baseline conflict");
-  if(!Array.isArray(m24)||m24[0]!==1136)throw Error("Unexpected October 2024 reference");
+  // DEF-004: month is derived from the announcement, not hard-wired to October.
+  const [py,pmo]=a.period.split("-").map(Number),idx=pmo-1,monthName=MONTHS[idx];
+  const mPrev=historical.monthly[String(py-1)]?.[idx],mPrev2=historical.monthly[String(py-2)]?.[idx];
+  // The announcement's own baseline must equal the published annual-report monthly figure when that year is held.
+  if(Array.isArray(mPrev)&&mPrev[0]!==a.vessels.prev)throw Error(`Official ${monthName} ${py-1} baseline conflict`);
+  if(!Array.isArray(mPrev2)||!Number.isSafeInteger(mPrev2[0]))throw Error(`Missing ${monthName} ${py-2} reference`);
+  const m24=mPrev2,m25=mPrev??[a.vessels.prev];
   const percent=(next,prev)=>100*(next/prev-1);
   const perVessel=(entry)=>entry.netTonnageThousands*1000/entry.vessels;
   const last=(prev,current)=>({previous:prev,current,absolute:current-prev,changePct:percent(current,prev)});
@@ -22,19 +27,20 @@ export function buildTrafficInsights(historical,announcements){
     sourceUrl:historical.sourceUrl,status:"official-published-derived-indicators"
   };
   const october={
-    month:"October",period:"2026-10",comparison:"2025-10",
+    month:monthName,period:a.period,comparison:a.baseline,
     vessels:a.vessels,
-    comparedTo2024:{base:m24[0],current:a.vessels.now,changePct:percent(a.vessels.now,m24[0])},
+    comparedTo2024:{base:m24[0],baseYear:py-2,current:a.vessels.now,changePct:percent(a.vessels.now,m24[0])},
     netTonnesPerVesselApprox:a.netTonnagePerVesselApprox,
     revenuePerVesselUsdApprox:a.revenuePerVesselUsdApprox,
     sourceUrl:a.sourceUrl,publicationDate:a.publicationDate,
     status:"announced-2026-aggregate-with-rounded-values"
   };
   return {
-    annual,october,
+    // `october` is a legacy key kept for existing UIs; `latestMonth` is the same object for any announced month.
+    annual,october,latestMonth:october,
     signal:october.vessels.now>m25[0]&&october.vessels.now>m24[0]
-      ?"OCTOBER_VESSEL_COUNT_ABOVE_2024_AND_2025":"NO_UNAMBIGUOUS_RECOVERY_SIGNAL",
+      ?`${monthName.toUpperCase()}_VESSEL_COUNT_ABOVE_${py-2}_AND_${py-1}`:"NO_UNAMBIGUOUS_RECOVERY_SIGNAL",
     noAnnual2026:true,verifiedVoyageSavings:null,
-    interpretation:"Annual net tons per transit changed with fleet/cargo mix; it is NOT DWT, GT or a proven causal measure. October 2026 results are monthly only, not full-year performance."
+    interpretation:"Annual net tons per transit changed with fleet/cargo mix; it is NOT DWT, GT or a proven causal measure. "+`${monthName} ${py} results are monthly only, not full-year performance.`
   };
 }

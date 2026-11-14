@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --check worker.js && node tests/smoke.mjs"
+    "test": "node --check worker.js && node --check scripts/ais-source-quality.mjs && node --check scripts/sca-annual-archive-watch.mjs && node tests/smoke.mjs && npm run test:unit",
+    "test:smoke": "node --check worker.js && node tests/smoke.mjs",
+    "test:unit": "node --test ais-lab/*.test.mjs src/*.test.mjs sca-stats/*.test.mjs backend/*.test.mjs tests/decision-room.test.mjs tests/provenance-manifest.test.mjs"
   },
   "devDependencies": {
     "jsdom": "^26.1.0"

@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'index.html'
+      - 'official-statistics.html'
       - 'tests/smoke.mjs'
       - 'data/sca-2026-official-announcements.json'
       - 'sca-stats/announcements-2026.mjs'

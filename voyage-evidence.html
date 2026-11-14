@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CERI-SC — ربط عبور السفن وحساب الوقود</title>
+<style>
+:root{color-scheme:dark;--bg:#061d24;--surface:#10343e;--surface2:#0b2831;--text:#eaf8f5;--line:#42656b;--mint:#49e3bb;--muted:#b6d1cf;--warn:#f3c583;font-family:Tahoma,"Segoe UI",Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);line-height:1.8}
+header,main,footer{margin:auto;max-width:1200px;padding:20px}
+header{border-bottom:1px solid var(--line)}h1{font-size:clamp(25px,3vw,36px);line-height:1.4}h2{font-size:20px}
+a{color:var(--mint)}.nav{display:flex;gap:15px;flex-wrap:wrap}
+.panel{border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:22px;margin:16px 0}
+.warning{background:#44351b;border:1px solid #a48351;padding:14px;border-radius:8px;color:#ffe4aa}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px}
+.metric{border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--surface2)}
+.metric strong{display:block;font-size:26px;color:var(--mint);direction:ltr;text-align:right}
+.metric small,small{color:var(--muted)}
+label{display:block;font-weight:600;font-size:14px}
+input{font:inherit;display:block;color:var(--text);border:1px solid #72969a;background:#061b22;width:100%;padding:10px;border-radius:7px;margin:6px 0 14px}
+button{font:inherit;border:0;border-radius:8px;background:var(--mint);color:#073a33;padding:11px 18px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:350px;overflow:auto}
+#errors{color:#ffafa7}
+strong,code{unicode-bidi:isolate}code{direction:ltr;font-size:12px}
+table{border-collapse:collapse;width:100%;min-width:580px}th,td{padding:10px;text-align:right;border-bottom:1px solid var(--line)}
+.scroller{overflow-x:auto}
+@media print{body{background:white;color:black}.panel,.metric{background:white;color:black;border-color:#aaa}button,input{display:none}a{color:black}}
+</style>
+</head>
+<body>
+<header>
+<nav class="nav"><a href="./">الرئيسية V9</a><a href="./decision-room.html">غرفة القرار</a><a href="./ais-lab/reconcile.html">مطابقة AIS</a><a href="./official-statistics.html">الإحصاءات الرسمية</a></nav>
+<h1>ربط سجلات العبور بحسابات رحلة السفينة</h1>
+<p>اختبار منضبط يبدأ من سجلات AIS المستنتجة، ثم سجل عبور مرجعي، ثم بيانات التشغيل الخاصة بكل رحلة، لينتج مقارنات وقود وCO₂ قابلة لإعادة الحساب.</p>
+</header>
+<main>
+<section class="panel">
+<h2>1 — شروط قبول الأدلة</h2>
+<div class="warning">
+<strong>ليس ربطًا مباشرًا بقاعدة بيانات هيئة قناة السويس.</strong> الملفات يحددها المستخدم، واسم «رسمي» داخل ملف لا يثبت أصالته. لا يُرفع أي ملف إلى الخادم؛ تتم المطابقة والحساب داخل المتصفح فقط. مخرجات الوقود والانبعاثات كلها محاكاة TTW وغير معتمدة حتى تتحقق جهات مختصة من أصل الملفات ومدخلات السفن.
+</div>
+<p>لا يُقبل السجل في الحساب إلا عند وجود <strong>MMSI متطابق، واتجاه متطابق، ووقت خروج UTC داخل الهامش</strong>، بالإضافة إلى سجل تشغيل مرتبط بنفس وقت العبور المرجعي بالضبط، ومراجع للمسافة والوقود ومعامل الانبعاث.</p>
+</section>
+<section class="panel">
+<h2>2 — ارفع ملفات المقارنة الثلاثة</h2>
+<div class="grid">
+<label>ملف حالات AIS المحتملة CSV
+<input id="aisFile" type="file" accept=".csv,text/csv">
+<small>أعمدة: <code>MMSI,Direction,Exit UTC</code></small></label>
+<label>سجل العبور المرجعي CSV
+<input id="referenceFile" type="file" accept=".csv,text/csv">
+<small>أعمدة: <code>MMSI,Direction,Exit UTC,Source</code></small></label>
+<label>سجل بيانات الرحلات والوقود CSV
+<input id="operatingFile" type="file" accept=".csv,text/csv">
+<small>يتضمن المسافات والسرعة واستهلاك الوقود ومصادر القيم</small></label>
+</div>
+<p><a href="./examples/voyage-operating-template.csv">تحميل قالب سجل التشغيل — بيانات افتراضية توضيحية</a></p>
+<p>أعمدة التشغيل الإلزامية: <code>MMSI, Direction, Exit UTC, Suez Distance Nm, Cape Distance Nm, Speed Kn, Sea Burn Tonnes Day, Suez Extra Hours, Cape Extra Hours, Standby Burn Tonnes Day, Combustion EF, Burn Sensitivity Pct, Distance Source, Fuel Source, Factor Source</code>.</p>
+<label>هامش الوقت بين خروج AIS وخروج السجل المرجعي (بالدقيقة)
+<input id="tolerance" type="number" min="1" max="360" step="1" value="180"></label>
+<p><button id="analyze" type="button">مطابقة السجلات وحساب الرحلات المستوفية</button>
+<button id="download" type="button" disabled>تصدير تقرير إجمالي دون هوية السفن</button></p>
+<div id="errors" role="alert"></div>
+</section>
+<section class="panel">
+<h2>3 — نتائج الربط والفحص</h2>
+<p id="status" role="status">لم يبدأ الفحص بعد.</p>
+<div id="cards" class="grid"></div>
+<p id="qualityNote"></p>
+<h2>السجلات المرفوضة وأسباب الرفض</h2>
+<pre id="rejections" aria-label="سجلات مرفوضة">لا توجد نتائج.</pre>
+</section>
+<section class="panel">
+<h2>4 — الحساب التجميعي</h2>
+<div class="warning">المجموع الحسابي أدناه يخص فقط الحالات المقبولة في مطابقة الملفات، ولا يمثل خفضًا فعليًا معتمدًا أو إجمالي انبعاثات السفن العابرة للقناة. إذا لم يوجد سجل واحد مستوفٍ، تظهر حالة «لا يوجد أساس للحساب» ولا تُعرض قيمة صفر باعتبارها أداءً بيئيًا.</div>
+<div class="grid" id="totals"></div>
+</section>
+<section class="panel">
+<h2>5 — شروط الوصول إلى نتائج تشغيلية موثقة</h2>
+<div class="scroller">
+<table><thead><tr><th>البوابة</th><th>الشرط</th><th>الحالة الحالية</th></tr></thead><tbody>
+<tr><td>مصدر الحركة</td><td>سجلات عبور موثقة من الهيئة وحقوق معالجة واضحة</td><td>غير متصل</td></tr>
+<tr><td>AIS</td><td>رصد مستمر ومرخص، ومطابقة زمنية لسجل الهيئة</td><td>المتاح مصدر تجريبي محدود التغطية</td></tr>
+<tr><td>الوقود</td><td>استهلاك السفينة أو نموذج معاير والتحقق من المصدر</td><td>مدخلات يرفعها المستخدم</td></tr>
+<tr><td>المسار البديل</td><td>مرجع مسافات صالح للرحلة والظروف التشغيلية</td><td>مدخلات يرفعها المستخدم</td></tr>
+<tr><td>الانبعاثات</td><td>معاملات منشأ وتاريخ ونطاق حساب وWtW عند الحاجة</td><td>TTW احتراق فقط</td></tr>
+<tr><td>اعتماد التقرير</td><td>مراجعة جهة مسؤولة ونظام MRV محدد</td><td>غير معتمد</td></tr>
+</tbody></table>
+</div>
+</section>
+</main><footer>سجلات المستخدم لا تصبح سجلات رسمية بمجرد الرفع · Local-only analytical prototype</footer>
+<script type="module">
+import {auditVesselEvidence} from "./src/ais-sca-voyage-pipeline.mjs";
+const $=id=>document.getElementById(id);
+const fmt=(value,d=0)=>value===null||!Number.isFinite(value)?"لا يتوفر":value.toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d});
+function metric(target,label,value,desc){
+ const el=document.createElement("div");el.className="metric";
+ const a=document.createElement("small");a.textContent=label;
+ const b=document.createElement("strong");b.textContent=value;
+ const c=document.createElement("small");c.textContent=desc;
+ el.append(a,b,c);target.appendChild(el);
+}
+let report=null;
+$("analyze").addEventListener("click",async()=>{
+ report=null;$("download").disabled=true;$("errors").textContent="";
+ $("status").textContent="جارٍ فحص المدخلات المحلية...";
+ $("cards").replaceChildren();$("totals").replaceChildren();$("rejections").textContent="";
+ try{
+  const names=["aisFile","referenceFile","operatingFile"];
+  const files=names.map(id=>$(id).files?.[0]);
+  if(files.some(f=>!f))throw Error("يجب رفع ملفات AIS والعبور والتشغيل الثلاثة.");
+  if(files.some(f=>f.size>5_000_000))throw Error("الحد الأقصى 5 MB لكل ملف.");
+  const [a,r,o]=await Promise.all(files.map(f=>f.text()));
+  const result=auditVesselEvidence(a,r,o,{toleranceMinutes:Number($("tolerance").value)});
+  if(!result.ok){
+   $("status").textContent="فشلت بوابة المطابقة؛ لا توجد حسابات.";
+   $("rejections").textContent=(result.errors||[]).map(e=>"CSV line "+e.line+" : "+e.message).join("\n");
+   return;
+  }
+  report={...result,generatedAt:new Date().toISOString(),
+   sourceAuthentication:"USER_FILES_NOT_INDEPENDENTLY_AUTHENTICATED"};
+  $("status").textContent="اكتمل الفحص الحسابي. حالة الأدلة: ملفات المستخدم غير مصدّق على مصدرها.";
+  const cards=$("cards");
+  metric(cards,"حالات AIS المحتملة",fmt(result.aisCandidates),"ليست عدد السفن الرسمية");
+  metric(cards,"سجلات العبور المرجعية",fmt(result.referenceRecords),"ملف مرجعي يرفعه المستخدم");
+  metric(cards,"المطابقات الزمنية الأولية",fmt(result.sourceMatched),"قبل تطبيق شروط بيانات الوقود");
+  metric(cards,"الحالات المؤهلة للحساب",fmt(result.eligible),"مطابقة الهوية والوقت مع اكتمال مدخلات ومراجع");
+  metric(cards,"مرفوض لخلل البيانات",fmt(result.rejectedRows),"لا تدخل ضمن المجموع");
+  metric(cards,"مطابقات ملتبسة",fmt(result.ambiguousMatchedRows),"مستبعدة من الحساب");
+  metric(cards,"حالات مطابقة دون بيانات تشغيل مقبولة",fmt(result.missingOperatingInputs),"يلزم مصدر تشغيل صالح");
+  $("qualityNote").textContent=result.warning;
+  $("rejections").textContent=result.rejectionDetails.length?
+    result.rejectionDetails.map(e=>"CSV line "+e.line+": "+e.reasons.join(", ")).join("\n"):"لا يوجد رفض بسبب صيغة ملف التشغيل؛ قد توجد حالات غير مطابقة أو ملتبسة.";
+  if(result.eligible){
+   const totals=$("totals"),v=result.totals;
+   metric(totals,"وقود طريق السويس",fmt(v.suezFuelTonnes,2)+" طن","مجموع سيناريوهات الرحلات المؤهلة فقط");
+   metric(totals,"وقود طريق الرأس",fmt(v.capeFuelTonnes,2)+" طن","مجموع سيناريوهات الرحلات المؤهلة فقط");
+   metric(totals,"فرق استهلاك الوقود",fmt(v.deltaFuelTonnes,2)+" طن","الرأس ناقص السويس — قد يكون سالبًا");
+   metric(totals,"فرق CO₂ التشغيلي",fmt(v.deltaCO2Tonnes,2)+" طن CO₂","نموذج TTW فقط وغير معتمد");
+   metric(totals,"فرق زمن الرحلات",fmt(v.deltaHours,2)+" ساعة","مجموع الفروق لا وقت رحلة منفردة");
+  }else{
+   $("totals").textContent="لا يوجد سجل مستوفٍ لشروط الحساب. لا توجد نتيجة انبعاثات يمكن تقديمها.";
+  }
+  $("download").disabled=false;
+ }catch(e){$("status").textContent="تعذر الحساب."; $("errors").textContent=String(e.message||e);}
+});
+$("download").addEventListener("click",()=>{
+ if(!report)return;
+ const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);
+ const link=document.createElement("a");link.href=url;link.download="ceri-sc-voyage-batch-unverified.json";link.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+</script>
+</body></html>

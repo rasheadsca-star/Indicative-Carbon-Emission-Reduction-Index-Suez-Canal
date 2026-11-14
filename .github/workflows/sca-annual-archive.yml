@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --check scripts/sca-annual-archive-watch.mjs
+      - run: node --check scripts/sca-annual-archive-watch.mjs && node --test sca-stats/archive-parser.test.mjs
       - run: node scripts/sca-annual-archive-watch.mjs
       - uses: actions/upload-artifact@v4
         with:

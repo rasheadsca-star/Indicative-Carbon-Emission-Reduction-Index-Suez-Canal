@@ -5,6 +5,7 @@
  * All raw ship identifiers/positions stay outside GitHub and its Pages deployment.
  */
 import {openPrivateTrial} from "./trial-store.mjs";
+import {readFile} from "node:fs/promises";
 import {createHealthMonitor,normalizeAisMessage} from "./ais-provider.mjs";
 import {createTransitEngine} from "./transit-fsm.mjs";
 import {createAisstreamProvider} from "./providers/aisstream.mjs";
@@ -64,12 +65,13 @@ export function createTrialSession({store,now=()=>Date.now(),providerId="aisstre
 export async function runSevenDayTrial({env=process.env,now=()=>Date.now(),
  createProvider=createAisstreamProvider,log=console.log,err=console.error}={}){
  if(env.AIS_TERMS_ACCEPTED!=="yes")throw Error("Provider use is blocked until operator sets AIS_TERMS_ACCEPTED=yes after reviewing terms and rights");
- if(!env.AISSTREAM_API_KEY)throw Error("AISSTREAM_API_KEY missing; set as server secret, NEVER in GitHub/Pages");
+ const apiKey=env.AISSTREAM_API_KEY||(env.AISSTREAM_API_KEY_FILE?(await readFile(env.AISSTREAM_API_KEY_FILE,"utf8")).trim():"");
+ if(!apiKey)throw Error("AISSTREAM_API_KEY or AISSTREAM_API_KEY_FILE missing; keep secret off GitHub/Pages");
  if(!env.AIS_PRIVATE_DATA_DIR)throw Error("AIS_PRIVATE_DATA_DIR missing; use a private persistent volume outside the repository");
  const store=await openPrivateTrial({directory:env.AIS_PRIVATE_DATA_DIR,now});
  const expires=Date.parse(store.manifest.endsAt);
  if(now()>=expires)throw Error("The seven-day trial window has elapsed. Review report before a new trial");
- const provider=createProvider({apiKey:env.AISSTREAM_API_KEY});
+ const provider=createProvider({apiKey,idleReconnectMs:20*60_000});
  const session=createTrialSession({store,now,providerId:provider.id});
  let stopped=false,heartbeatTimer=null,silenceTimer=null;
  const stop=async(reason)=>{

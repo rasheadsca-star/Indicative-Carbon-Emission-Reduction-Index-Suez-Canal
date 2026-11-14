@@ -1,0 +1,136 @@
+{
+  "schema": "ceri-sc-official-sca-summary-v1",
+  "dataStatus": "published-official-source-transcribed-not-api",
+  "method": "Manually transcribed from Suez Canal Authority 2025 Annual Report Table 2 (p.5) with year totals crosschecked against Table 1; not a live official API",
+  "sourceUrl": "https://www.suezcanal.gov.eg/English/Downloads/DownloadsDocLibrary/Navigation%20Reports/Annual%20Reports%E2%80%8B%E2%80%8B%E2%80%8B/2025.pdf",
+  "verifiedTable": "2025 annual report, Table 2, MONTHLY TRAFFIC (2024, 2025)",
+  "lastPublishedPeriod": "2025-12",
+  "measurement": "Ships transiting canal, Net Ton in thousands",
+  "units": {
+    "vessels": "count",
+    "netTonnage": "thousand net tons"
+  },
+  "annual": {
+    "2023": {
+      "vessels": 26434,
+      "netTonnageThousands": 1568257,
+      "source": "2025 annual report Table 1"
+    },
+    "2024": {
+      "vessels": 13213,
+      "netTonnageThousands": 524527
+    },
+    "2025": {
+      "vessels": 12758,
+      "netTonnageThousands": 522084
+    }
+  },
+  "monthly": {
+    "2024": [
+      [
+        1362,
+        61031
+      ],
+      [
+        1120,
+        45701
+      ],
+      [
+        1115,
+        43569
+      ],
+      [
+        1124,
+        43759
+      ],
+      [
+        1111,
+        44918
+      ],
+      [
+        1043,
+        40945
+      ],
+      [
+        1047,
+        41960
+      ],
+      [
+        1107,
+        44074
+      ],
+      [
+        1042,
+        41129
+      ],
+      [
+        1136,
+        40421
+      ],
+      [
+        1000,
+        38268
+      ],
+      [
+        1006,
+        38752
+      ]
+    ],
+    "2025": [
+      [
+        1046,
+        39547
+      ],
+      [
+        864,
+        33772
+      ],
+      [
+        1071,
+        42314
+      ],
+      [
+        1038,
+        40836
+      ],
+      [
+        1035,
+        41742
+      ],
+      [
+        1001,
+        39960
+      ],
+      [
+        1055,
+        44871
+      ],
+      [
+        1070,
+        45177
+      ],
+      [
+        1152,
+        47988
+      ],
+      [
+        1128,
+        47054
+      ],
+      [
+        1160,
+        48399
+      ],
+      [
+        1138,
+        50424
+      ]
+    ]
+  },
+  "limitations": [
+    "2026 monthly data has not been verified from an official primary report in this dataset",
+    "No verified weekly or daily history imported",
+    "Do not infer daily counts from monthly average or AIS counts",
+    "Source report copyright/use terms must be respected for institutional republication"
+  ]
+}

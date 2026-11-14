@@ -64,7 +64,9 @@ export function evaluateQuality(history,now=new Date()){
       collectionRunRatio:null,
       assessment:arr.length===0?"NO_SAMPLES":usable.length===0?"NO_USABLE_SNAPSHOT":"REGIONAL_SAMPLE_ONLY"};
     if(out[key].scheduleWindowMature){
-      out[key].collectionRunRatio=Math.min(1,arr.length/hours);
+      // Multiple push-triggered runs in one UTC hour count as a single scheduled slot.
+      const distinctUtcHours=new Set(arr.map(x=>x.checkedAt.slice(0,13)));
+      out[key].collectionRunRatio=Math.min(1,distinctUtcHours.size/hours);
     }
   }
   return out;

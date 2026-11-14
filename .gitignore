@@ -1,3 +1,10 @@
 node_modules/
 .DS_Store
 npm-debug.log*
+
+# Never commit secrets or licensed raw AIS telemetry
+.secrets/*
+!.secrets/.gitignore
+trial-private/
+*.env
+backend/ais-trial.env

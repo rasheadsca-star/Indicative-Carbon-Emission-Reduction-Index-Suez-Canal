@@ -11,8 +11,10 @@ import { assertAisProvider } from "../ais-provider.mjs";
 export const SUEZ_BBOX = [[29.70, 31.90], [31.65, 32.85]];
 
 export function createAisstreamProvider({ apiKey = process.env.AISSTREAM_API_KEY, WebSocketImpl = globalThis.WebSocket,
-  url = "wss://stream.aisstream.io/v0/stream", maxBackoffMs = 60_000, setTimer = setTimeout } = {}) {
-  let ws = null, stopped = false, backoff = 1000;
+  url = "wss://stream.aisstream.io/v0/stream", maxBackoffMs = 60_000, setTimer = setTimeout, idleReconnectMs = 0 } = {}) {
+  let ws = null, stopped = false, backoff = 1000, idleTimer = null;
+  const clearIdle=()=>{if(idleTimer!==null){clearTimeout(idleTimer);idleTimer=null}};
+  const armIdle=(onHealth)=>{clearIdle();if(idleReconnectMs>0)idleTimer=setTimer(()=>{onHealth?.({event:"position_stream_silent_timeout"});ws?.close()},idleReconnectMs)};
   const provider = {
     id: "aisstream", licenceRef: "https://aisstream.io (terms to be accepted and archived by the data owner)", coverageStatus: "UNVERIFIED",
     async start(onMessage, onHealth) {
@@ -20,17 +22,28 @@ export function createAisstreamProvider({ apiKey = process.env.AISSTREAM_API_KEY
       if (typeof WebSocketImpl !== "function") throw Error("WebSocket implementation unavailable");
       stopped = false;
       const open = () => {
-        ws = new WebSocketImpl(url);
+        ws = new WebSocketImpl(url,{perMessageDeflate:true});
         ws.onopen = () => {
           backoff = 1000;
           ws.send(JSON.stringify({ APIKey: apiKey, BoundingBoxes: [SUEZ_BBOX], FilterMessageTypes: ["PositionReport", "StandardClassBPositionReport", "ExtendedClassBPositionReport"] }));
           onHealth?.({ event: "connect" });
+          armIdle(onHealth);
         };
         ws.onmessage = (ev) => {
           let raw; try { raw = JSON.parse(typeof ev.data === "string" ? ev.data : String(ev.data)); } catch { onHealth?.({ event: "bad_frame" }); return; }
+          if(raw?.MessageType==="SubscriptionConfirmation"||raw?.SubscriptionConfirmation){
+            onHealth?.({event:"subscription_confirmed",compressionEnabled:raw?.Message?.SubscriptionConfirmation?.CompressionEnabled??null});
+            return;
+          }
+          if(raw?.MessageType==="Error"||raw?.error){
+            onHealth?.({event:"provider_error"});
+            return;
+          }
+          if(/PositionReport$/.test(String(raw?.MessageType||"")))armIdle(onHealth);
           onMessage(raw);
         };
         ws.onclose = () => {
+          clearIdle();
           onHealth?.({ event: "disconnect" });
           if (!stopped) { setTimer(open, backoff); backoff = Math.min(maxBackoffMs, backoff * 2); }
         };
@@ -38,7 +51,7 @@ export function createAisstreamProvider({ apiKey = process.env.AISSTREAM_API_KEY
       };
       open();
     },
-    async stop() { stopped = true; ws?.close(); }
+    async stop() { stopped = true; clearIdle(); ws?.close(); }
   };
   return assertAisProvider(provider);
 }

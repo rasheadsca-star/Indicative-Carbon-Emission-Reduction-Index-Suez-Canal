@@ -45,7 +45,7 @@ test("walk forward uses only earlier years and reports errors for both the crisi
  assert.equal(b.runs.length,3);
  assert.equal(r24.actual,13213);
  assert.equal(r24.forecasts.lastYear,26434);
- assert.equal(r24.forecasts.movingAverage3,(18830+20694+23851)/3);
+ assert.equal(r24.forecasts.movingAverage3,(20694+23851+26434)/3);
  assert.equal(r25.forecasts.lastYear,13213);
  assert.ok(b.lastYear.mapePct>0);
  assert.equal(b.state,"HISTORICAL_TRAFFIC_FORECAST_BACKTEST_NOT_EMISSIONS");

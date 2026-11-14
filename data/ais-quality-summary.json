@@ -1,0 +1,32 @@
+{
+  "status": "UNVERIFIED_COVERAGE",
+  "assessedAt": "2026-11-14T09:09:32.800Z",
+  "sampleCount": 1,
+  "why": "Regional snapshots overlap in time; do NOT sum unique MMSIs or infer daily SCA vessel counts.",
+  "last24h": {
+    "samples": 1,
+    "usableSamples": 1,
+    "failures": 0,
+    "snapshotMean": 4,
+    "snapshotMedian": 4,
+    "snapshotMax": 4,
+    "latestCheckedAt": "2026-11-14T09:09:32.800Z",
+    "stale": false,
+    "transitCount": null,
+    "coverageRate": null,
+    "assessment": "REGIONAL_SAMPLE_ONLY"
+  },
+  "last7d": {
+    "samples": 1,
+    "usableSamples": 1,
+    "failures": 0,
+    "snapshotMean": 4,
+    "snapshotMedian": 4,
+    "snapshotMax": 4,
+    "latestCheckedAt": "2026-11-14T09:09:32.800Z",
+    "stale": false,
+    "transitCount": null,
+    "coverageRate": null,
+    "assessment": "REGIONAL_SAMPLE_ONLY"
+  }
+}

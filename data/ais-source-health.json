@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "checkedAt": "2026-11-14T08:08:44.367Z",
+  "checkedAt": "2026-11-14T09:09:32.800Z",
   "provider": "Open Waters AIS",
   "region": "Suez Canal approximate bounding box",
   "bbox": "29.70,31.90,31.65,32.85",
@@ -16,8 +16,8 @@
   "snapshot": {
     "reachable": true,
     "httpStatus": 200,
-    "recentFeatureCount": 1,
-    "distinctMmsiCount": 1,
+    "recentFeatureCount": 4,
+    "distinctMmsiCount": 4,
     "truncated": false
   },
   "assessment": "NO_VERIFIED_COVERAGE",

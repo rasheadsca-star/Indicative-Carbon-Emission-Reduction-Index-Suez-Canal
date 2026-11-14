@@ -54,8 +54,7 @@ test("invalid times, spoofed verification and malformed CSV rejected",()=>{
  assert.throws(()=>readCsv('"unterminated',['MMSI']),/Unclosed/);
 });
 test("empty reference does not create a false 100% rate",()=>{
- const result=reconcilePassages(ais,headerRef+"\n,,,,");
- assert.equal(result.ok,false);
+ assert.throws(()=>reconcilePassages(ais,headerRef+"\n,,,,"),/Invalid CSV row count/);
 });
 test("tolerance is bounded",()=>{
  assert.throws(()=>reconcilePassages(ais,ref,{toleranceMinutes:1000}),/Tolerance/);

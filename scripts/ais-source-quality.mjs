@@ -3,7 +3,8 @@
  * Samples public source availability and recent vessel snapshot coverage.
  * Saves aggregates only; never saves raw MMSI, AIS position, name or NMEA.
  */
-import {writeFile,mkdir} from "node:fs/promises";
+import {writeFile,mkdir,readFile} from "node:fs/promises";
+import {appendQualitySample,evaluateQuality} from "../src/ais-quality-history.mjs";
 const endpoint="https://ais.openwaters.io";
 const bbox="29.70,31.90,31.65,32.85";
 const checkedAt=new Date().toISOString();
@@ -47,4 +48,10 @@ try{
 }catch(e){status.errors.push("snapshot: "+String(e.name||e.message||"request error"))}
 await mkdir("data",{recursive:true});
 await writeFile("data/ais-source-health.json",JSON.stringify(status,null,2)+"\n","utf8");
+let previous={samples:[]};
+try{previous=JSON.parse(await readFile("data/ais-quality-history.json","utf8"));}catch{}
+const history=appendQualitySample(previous,status);
+await writeFile("data/ais-quality-history.json",JSON.stringify(history,null,2)+"\n","utf8");
+const quality=evaluateQuality(history,new Date(checkedAt));
+await writeFile("data/ais-quality-summary.json",JSON.stringify(quality,null,2)+"\n","utf8");
 console.log(JSON.stringify({checkedAt,health:status.health,snapshot:status.snapshot,assessment:status.assessment,errors:status.errors}));

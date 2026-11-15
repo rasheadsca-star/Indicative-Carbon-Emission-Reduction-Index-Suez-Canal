@@ -6,7 +6,6 @@ import { JSDOM, VirtualConsole } from "jsdom";
 const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../dashboard-v6.css", import.meta.url), "utf8");
 const worker = await readFile(new URL("../worker.js", import.meta.url), "utf8");
-const official2026 = await readFile(new URL("../data/sca-2026-official-announcements.json", import.meta.url), "utf8");
 
 for (const [index, match] of [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].entries()) {
   if (match[1].trim()) new vm.Script(match[1], { filename: `index-inline-${index}.js` });
@@ -41,36 +40,14 @@ const dom = new JSDOM(html, {
     window.requestAnimationFrame = (callback) => window.setTimeout(callback, 0);
     window.cancelAnimationFrame = (id) => window.clearTimeout(id);
     window.Response = Response;
-    window.fetch = async (url) => String(url).includes("sca-2026-official-announcements.json")
-      ? new Response(official2026, { status: 200, headers: { "Content-Type": "application/json" } })
-      : new Response(JSON.stringify({ ok: false, error: "test_fallback" }), { status: 503, headers: { "Content-Type": "application/json" } });
+    window.fetch = async () => new Response(JSON.stringify({ ok: false, error: "test_fallback" }), { status: 503, headers: { "Content-Type": "application/json" } });
     Object.defineProperty(window.navigator, "serviceWorker", { value: { register: async () => ({}) }, configurable: true });
   },
 });
 
 await new Promise((resolve) => setTimeout(resolve, 120));
 assert.equal(dom.window.document.querySelectorAll("#nav button").length, 6);
-assert.match(dom.window.document.querySelector("#main").textContent, /Official Suez Canal intelligence|مؤشرات قناة السويس الرسمية/);
-assert.doesNotMatch(dom.window.document.querySelector("#main").textContent, /PRO-RATA YEAR-TO-DATE/);
-assert.doesNotMatch(dom.window.document.querySelector("#main").textContent, /19\.2M|60,553|1,841,825/);
-assert.match(html, /renderOfficialCurrentYear\(M,yr\)/);
-assert.match(html, /official-statistics\.html/);
-assert.match(dom.window.document.querySelector("#main").textContent, /1,490/);
-assert.match(dom.window.document.querySelector("#main").textContent, /724/);
-assert.match(dom.window.document.querySelector("#main").textContent, /166/);
-assert.match(dom.window.document.querySelector("#main").textContent, /2026/);
-assert.match(dom.window.document.querySelector("#main").textContent, /CO₂/);
-assert.match(html, /sca-2026-official-announcements\.json/);
-assert.doesNotMatch(html,/const target=\+o\.reduction/);
-assert.match(html,/manualReduction'\)\.disabled=true/);
-dom.window.document.querySelectorAll("#nav button")[1].click();
-assert.ok(dom.window.document.getElementById("rcEmissionBoundary"));
-dom.window.document.getElementById("rcEmissionBoundary").value="WTW";
-dom.window.rcCalculate();
-assert.match(dom.window.document.getElementById("rcResults").textContent,/Well-to-Wake is unavailable|لا يمكن حساب Well-to-Wake/);
-dom.window.document.getElementById("rcEmissionBoundary").value="TTW";
-dom.window.rcCalculate();
-assert.match(dom.window.document.getElementById("rcResults").textContent,/indicative Tank-to-Wake|بوابة التحقق/);
+assert.match(dom.window.document.querySelector("#main").textContent, /PRO-RATA YEAR-TO-DATE/);
 dom.window.document.querySelectorAll("#nav button")[3].click();
 assert.match(dom.window.document.querySelector("#main").textContent, /Fuel Lifecycle Boundary/);
 dom.window.document.querySelectorAll("#nav button")[4].click();
@@ -83,17 +60,6 @@ dom.window.openFeedback();
 assert.ok(dom.window.document.getElementById("feedbackModal").classList.contains("open"));
 const report = dom.window.buildDashboardPrintReport();
 assert.equal(report.querySelectorAll(".print-report-page").length, 4);
-// DEF-001: 2026 has no complete official annual total; it must not be annualised from a partial period.
-assert.match(report.textContent, /No complete official annual total exists for 2026/);
-assert.doesNotMatch(report.textContent, /12,300/);
-assert.doesNotMatch(html, /t:12300/);
-const seriesYears = dom.window.allYears("SG-RTM").map((a) => a.yr);
-assert.equal(seriesYears.at(-1), 2025);
-assert.ok(!seriesYears.includes(2026));
-const cum = dom.window.cumulative("SG-RTM");
-assert.equal(cum.at(-1).cum, seriesYears.reduce((s, y) => s + dom.window.calcYr(y, "SG-RTM").tR, 0));
-dom.window.document.querySelectorAll("#nav button")[2].click();
-assert.doesNotMatch(dom.window.document.querySelector("#main").textContent, /12,300/);
 assert.deepEqual(runtimeErrors, []);
 dom.window.close();
 

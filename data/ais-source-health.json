@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "checkedAt": "2026-11-15T14:48:13.730Z",
+  "checkedAt": "2026-11-15T20:25:27.457Z",
   "provider": "Open Waters AIS",
   "region": "Suez Canal approximate bounding box",
   "bbox": "29.70,31.90,31.65,32.85",
@@ -16,11 +16,13 @@
   "snapshot": {
     "reachable": true,
     "httpStatus": 200,
-    "recentFeatureCount": 8,
-    "distinctMmsiCount": 8,
+    "recentFeatureCount": 0,
+    "distinctMmsiCount": 0,
     "truncated": false
   },
   "assessment": "NO_VERIFIED_COVERAGE",
   "reason": "This source has not been calibrated against an authoritative daily transit register.",
-  "errors": []
+  "errors": [
+    "No MMSI returned by this regional snapshot; not proof of zero traffic"
+  ]
 }

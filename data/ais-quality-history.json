@@ -1,7 +1,7 @@
 {
   "schema": "ceri-sc-ais-aggregate-samples-v1",
   "source": "Open Waters regional snapshot",
-  "updatedAt": "2026-11-15T06:41:12.396Z",
+  "updatedAt": "2026-11-15T14:48:13.730Z",
   "claim": "Diagnostic snapshots, NOT transits and NOT validated coverage.",
   "samples": [
     {
@@ -66,6 +66,14 @@
       "hasSnapshot": true,
       "uniqueMmsi": 9,
       "snapshotFeatures": 9,
+      "status": "PARTIAL_UNVERIFIED_SAMPLE"
+    },
+    {
+      "checkedAt": "2026-11-15T14:48:13.730Z",
+      "healthy": true,
+      "hasSnapshot": true,
+      "uniqueMmsi": 8,
+      "snapshotFeatures": 8,
       "status": "PARTIAL_UNVERIFIED_SAMPLE"
     }
   ]

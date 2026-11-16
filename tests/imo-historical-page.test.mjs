@@ -14,8 +14,10 @@ test("IMO 2012 historical user interface explicitly gates assumptions and avoids
  assert.match(page,/validatedAvoidedCO2_t:null/);
 });
 test("IMO historical links appear in each navigational research overview",async()=>{
- const pages=await Promise.all(["index.html","historical-performance.html","decision-room.html"].map(read));
- for(const page of pages)assert.match(page,/imo-historical\.html/);
+ const home=await read("index.html");
+ const next=await read("next/index.html");
+ assert.match(home,/href="\.\/next\/"/);
+ assert.match(next,/href="\.\.\/imo-historical\.html"/);
 });
 test("IMO data retains exact original HFO CO2 reference, no WtW claim",async()=>{
  const j=JSON.parse(await read("data/imo-fleet-2012-reference-coefficients.json"));

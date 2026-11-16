@@ -75,6 +75,7 @@ function calculate(){
     const r=runVoyage({
       origin:$("origin").value,destination:$("destination").value,
       fuelId:$("fuel").value,speedKn:readNum("speed"),referenceSpeedKn:15,
+      weatherMultiplier:readNum("weather"),
       referenceMainPowerKw:readNum("mainPower"),
       auxiliaryPowerKw:readNum("auxPower"),mainSFOCgKwh:readNum("mainSfoc"),
       auxiliarySFOCgKwh:readNum("auxSfoc"),

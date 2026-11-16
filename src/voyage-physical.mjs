@@ -81,13 +81,15 @@ export function runVoyage(input) {
   const price=optionalMoney("fuelPriceUsdPerTonne",input.fuelPriceUsdPerTonne);
   const toll=optionalMoney("userEnteredTollUsd",input.userEnteredTollUsd);
   const dailyOpex=optionalMoney("dailyOperatingCostUsd",input.dailyOperatingCostUsd);
+  if(canalDistance===0)throw Error("Canal segment must have distance");
   if(canalDistance>=route.suezNm)throw Error("Canal distance cannot exceed Suez route");
   if(canalDistance/canalHours>18)throw Error("Canal segment speed is implausible");
   // Mandatory explicit reference fuel basis; SFOC here is calibrated to HFO
   // and alternative-fuel mass is adjusted by energy content at equal assumed efficiency.
   const refLhv=FUELS.HFO.lhvMJkg;
   const energyMassFactor=refLhv/fuel.lhvMJkg;
-  const mainPowerAtSpeed=s=>referencePower*Math.pow(s/referenceSpeed,3);
+  const weatherMultiplier=requireRange("weatherMultiplier",input.weatherMultiplier,0,2);
+  const mainPowerAtSpeed=s=>referencePower*Math.pow(s/referenceSpeed,3)*weatherMultiplier;
   const combustion=(mainKw,auxKw,hours)=>
     (mainKw*mainSFOC+auxKw*auxiliarySFOC)*hours/1e6*energyMassFactor;
   const canalSpeed=canalDistance/canalHours;
@@ -129,7 +131,7 @@ export function runVoyage(input) {
     fuelSavingUsd,timeSavingUsd,netSavingUsd,
     assumptions:[
       "Equal reference propulsion efficiency across fuels (NOT verified engine compatibility)",
-      "Main-engine cube-law power vs speed; no wind, current, weather or hull fouling",
+      "Main-engine cube-law power vs speed; user weather resistance multiplier applies equally to both routes, not forecast, no current or hull fouling",
       "HFO-referenced SFOC and constant auxiliary loads; canal main-engine power idealised",
       "Canal distance, transit and waiting hours are user assumptions; port-pair distances SCA official",
       "Physical TTW CO2 only; CH4, N2O, upstream WtW and compliance costs NOT calculated"

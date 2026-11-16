@@ -1,0 +1,4 @@
+date,direction,ship_type,vessel_count,net_tonnage,source,source_date,status
+2026-01-01,northbound,TOTAL,3,120000,DEMO NOT OFFICIAL,2026-01-02,scenario
+2026-01-01,northbound,Container,2,80000,DEMO NOT OFFICIAL,2026-01-02,scenario
+2026-01-01,northbound,Bulk Carrier,1,40000,DEMO NOT OFFICIAL,2026-01-02,scenario

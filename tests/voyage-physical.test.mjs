@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
+import vm from "node:vm";
+import {JSDOM} from "jsdom";
 import {OFFICIAL_ROUTES,FUELS,validIMO,runVoyage} from "../src/voyage-physical.mjs";
 const input={
   origin:"Singapore",destination:"Rotterdam",speedKn:15,referenceSpeedKn:15,
@@ -122,4 +124,17 @@ test("NEXT interface imports the canonical module and excludes known false-preci
   assert.doesNotMatch(html,/rate=\.95\*fuel\*Math\.pow/);
   assert.doesNotMatch(html,/Singapore:\{suez:4660,cape:5050\}/);
   assert.doesNotMatch(html,/31\.0 Mt|45\.0 Mt/);
+});
+
+test("NEXT markup has required engineering controls and syntactically valid module",async()=>{
+  const html=await readFile(new URL("../next/index.html",import.meta.url),"utf8");
+  const match=html.match(/<script type="module">([\s\S]*?)<\/script>/);
+  assert.ok(match,"one module script expected");
+  const asClassic=match[1].replace(/^import .*?;\s*$/m,"");
+  new vm.Script(asClassic,{filename:"next-inline-checked.js"});
+  const dom=new JSDOM(html,{runScripts:"outside-only",url:"https://localhost/next/"});
+  for(const id of ["origin","destination","speed","fuel","weather","mainPower","auxPower","mainSfoc","auxSfoc","canalDistance","canalHours","waitSuez","waitCape","fuelPrice","toll","opex","avoided","calcStatus","exportBtn"]){
+    assert.ok(dom.window.document.getElementById(id),"missing control "+id);
+  }
+  dom.window.close();
 });

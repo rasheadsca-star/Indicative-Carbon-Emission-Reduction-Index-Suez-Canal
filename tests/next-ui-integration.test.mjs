@@ -5,6 +5,7 @@ import {JSDOM} from "jsdom";
 import {runVoyage,validIMO,SCA_DISTANCE_SOURCE,IMO_CO2_SOURCE} from "../src/voyage-physical.mjs";
 import {computeSCA2024BaseToll,SCA_2024_BASE_RATES} from "../src/sca-tolls-2024.mjs";
 import {estimateScenarioWtW} from "../src/fuel-lca-scenario.mjs";
+import {screenEUETS} from "../src/regulation-screen.mjs";
 
 const html=await readFile(new URL("../next/index.html",import.meta.url),"utf8");
 const script=html.match(/<script type="module">([\s\S]*?)<\/script>/);
@@ -13,7 +14,7 @@ const classic=script[1].replace(/^import .*?;\s*$/gm,"");
 function createApp(){
   const d=new JSDOM(html,{runScripts:"outside-only",url:"https://ceri-sc-local.test/next/"});
   Object.assign(d.window,{CERI_VESSELS:[],runVoyage,validIMO,SCA_DISTANCE_SOURCE,
-    IMO_CO2_SOURCE,computeSCA2024BaseToll,SCA_2024_BASE_RATES,estimateScenarioWtW});
+    IMO_CO2_SOURCE,computeSCA2024BaseToll,SCA_2024_BASE_RATES,estimateScenarioWtW,screenEUETS});
   d.window.eval(classic);
   const el=id=>d.window.document.getElementById(id);
   const change=(id,value)=>{
@@ -80,5 +81,21 @@ test("nonsupported route blocks calculation and Arabic toggle keeps engineering 
     a.el("langBtn").click();
     assert.equal(a.d.window.document.documentElement.dir,"rtl");
     assert.equal(a.el("mainPower").value,"19000");
+  }finally{a.d.window.close()}
+});
+
+test("EU ETS screening requires GT and confirmed port calls, and never issues a full charge",()=>{
+  const a=createApp();
+  try{
+    assert.match(a.el("etsResult").textContent,/Not calculated/);
+    a.change("grossTonnage",80000);
+    a.change("shipService","cargo");
+    a.change("euaPrice",80);
+    assert.match(a.el("etsResult").textContent,/Not calculated/);
+    a.change("directPortCalls",true);
+    assert.match(a.el("etsResult").textContent,/€[0-9]/);
+    assert.match(a.el("policyStatus").textContent,/50% leg/);
+    assert.match(a.el("policyStatus").textContent,/2026 CH₄\/N₂O NOT modelled/);
+    assert.match(a.el("netSaved").textContent,/Not calculated/);
   }finally{a.d.window.close()}
 });

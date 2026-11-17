@@ -72,6 +72,12 @@ export function runVoyage(input) {
   const referenceSpeed=requireRange("referenceSpeedKn",input.referenceSpeedKn,0,35);
   const referencePower=requireRange("referenceMainPowerKw",input.referenceMainPowerKw,0,150000);
   const auxPower=requireRange("auxiliaryPowerKw",input.auxiliaryPowerKw,0,15000,true);
+  // An actual engine's Maximum Continuous Rating (MCR), not inferred from
+  // power at reference speed. If unknown, keep the result explicitly unverified.
+  const installedMainMcrKw=input.installedMainMcrKw==null?null:
+    requireRange("installedMainMcrKw",input.installedMainMcrKw,0,200000);
+  if(installedMainMcrKw!==null&&referencePower>installedMainMcrKw)
+    throw new RangeError("REFERENCE_POWER_EXCEEDS_INSTALLED_MCR");
   const mainSFOC=requireRange("mainSFOCgKwh",input.mainSFOCgKwh,0,500);
   const auxiliarySFOC=requireRange("auxiliarySFOCgKwh",input.auxiliarySFOCgKwh,0,500);
   const canalDistance=requireRange("canalDistanceNm",input.canalDistanceNm,0,200,true);
@@ -92,6 +98,13 @@ export function runVoyage(input) {
   const energyMassFactor=refLhv/(fuel.lhvMJkg*efficiencyRatio);
   const weatherMultiplier=requireRange("weatherMultiplier",input.weatherMultiplier,0,2);
   const mainPowerAtSpeed=s=>referencePower*Math.pow(s/referenceSpeed,3)*weatherMultiplier;
+  const openSeaPowerKw=mainPowerAtSpeed(v);
+  const canalRequestedPowerKw=mainPowerAtSpeed(canalDistance/canalHours);
+  if(installedMainMcrKw!==null&&
+    Math.max(openSeaPowerKw,canalRequestedPowerKw)>installedMainMcrKw+1e-7)
+    throw new RangeError("MAIN_ENGINE_POWER_EXCEEDS_MCR: demanded "+
+      Math.max(openSeaPowerKw,canalRequestedPowerKw).toFixed(0)+
+      " kW > installed "+installedMainMcrKw.toFixed(0)+" kW");
   const combustion=(mainKw,auxKw,hours)=>
     (mainKw*mainSFOC+auxKw*auxiliarySFOC)*hours/1e6*energyMassFactor;
   const canalSpeed=canalDistance/canalHours;
@@ -121,6 +134,10 @@ export function runVoyage(input) {
     ?fuelSavingUsd+timeSavingUsd-toll:null;
   return {
     status:"SCA_OFFICIAL_DISTANCE__ASSUMED_ENGINE_VOYAGE",
+    modelVersion:"voyage-physical-2026-11-18-mcr",
+    powerEnvelope:{referenceMainPowerKw:referencePower,
+      installedMainMcrKw,openSeaPowerKw,canalRequestedPowerKw,
+      enforced:installedMainMcrKw!==null},
     verifiedVoyage:false,
     source:SCA_DISTANCE_SOURCE,inputs:{...input},
     fuel:{...fuel,id:input.fuelId},
@@ -135,6 +152,9 @@ export function runVoyage(input) {
       "Selected fuel conversion efficiency ratio is a user assumption (1.0 if omitted), NOT verified machinery compatibility",
       "Main-engine cube-law power vs speed; user weather resistance multiplier applies equally to both routes, not forecast, no current or hull fouling",
       "HFO-referenced SFOC and constant auxiliary loads; canal main-engine power idealised",
+      installedMainMcrKw===null
+        ?"Installed MCR not supplied: power feasibility check NOT performed"
+        :"Main engine demand checked against user supplied installed MCR; engine curve not independently verified",
       "Canal distance, transit and waiting hours are user assumptions; port-pair distances SCA official",
       "Physical TTW CO2 only; CH4, N2O, upstream WtW and compliance costs NOT calculated"
     ]

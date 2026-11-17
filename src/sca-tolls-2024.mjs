@@ -29,7 +29,6 @@ const max=(name,x,minimum,maximum)=>{
 export function computeSCA2024BaseToll({scnt,vesselClass,loadState,usdPerSdr=null}={}){
   // This is a reference calculation, never a payable amount.
   const tonnage=max("SCNT",scnt,1,600000);
-  if(!Number.isInteger(tonnage))throw new RangeError("INVALID_SCNT_INTEGER");
   const rates=SCA_2024_BASE_RATES[vesselClass];
   if(!rates)throw new RangeError("UNSUPPORTED_SCA_CLASS");
   if(loadState!=="laden"&&loadState!=="ballast")throw new RangeError("UNKNOWN_LOAD_STATE");

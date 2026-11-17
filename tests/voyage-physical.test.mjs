@@ -130,7 +130,7 @@ test("NEXT markup has required engineering controls and syntactically valid modu
   const html=await readFile(new URL("../next/index.html",import.meta.url),"utf8");
   const match=html.match(/<script type="module">([\s\S]*?)<\/script>/);
   assert.ok(match,"one module script expected");
-  const asClassic=match[1].replace(/^import .*?;\s*$/m,"");
+  const asClassic=match[1].replace(/^import .*?;\s*$/gm,"");
   new vm.Script(asClassic,{filename:"next-inline-checked.js"});
   const dom=new JSDOM(html,{runScripts:"outside-only",url:"https://localhost/next/"});
   for(const id of ["origin","destination","speed","fuel","weather","mainPower","auxPower","mainSfoc","auxSfoc","canalDistance","canalHours","waitSuez","waitCape","fuelPrice","toll","opex","avoided","calcStatus","exportBtn"]){

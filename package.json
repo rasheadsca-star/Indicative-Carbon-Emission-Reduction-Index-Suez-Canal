@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --check worker.js && node tests/smoke.mjs && node --test src/imo-historical-activity.test.mjs tests/imo-historical-page.test.mjs tests/green-route-v4-imo-integrated.test.mjs tests/voyage-physical.test.mjs"
+    "test": "node --check worker.js && node tests/smoke.mjs && node --test src/imo-historical-activity.test.mjs tests/imo-historical-page.test.mjs tests/green-route-v4-imo-integrated.test.mjs tests/voyage-physical.test.mjs tests/tolls-lca.test.mjs"
   },
   "devDependencies": {
     "jsdom": "^26.1.0"

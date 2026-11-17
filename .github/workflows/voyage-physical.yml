@@ -5,9 +5,11 @@ on:
       - 'src/voyage-physical.mjs'
       - 'src/sca-tolls-2024.mjs'
       - 'src/fuel-lca-scenario.mjs'
+      - 'src/regulation-screen.mjs'
       - 'tests/voyage-physical.test.mjs'
       - 'tests/tolls-lca.test.mjs'
       - 'tests/next-ui-integration.test.mjs'
+      - 'tests/regulation-screen.test.mjs'
       - 'next/index.html'
       - '.github/workflows/voyage-physical.yml'
   workflow_dispatch:
@@ -25,5 +27,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node --check src/voyage-physical.mjs
-      - run: node --test tests/voyage-physical.test.mjs tests/tolls-lca.test.mjs tests/next-ui-integration.test.mjs
+      - run: node --test tests/voyage-physical.test.mjs tests/tolls-lca.test.mjs tests/next-ui-integration.test.mjs tests/regulation-screen.test.mjs
       - run: npm test

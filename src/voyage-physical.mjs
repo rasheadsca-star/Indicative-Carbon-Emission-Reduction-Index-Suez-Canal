@@ -32,10 +32,10 @@ export const FUELS = Object.freeze({
     note:"No pilot fuel or dual-fuel engine penalties; hypothetical equivalent energy" },
   EMETHANOL: { name:"e-Methanol", lhvMJkg:19.9, physicalCO2:1.375,
     note:"Physical CO2 is NOT zero; WtW depends on certified production and carbon source" },
-  B100: { name:"B100 illustrative FAME", lhvMJkg:27.0, physicalCO2:2.816,
-    note:"Example from IMO-hosted Japan roadmap, not a universal biodiesel specification" },
-  B20: { name:"B20 20% mass FAME + 80% HFO proxy", lhvMJkg:37.72,
-    physicalCO2:0.2*2.816+0.8*3.114,
+  B100: { name:"B100 illustrative FAME", lhvMJkg:37.2, physicalCO2:2.834,
+    note:"Illustrative FAME physical CO2; lifecycle carbon accounting requires fuel sustainability certification" },
+  B20: { name:"B20 20% mass FAME + 80% HFO proxy", lhvMJkg:39.76,
+    physicalCO2:0.2*2.834+0.8*3.114,
     note:"Mass-blend example only; blend energy/content and eligibility require fuel evidence" },
   EAMMONIA: { name:"e-Ammonia", lhvMJkg:20.5, physicalCO2:0,
     note:"CO2 combustion only is zero; N2O, pilot fuel, process WtW and engine design are unmodelled" },
@@ -87,7 +87,9 @@ export function runVoyage(input) {
   // Mandatory explicit reference fuel basis; SFOC here is calibrated to HFO
   // and alternative-fuel mass is adjusted by energy content at equal assumed efficiency.
   const refLhv=FUELS.HFO.lhvMJkg;
-  const energyMassFactor=refLhv/fuel.lhvMJkg;
+  const efficiencyRatio=input.fuelEfficiencyRatio===undefined?1:
+    requireRange("fuelEfficiencyRatio",input.fuelEfficiencyRatio,0.4,1.6);
+  const energyMassFactor=refLhv/(fuel.lhvMJkg*efficiencyRatio);
   const weatherMultiplier=requireRange("weatherMultiplier",input.weatherMultiplier,0,2);
   const mainPowerAtSpeed=s=>referencePower*Math.pow(s/referenceSpeed,3)*weatherMultiplier;
   const combustion=(mainKw,auxKw,hours)=>
@@ -130,7 +132,7 @@ export function runVoyage(input) {
     officialTollUsd:null,tollEstimateUsd:null,userEnteredTollUsd:toll,
     fuelSavingUsd,timeSavingUsd,netSavingUsd,
     assumptions:[
-      "Equal reference propulsion efficiency across fuels (NOT verified engine compatibility)",
+      "Selected fuel conversion efficiency ratio is a user assumption (1.0 if omitted), NOT verified machinery compatibility",
       "Main-engine cube-law power vs speed; user weather resistance multiplier applies equally to both routes, not forecast, no current or hull fouling",
       "HFO-referenced SFOC and constant auxiliary loads; canal main-engine power idealised",
       "Canal distance, transit and waiting hours are user assumptions; port-pair distances SCA official",

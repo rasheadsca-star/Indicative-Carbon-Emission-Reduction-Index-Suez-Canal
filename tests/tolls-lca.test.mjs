@@ -84,7 +84,7 @@ test("user-pathway WtW respects energy units and never marks scenario as certifi
 test("no universal default WtW, no synthetic valid pathway metadata",()=>{
   const v=runVoyage(voyageInputs);
   assert.throws(()=>estimateScenarioWtW(v),/INVALID_WTW_FACTOR/);
-  assert.throws(()=>estimateScenarioWtW(v,{gCO2ePerMJ:90,productionPathway:"path",engineTechnology:"engine",evidenceReference:"src"}),/MISSING_PRODUCTION_PATHWAY/);
+  assert.throws(()=>estimateScenarioWtW(v,{gCO2ePerMJ:90,productionPathway:"p",engineTechnology:"engine",evidenceReference:"src"}),/MISSING_PRODUCTION_PATHWAY/);
   assert.throws(()=>estimateScenarioWtW(v,{gCO2ePerMJ:999,
     productionPathway:"named production pathway",engineTechnology:"named engine",
     evidenceReference:"provided external certificate"}),/INVALID_WTW_FACTOR/);

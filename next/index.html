@@ -60,6 +60,18 @@
 <label>Factor reference / مرجع المعامل<input id="pathwayRef" placeholder="Link / publication / certificate ID"></label>
 </div><p class="panel-note" id="wtwStatus" style="margin-top:9px">WtW not calculated until all evidence fields are provided.</p>
 </details>
+<details style="margin-top:12px;border:1px solid var(--line);padding:12px">
+<summary style="cursor:pointer;font-weight:700">EU ETS / FuelEU applicability — scope screen only / نطاق اللوائح الأوروبية</summary>
+<p class="panel-note" style="margin:9px 0">EU ETS: 50% of direct extra-EU/EEA sea leg, subject to verified vessel type, GT, port-call and exemption rules; 2026 includes CH₄ and N₂O. No official compliance cost or FuelEU penalty is calculated. IMO Net-Zero Framework still draft as of 17 Nov 2026.</p>
+<div class="fields">
+<label>Gross tonnage (GT), NOT SCNT / الحمولة الإجمالية<input id="grossTonnage" type="number" min="0" step="1" placeholder="Enter verified GT"></label>
+<label>Ship service / نشاط السفينة<select id="shipService"><option value="unknown">Not established / غير محدد</option><option value="cargo">Cargo ship / نقل بضائع</option><option value="passenger">Passenger ship / ركاب</option></select></label>
+<label>Reporting year / سنة الانبعاثات<select id="reportingYear"><option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option></select></label>
+<label>EUA price (EUR/tCO₂) / سعر رخصة الكربون<input id="euaPrice" type="number" min="0" placeholder="Manual illustrative price"></label>
+<label class="field-wide" style="display:flex;align-items:center;gap:8px;letter-spacing:0;text-transform:none"><input type="checkbox" id="directPortCalls" style="width:auto">I confirm that origin and destination are consecutive actual ports of call, with no intervening stop / أؤكد تسلسل موانئ الرحلة</label>
+</div>
+<p class="panel-note" id="policyStatus" style="margin-top:9px">Eligibility and regulatory costs are not established.</p>
+</details>
 <p class="panel-note" style="margin:12px 0">All engine values above are <b>editable hypothetical inputs</b>, not extracted from vessel identity. The static ship registry does not establish engine or fuel particulars. / هذه بيانات افتراضية وليست بيانات فنية معتمدة للسفينة.</p><button class="primary" id="saveBtn" style="margin-top:20px" data-i18n="save">Save locally</button><div class="saved" id="saved">Scenario saved in this browser.</div></section>
     <section class="panel"><h3 data-i18n="result">Indicative result</h3><p class="panel-note" data-i18n="resultCopy">Same vessel and operating assumptions; only the maritime corridor changes.</p><div class="result-card"><small data-i18n="avoided">INDICATIVE CO₂ AVOIDED VIA SUEZ</small><strong id="avoided">—</strong><span>tCO₂ per modelled voyage</span></div><div class="result-list"><div><span data-i18n="distanceSaved">DISTANCE SAVED</span><b id="distanceSaved">—</b></div><div><span data-i18n="daysSaved">TIME SAVED</span><b id="daysSaved">—</b></div><div><span>SUEZ CO₂</span><b id="suezCo2">—</b></div><div><span>CAPE CO₂</span><b id="capeCo2">—</b></div></div></section>
     <section class="panel" aria-live="polite">
@@ -70,6 +82,8 @@
 <div><span>CANAL TOLL / رسم القناة</span><b id="tollResult">—</b></div>
 <div><span>WTW GHG saving / وفر دورة الحياة</span><b id="wtwResult">Not calculated</b></div>
 <div><span>SCA 2024 base toll / رسوم أساس 2024</span><b id="tollBaseResult">Not calculated</b></div>
+<div><span>EU ETS CO₂-only illustrative savings / وفر الكربون الأوروبي</span><b id="etsResult">Not calculated</b></div>
+<div><span>FuelEU & IMO GFI payable cost / التكاليف الملزمة</span><b>Not calculated / غير محسوب</b></div>
 </div><table style="margin-top:12px"><caption style="text-align:left;font-weight:700">SCA 2024 progressive band breakdown — SDR / تفصيل الشرائح</caption><thead><tr><th>Band</th><th>SCNT</th><th>Rate</th><th>SDR</th></tr></thead><tbody id="tollBreakdown"><tr><td colspan="4">Enter SCNT</td></tr></tbody></table><p class="panel-note" id="calcStatus" style="margin-top:14px">Model inputs are not validated.</p>
 <button class="primary" id="exportBtn" style="margin-top:12px">Export scenario JSON / تصدير الفرضيات</button>
 </section>
@@ -79,7 +93,7 @@
 <p class="panel-note">SCA official port-pair route distances: <a href="https://www.suezcanal.gov.eg/English/About/Pages/WhySuezCanal.aspx" target="_blank" rel="noopener">Why Suez Canal</a>. All other port pairs are intentionally blocked. Navigation tracks shown above are <b>diagrammatic</b> and NOT hydrographically verified.</p>
 <p class="panel-note" style="margin-top:9px">Physical CO₂ factors: <a href="https://wwwcdn.imo.org/localresources/en/OurWork/Environment/Documents/Air%20pollution/MEPC.346%2878%29.pdf" target="_blank" rel="noopener">IMO MEPC.346(78)</a>. Example lower heating values: <a href="https://wwwcdn.imo.org/localresources/en/OurWork/Environment/Documents/Air%20pollution/Roadmap%20to%20Zero%20Emission%20from%20International%20Shipping%20-%20Japan%20March%202020.pdf" target="_blank" rel="noopener">IMO-hosted maritime roadmap</a>.</p>
 <p class="panel-note" style="margin-top:9px"><b>Not provided:</b> actual marine engine specifications, verified speed/power curves, AIS voyage, official SCNT toll, compliance ETS/FuelEU cost, methane slip, N₂O, WtW emission factors, fuel certificates. Alternative-fuel machinery assumptions are NOT certified. FAME B100 LHV 37.2 MJ/kg and CO₂ factor 2.834; mass-blended B20 LHV 39.76 MJ/kg.
-See <a href="https://www.suezcanal.gov.eg/Arabic/Navigation/Tolls/Pages/TollsTable.aspx" target="_blank" rel="noopener">SCA 2024 base rates</a> and <a href="https://www.imo.org/en/OurWork/Environment/Pages/Lifecycle-GHG---carbon-intensity-guidelines.aspx" target="_blank" rel="noopener">IMO LCA guidelines</a>. Results are hypotheses, not current tolls, verified savings or certified WtW.</p></section>
+See <a href="https://www.suezcanal.gov.eg/Arabic/Navigation/Tolls/Pages/TollsTable.aspx" target="_blank" rel="noopener">SCA 2024 base rates</a> and <a href="https://www.imo.org/en/OurWork/Environment/Pages/Lifecycle-GHG---carbon-intensity-guidelines.aspx" target="_blank" rel="noopener">IMO LCA guidelines</a>. Results are hypotheses, not current tolls, verified savings or certified WtW. EU ETS reference: <a href="https://climate.ec.europa.eu/areas-action/transport-decarbonisation/reducing-emissions-shipping-sector_en" target="_blank" rel="noopener">European Commission</a>. IMO NZF: <a href="https://www.imo.org/en/mediacentre/hottopics/pages/faqs-the-imo-net-zero-framework.aspx" target="_blank" rel="noopener">IMO regulatory status</a>.</p></section>
 </main>
 <footer class="footer">CERI-SC NEXT GitHub Edition · Indicative decision-support only. Not an official emissions inventory, certified MRV statement, navigation route, toll quotation or carbon credit.</footer>
 <script src="vessels.js"></script>
@@ -87,6 +101,7 @@ See <a href="https://www.suezcanal.gov.eg/Arabic/Navigation/Tolls/Pages/TollsTab
 import {runVoyage,validIMO,SCA_DISTANCE_SOURCE,IMO_CO2_SOURCE} from "../src/voyage-physical.mjs";
 import {computeSCA2024BaseToll,SCA_2024_BASE_RATES} from "../src/sca-tolls-2024.mjs";
 import {estimateScenarioWtW} from "../src/fuel-lca-scenario.mjs";
+import {screenEUETS} from "../src/regulation-screen.mjs";
 const officialPortPairs = "Singapore–Rotterdam; Tokyo–Rotterdam; Ras Tanura–Rotterdam; Jeddah–Rotterdam; Jeddah–Piraeus";
 const curated={"9811000":{name:"EVER GIVEN",type:"Container ship",flag:"Panama",dwt:199629,gt:219079,built:2018,dataClass:"curated-particulars",source:"IMO Maritime Knowledge Centre"},"9839179":{name:"CMA CGM JACQUES SAADE",type:"LNG container ship",flag:"France",dwt:221251,gt:236583,built:2020,dataClass:"curated-particulars",source:"CMA CGM public vessel record"},"9839430":{name:"MSC GULSUN",type:"Container ship",flag:"Panama",dwt:228149,gt:232618,built:2019,dataClass:"curated-particulars",source:"Port of Hamburg vessel register"}};
 const registry=(window.CERI_VESSELS||[]).map(v=>({...v,...(curated[v.i]||{}),imo:v.i,name:(curated[v.i]||{}).name||v.n,type:(curated[v.i]||{}).type||v.t,flag:(curated[v.i]||{}).flag||v.f,mmsi:v.m}));Object.keys(curated).forEach(imo=>{if(!registry.some(v=>v.imo===imo))registry.unshift({imo,...curated[imo]})});
@@ -148,7 +163,23 @@ function calculate(){
     $("wtwResult").textContent=wtwScenario?format(wtwScenario.deltaWtW_tCO2e)+" tCO₂e (user factor)":"Not calculated";
     $("wtwStatus").textContent=wtwScenario?"Unverified user-supplied fuel pathway. NOT certified, NOT regulatory compliance.":
       wtwError?"WtW withheld: "+wtwError:"WtW not calculated: no cited pathway factor.";
-    currentResult={...r,tollBasis,historicalBaseToll:historicBase,wtwScenario};
+    let policy=null,policyError="";
+    try{
+      policy=screenEUETS(r,{
+        grossTonnage:readNum("grossTonnage"),shipService:$("shipService").value,
+        reportingYear:Number($("reportingYear").value),
+        directPortCallsConfirmed:$("directPortCalls").checked,
+        allowancePriceEur:readNum("euaPrice")
+      })
+    }catch(e){policyError=e.message}
+    $("etsResult").textContent=policy?.co2OnlyIllustrativeCostSaved_EUR!==null &&
+      policy?.co2OnlyIllustrativeCostSaved_EUR!==undefined
+      ?"€"+format(policy.co2OnlyIllustrativeCostSaved_EUR,0)+" (CO₂ only)":"Not calculated";
+    $("policyStatus").textContent=policyError?("Policy estimate withheld: "+policyError):
+      policy?.status==="POTENTIAL_EU_ETS_SCOPE_CO2_ONLY"
+      ?"EU ETS screening: "+format(100*policy.voyageLegCoverageFraction,0)+"% leg; "+format(100*policy.surrenderFractionOfReportingYear,0)+"% surrender. "+(policy.includesCH4N2O?"2026 CH₄/N₂O NOT modelled. ":"")+"No official ETS/FuelEU/IMO compliance cost."
+      :"EU ETS/FuelEU scope not established. GT, cargo/passenger service and consecutive port calls are required; special exclusions may apply.";
+    currentResult={...r,tollBasis,historicalBaseToll:historicBase,wtwScenario,policyScreen:policy};
     $("avoided").textContent=format(r.ttWCO2SavedTonnes)+" tCO₂";
     $("distanceSaved").textContent=format(r.distanceSavedNm,0)+" nm";
     $("daysSaved").textContent=format(r.daysSaved)+" days";
@@ -163,12 +194,12 @@ function calculate(){
     $("mapDestination").textContent=$("destination").value;
   }catch(err){
     currentResult=null;
-    for(const id of ["avoided","distanceSaved","daysSaved","suezCo2","capeCo2","fuelSaved","netSaved","tollResult","wtwResult"])$(id).textContent="—";
+    for(const id of ["avoided","distanceSaved","daysSaved","suezCo2","capeCo2","fuelSaved","netSaved","tollResult","wtwResult","etsResult"])$(id).textContent="—";
     $("calcStatus").textContent="RESULT WITHHELD / تم حجب النتيجة: "+err.message+
       ". Only official SCA port pairs can be calculated: "+officialPortPairs;
   }
 }
-$("registryCount").textContent=registry.length.toLocaleString();$("coverageStrong").textContent=`${registry.length.toLocaleString()} searchable identities`;$("vesselSearch").addEventListener("input",search);$("searchButton").onclick=search;["origin","destination","speed","fuel","weather","mainPower","auxPower","mainSfoc","auxSfoc","canalDistance","canalHours","waitSuez","waitCape","fuelEfficiency","fuelPrice","toll","opex","scnt","tollClass","tollState","sdrFx","useHistoricalBase","wtwFactor","fuelPathway","engineTech","pathwayRef"].forEach(id=>$(id).addEventListener("input",calculate));$("langBtn").onclick=()=>{lang=lang==="en"?"ar":"en";renderLanguage()};$("exportBtn").onclick=()=>{if(!currentResult)return;const blob=new Blob([JSON.stringify(currentResult,null,2)],{type:"application/json"});const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download="CERI-SC-voyage-scenario.json";a.click();URL.revokeObjectURL(u)};$("saveBtn").onclick=()=>{localStorage.setItem("ceri-next-static-scenario",JSON.stringify({imo:selected?.imo,origin:$("origin").value,destination:$("destination").value,speed:$("speed").value,fuel:$("fuel").value,weather:$("weather").value,engineAssumptions:currentResult?.inputs??null}));$("saved").classList.add("show");setTimeout(()=>$("saved").classList.remove("show"),2500)};document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))$("suggestions").classList.remove("show")});calculate();renderLanguage();
+$("registryCount").textContent=registry.length.toLocaleString();$("coverageStrong").textContent=`${registry.length.toLocaleString()} searchable identities`;$("vesselSearch").addEventListener("input",search);$("searchButton").onclick=search;["origin","destination","speed","fuel","weather","mainPower","auxPower","mainSfoc","auxSfoc","canalDistance","canalHours","waitSuez","waitCape","fuelEfficiency","fuelPrice","toll","opex","scnt","tollClass","tollState","sdrFx","useHistoricalBase","wtwFactor","fuelPathway","engineTech","pathwayRef","grossTonnage","shipService","reportingYear","euaPrice","directPortCalls"].forEach(id=>$(id).addEventListener("input",calculate));$("langBtn").onclick=()=>{lang=lang==="en"?"ar":"en";renderLanguage()};$("exportBtn").onclick=()=>{if(!currentResult)return;const blob=new Blob([JSON.stringify(currentResult,null,2)],{type:"application/json"});const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download="CERI-SC-voyage-scenario.json";a.click();URL.revokeObjectURL(u)};$("saveBtn").onclick=()=>{localStorage.setItem("ceri-next-static-scenario",JSON.stringify({imo:selected?.imo,origin:$("origin").value,destination:$("destination").value,speed:$("speed").value,fuel:$("fuel").value,weather:$("weather").value,engineAssumptions:currentResult?.inputs??null}));$("saved").classList.add("show");setTimeout(()=>$("saved").classList.remove("show"),2500)};document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))$("suggestions").classList.remove("show")});calculate();renderLanguage();
 </script>
 </body>
 </html>

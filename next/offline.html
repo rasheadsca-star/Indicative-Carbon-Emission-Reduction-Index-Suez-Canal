@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#061c20">
+<title>CERI-SC NEXT — Vessel & Voyage Intelligence</title>
+<style>
+:root{--ink:#061c20;--navy:#082a31;--mint:#36e7bb;--lime:#c4f24d;--paper:#f4f3ed;--line:rgba(8,42,49,.14);--gold:#e0ba57}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}button,input,select{font:inherit}button{cursor:pointer}.rtl{direction:rtl}.topbar{min-height:78px;padding:10px 4vw;display:flex;align-items:center;justify-content:space-between;gap:20px;background:rgba(244,243,237,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;backdrop-filter:blur(16px)}.brand{display:flex;align-items:center;gap:13px}.logos{display:flex;align-items:center;gap:7px;padding:5px 8px;background:#fff;border:1px solid var(--line);border-radius:11px}.logos img{width:54px;height:35px;object-fit:contain}.logos img+img{width:45px;border-left:1px solid #ddd;padding-left:7px}.brand strong{display:block;font-size:15px}.brand strong span{color:#16866f}.brand small{display:block;margin-top:4px;color:#718080;font-size:8px;letter-spacing:.1em}.head-actions{display:flex;gap:8px}.head-actions a,.head-actions button{border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 13px;border-radius:8px;text-decoration:none;font-size:10px;font-weight:800}.head-actions button{background:var(--ink);color:#fff}.static-note{padding:10px 4vw;background:#fff3cf;border-bottom:1px solid #ead797;color:#73580d;font-size:10px;line-height:1.6}.hero{min-height:545px;display:grid;grid-template-columns:48% 52%;border-bottom:1px solid var(--line)}.hero-copy{padding:90px 5vw 65px 7vw}.eyebrow{font-size:9px;font-weight:800;letter-spacing:.18em;color:#16866f}.hero h1{font-size:clamp(46px,5vw,74px);line-height:.96;letter-spacing:-.06em;margin:25px 0}.hero h1 em{font-family:Georgia,serif;font-weight:400;color:#16866f}.hero p{color:#586969;font-size:16px;line-height:1.7;max-width:630px}.hero-actions{display:flex;gap:18px;margin-top:30px}.primary{border:0;background:var(--ink);color:#fff;padding:15px 18px;border-radius:5px;font-weight:800;box-shadow:5px 5px 0 var(--mint)}.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);padding:15px 18px;border-radius:5px;font-weight:800}.satellite{position:relative;overflow:hidden;min-height:545px;background:#03191e}.satellite img{width:100%;height:100%;object-fit:contain;position:absolute;filter:saturate(.9) contrast(1.05) brightness(.73)}.satellite:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,25,30,.6),transparent 28%,transparent 70%,rgba(3,25,30,.42))}.track{position:absolute;inset:0;width:100%;height:100%;z-index:3}.track path{fill:none;stroke:var(--mint);stroke-width:7;stroke-dasharray:17 17;filter:drop-shadow(0 0 8px var(--mint));animation:dash 11s linear infinite}.track circle{fill:var(--lime);stroke:#fff;stroke-width:5;filter:drop-shadow(0 0 12px var(--lime))}@keyframes dash{to{stroke-dashoffset:-150}}.map-badge{position:absolute;z-index:5;left:22px;top:22px;background:rgba(3,25,30,.84);border:1px solid rgba(54,231,187,.35);padding:11px 13px;color:#b8ceca;font-size:8px}.map-badge b{display:block;color:var(--mint);letter-spacing:.14em;margin-bottom:5px}.metrics{margin:-1px 4vw 0;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border:1px solid var(--line);box-shadow:0 15px 45px rgba(5,30,35,.07)}.metrics div{padding:22px 25px;border-right:1px solid var(--line)}.metrics div:last-child{border:0}.metrics span{display:block;color:#778686;font-size:8px;letter-spacing:.12em;text-transform:uppercase}.metrics strong{display:block;font:25px Georgia,serif;margin-top:7px}.workspace{padding:82px 4vw;max-width:1650px;margin:auto}.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:28px}.section-head span{color:#16866f;font-size:8px;font-weight:800;letter-spacing:.16em}.section-head h2{font:40px Georgia,serif;margin:8px 0 0}.section-head p{color:#708080;font-size:10px}.registry{background:var(--ink);color:#fff;padding:32px;box-shadow:0 20px 60px rgba(5,35,39,.12)}.registry-top{display:flex;justify-content:space-between;gap:20px}.registry h3{font:29px Georgia,serif;margin:8px 0}.registry p{color:#96adab;font-size:10px}.coverage{border:1px solid rgba(54,231,187,.28);padding:11px 14px;color:#8da8a5;font-size:8px}.coverage strong{color:#fff;display:block;font-size:12px;margin-bottom:4px}.search-wrap{position:relative;margin-top:24px}.search-box{display:flex;height:56px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.05);padding:5px}.search-box input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#fff;padding:0 15px;font:18px Georgia,serif}.search-box button{border:0;background:var(--mint);color:var(--ink);padding:0 23px;font-size:10px;font-weight:800}.suggestions{position:absolute;left:0;right:0;top:61px;z-index:15;background:#fff;color:var(--ink);border:1px solid rgba(54,231,187,.5);box-shadow:0 20px 45px rgba(0,0,0,.25);max-height:280px;overflow:auto;display:none}.suggestions.show{display:block}.suggestions button{width:100%;border:0;border-bottom:1px solid var(--line);background:#fff;padding:12px 14px;display:grid;grid-template-columns:1fr auto;text-align:left}.suggestions button:hover{background:#eff9f5}.suggestions strong,.suggestions small{display:block}.suggestions strong{font-size:10px}.suggestions small{color:#748381;font-size:8px;margin-top:3px}.suggestions b{font-size:7px;color:#88670d;background:#fff3cf;padding:5px 7px}.profile{margin-top:20px;background:#fff;color:var(--ink);display:none}.profile.show{display:block}.profile-head{padding:21px;display:grid;grid-template-columns:55px 1fr auto;gap:15px;align-items:center;border-bottom:1px solid var(--line)}.shipmark{width:50px;height:50px;display:grid;place-items:center;background:#def7ef;color:#147d69;font-size:26px}.profile-head h3{font:24px Georgia,serif;margin:0 0 4px}.profile-head p{margin:0;color:#647474}.quality{text-align:right}.quality b{display:block;color:#9a7314;font:18px Georgia}.quality small{color:#7c8988;font-size:8px}.facts{display:grid;grid-template-columns:repeat(5,1fr)}.facts div{padding:16px;border-right:1px solid var(--line)}.facts span{display:block;color:#788685;font-size:7px;letter-spacing:.1em}.facts strong{display:block;font:14px Georgia;margin-top:6px}.provenance{padding:13px 18px;background:#f3f7f5;color:#697a78;font-size:8px}.grid{display:grid;grid-template-columns:.82fr 1.18fr;gap:18px;margin-top:18px}.panel{background:#fff;border:1px solid var(--line);padding:26px;box-shadow:0 12px 35px rgba(5,35,39,.045)}.panel h3{margin:0;font-size:16px}.panel-note{color:#758482;font-size:10px;line-height:1.6}.fields{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:20px}.fields label{font-size:8px;color:#6e7e7c;text-transform:uppercase;letter-spacing:.1em}.fields select,.fields input{display:block;width:100%;margin-top:7px;padding:12px;border:1px solid var(--line);background:#f8faf8;color:var(--ink)}.field-wide{grid-column:1/-1}.result-card{background:var(--navy);color:#fff;padding:24px}.result-card small{color:#91aaa7;font-size:8px}.result-card strong{display:block;color:var(--mint);font:38px Georgia;margin:8px 0}.result-card span{font-size:9px;color:#bfd0cd}.result-list{display:grid;grid-template-columns:1fr 1fr;margin-top:14px}.result-list div{padding:14px;background:#f5f8f6;border:1px solid var(--line)}.result-list span{display:block;color:#778582;font-size:7px}.result-list b{display:block;font:16px Georgia;margin-top:6px}.route-compare{margin-top:18px;grid-column:1/-1}.route-map{height:275px;margin-top:18px;background:var(--navy);position:relative;overflow:hidden}.route-map svg{width:100%;height:100%}.route-map path{fill:none}.suez-route{stroke:var(--mint);stroke-width:4;stroke-dasharray:9 7;animation:dash 12s linear infinite}.cape-route{stroke:var(--gold);stroke-width:3;stroke-dasharray:5 8;animation:dash 16s linear infinite}.route-map text{fill:#b6ceca;font-size:13px}.sources{margin-top:18px}.source-row{display:grid;grid-template-columns:.5fr .8fr 1fr 1.5fr;padding:13px 0;border-bottom:1px solid var(--line);font-size:9px}.source-row:first-of-type{color:#84918f;font-size:7px}.status{color:#14755f;background:#e3f7f1;padding:5px 7px;width:max-content}.status.pending{color:#896714;background:#fff2cc}.saved{margin-top:14px;padding:12px;background:#e7f8f2;color:#176e5d;font-size:9px;display:none}.saved.show{display:block}.footer{padding:32px 4vw;background:var(--ink);color:#8ca5a1;font-size:9px;line-height:1.8}.rtl .hero-copy{padding-left:5vw;padding-right:7vw}.rtl .suggestions button{text-align:right}.rtl .quality{text-align:left}@media(max-width:1050px){.topbar{flex-wrap:wrap}.hero{grid-template-columns:1fr}.satellite{min-height:480px}.metrics{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.route-compare{grid-column:auto}.facts{grid-template-columns:1fr 1fr}.section-head{align-items:start;flex-direction:column}.workspace{padding-top:55px}}@media(max-width:650px){.brand>div:last-child{display:none}.head-actions a{display:none}.hero-copy{padding:65px 6vw}.hero h1{font-size:48px}.satellite{min-height:400px}.metrics{margin:0;grid-template-columns:1fr 1fr}.metrics div{padding:17px}.registry{padding:22px 16px}.registry-top{flex-direction:column}.search-box button{padding:0 12px}.profile-head{grid-template-columns:45px 1fr}.quality{grid-column:1/-1;text-align:left}.facts{grid-template-columns:1fr 1fr}.grid{gap:12px}.panel{padding:20px 16px}.fields{grid-template-columns:1fr}.field-wide{grid-column:auto}.source-row{grid-template-columns:.5fr .7fr 1fr}.source-row span:last-child{display:none}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="logos"><img src="suez-canal-logo.png" alt="Suez Canal Authority"><img src="green-transition-logo.png" alt="Green Transformation"></div><div><strong>CERI-SC <span>NEXT</span></strong><small>Vessel & voyage intelligence</small></div></div>
+  <div class="head-actions"><a href="../" id="mainLink">← Main index</a><a href="../imo-historical.html">IMO Historical</a><a href="../sca-green-route-v4-imo-integrated.html">Green Route V4 + IMO</a><button id="langBtn">العربية</button></div>
+</header>
+<div class="static-note" id="staticNote">GitHub edition · Search and scenario calculations run locally. Records are identity-only until verified against an authoritative source.</div>
+<section class="hero">
+  <div class="hero-copy"><div class="eyebrow" data-i18n="eyebrow">SUEZ CANAL DECISION INTELLIGENCE</div><h1 data-i18n-html="title">One vessel.<br><em>Two routes.</em><br>Evidence first.</h1><p data-i18n="heroText">Explore the geographic, operational and indicative emissions advantage of the Suez Canal with a searchable vessel identity registry and transparent scenario assumptions.</p><div class="hero-actions"><button class="primary" onclick="document.getElementById('registry').scrollIntoView()" data-i18n="start">Start vessel analysis</button><button class="secondary" onclick="window.print()" data-i18n="print">Print report</button></div></div>
+  <div class="satellite"><img src="suez-canal-landsat.jpg" alt="NASA Landsat image of the Suez Canal"><svg class="track" viewBox="0 0 600 680" aria-hidden="true"><path id="canalPath" d="M268 28 C286 98 274 143 286 196 C299 253 278 301 292 354 C305 404 327 439 321 489 C315 539 343 585 352 652"/><circle r="7"><animateMotion dur="12s" repeatCount="indefinite"><mpath href="#canalPath"/></animateMotion></circle></svg><div class="map-badge"><b>AUTHENTIC SATELLITE CONTEXT</b>NASA Landsat · illustrative canal track</div></div>
+</section>
+<section class="metrics"><div><span data-i18n="registry">Registry coverage</span><strong id="registryCount">—</strong></div><div><span data-i18n="valid">IMO checks / فحص الرقم</span><strong>Check digit</strong></div><div><span data-i18n="authority">Data authority</span><strong style="font:700 15px Arial;color:#16866f">CERI-SC NEXT</strong></div><div><span data-i18n="mode">Edition</span><strong style="font:700 15px Arial;color:#9a7314">GitHub Static</strong></div></section>
+<main class="workspace">
+  <div class="section-head"><div><span>01 · VESSEL IDENTITY</span><h2 data-i18n="registryTitle">Search the unified registry</h2></div><p data-i18n="registryCopy">Predictive search by vessel name or IMO number.</p></div>
+  <section class="registry" id="registry"><div class="registry-top"><div><span class="eyebrow">IDENTITY RESOLUTION</span><h3 data-i18n="searchTitle">Find a vessel before modelling it</h3><p data-i18n="searchHelp">Identity records do not automatically become trusted performance inputs.</p></div><div class="coverage"><strong id="coverageStrong">Loading registry…</strong><span>Open dataset · pending verification</span></div></div><div class="search-wrap"><div class="search-box"><input id="vesselSearch" autocomplete="off" placeholder="Type vessel name or 7-digit IMO"><button id="searchButton" data-i18n="search">Search</button></div><div class="suggestions" id="suggestions"></div></div><article class="profile" id="profile"></article></section>
+  <div class="grid">
+    <section class="panel"><h3 data-i18n="inputs">Scenario inputs</h3><p class="panel-note" data-i18n="inputsCopy">Change route and operating assumptions. These values are illustrative and editable.</p><div class="fields"><label><span data-i18n="origin">Origin</span><select id="origin"><option value="Singapore">Singapore</option><option value="Tokyo">Tokyo</option><option value="Ras Tanura">Ras Tanura</option><option value="Jeddah">Jeddah</option></select></label><label><span data-i18n="destination">Destination</span><select id="destination"><option value="Rotterdam">Rotterdam</option><option value="Piraeus">Piraeus</option></select></label><label><span data-i18n="speed">Speed (kn)</span><input id="speed" type="number" min="8" max="25" step=".5" value="15"></label><label><span data-i18n="fuel">Fuel</span><select id="fuel"><option value="HFO">HFO</option><option selected value="VLSFO">VLSFO (HFO proxy)</option><option value="MGO">MGO</option><option value="LNG">LNG (CO₂ only)</option><option value="METHANOL">Fossil methanol</option><option value="EMETHANOL">e-Methanol</option><option value="B100">B100 illustration</option><option value="B20">B20 illustration</option><option value="EAMMONIA">e-Ammonia (CO₂ only)</option><option value="EHYDROGEN">e-Hydrogen (CO₂ only)</option></select></label><label class="field-wide"><span data-i18n="weather">Weather</span><select id="weather"><option value=".94">Calm</option><option value="1" selected>Normal</option><option value="1.12">Adverse</option></select></label></div><div class="fields" id="engineeringFields" style="margin-top:15px">
+<label>Reference main power @15 kn (kW) / القدرة المرجعية<input id="mainPower" type="number" min="1" value="18000"></label>
+<label>Installed MCR (kW) / القدرة القصوى المستمرة للمحرك<input id="mainMcr" type="number" min="1" value="36000" placeholder="Actual rated MCR if known" title="36000 kW is a hypothetical default, NOT automatically derived from vessel type"></label>
+<label>Auxiliary power (kW) / القدرة المساعدة<input id="auxPower" type="number" min="0" value="900"></label>
+<label>Main SFOC (g/kWh) / الاستهلاك النوعي<input id="mainSfoc" type="number" min="1" value="175"></label>
+<label>Auxiliary SFOC (g/kWh)<input id="auxSfoc" type="number" min="1" value="190"></label>
+<label>Canal segment (nm) / طول جزء القناة<input id="canalDistance" type="number" min="1" value="105"></label>
+<label>Canal transit hours / زمن القناة<input id="canalHours" type="number" min="1" value="12"></label>
+<label>Suez waiting hours / الانتظار<input id="waitSuez" type="number" min="0" value="0"></label>
+<label>Cape waiting hours / الانتظار البديل<input id="waitCape" type="number" min="0" value="0"></label>
+<label>Alternative fuel relative engine efficiency / كفاءة المحرك النسبية<input id="fuelEfficiency" type="number" min="0.4" max="1.6" step="0.05" value="1" title="1 is a hypothetical unchanged efficiency, not an engine certificate"></label>
+<label>Fuel price ($/t) / سعر الوقود<input id="fuelPrice" type="number" min="0" placeholder="Optional / اختياري"></label>
+<label>User-entered toll ($) / رسم يدوي<input id="toll" type="number" min="0" placeholder="NOT a SCA quotation"></label>
+<label class="field-wide">Non-fuel operating cost ($/day) / تكاليف التشغيل دون الوقود<input id="opex" type="number" min="0" placeholder="Optional / اختياري"></label>
+</div>
+<details style="margin-top:15px;border:1px solid var(--line);padding:12px" open>
+<summary style="cursor:pointer;font-weight:700">SCA SCNT base dues (2024 reference) / تقدير رسوم الأساس 2024</summary>
+<p class="panel-note" style="margin:9px 0">Published tariff effective 15 Jan 2024. No 2026 surcharges/rebates, no deck levies or service fees. This is NOT a payable 2026 toll. Do not infer SCNT from DWT/GT.</p>
+<div class="fields">
+<label>SCA Net Tonnage — SCNT / حمولة صافية للقناة<input id="scnt" type="number" min="1" step="0.01" placeholder="Actual certified SCNT only"></label>
+<label>Type / نوع السفينة<select id="tollClass"><option value="CONTAINER">Containership / حاويات</option><option value="CRUDE_TANKER">Crude oil tanker / ناقلة بترول</option><option value="PRODUCT_TANKER">Product tanker / مشتقات</option><option value="DRY_BULK">Dry bulk / صب جاف</option><option value="LNG_TANKER">LNG / غاز طبيعي</option><option value="LPG_TANKER">LPG / غاز بترولي</option><option value="GENERAL_CARGO">General cargo / بضائع عامة</option><option value="RORO">Ro/Ro</option><option value="CAR_CARRIER">Car carrier / سيارات</option><option value="PASSENGER">Passenger / ركاب</option><option value="OTHER">Other / أخرى</option></select></label>
+<label>Condition / حالة السفينة<select id="tollState"><option value="laden">Laden / محملة</option><option value="ballast">Ballast / فارغة</option></select></label>
+<label>USD per SDR / دولار لكل وحدة SDR<input id="sdrFx" type="number" min="0.1" max="10" step="0.0001" placeholder="Enter date-specific published FX"></label>
+<label class="field-wide" style="display:flex;align-items:center;gap:8px;letter-spacing:0;text-transform:none"><input type="checkbox" id="useHistoricalBase" style="width:auto">Explicitly use the 2024 BASE USD as a hypothetical toll in net voyage cost (NOT current dues) / استخدام أساس 2024 في سيناريو التكلفة فقط</label>
+</div>
+<p class="panel-note" id="tollStatus" style="margin-top:9px">Provide actual SCNT to see dated base tariff bands.</p>
+</details>
+<details style="margin-top:12px;border:1px solid var(--line);padding:12px">
+<summary style="cursor:pointer;font-weight:700">Optional IMO LCA WtW scenario / سيناريو دورة الحياة</summary>
+<p class="panel-note" style="margin:9px 0">Requires a specific fuel pathway + engine + cited factor. A number entered here is still USER-SUPPLIED and NOT verified or FuelEU/IMO compliance.</p>
+<div class="fields">
+<label>WtW gCO₂e/MJ<input id="wtwFactor" type="number" min="0" max="350" step="0.1" placeholder="No default"></label>
+<label>Fuel production pathway / مسار الإنتاج<input id="fuelPathway" placeholder="e.g. certified renewable route"></label>
+<label>Engine technology / تقنية المحرك<input id="engineTech" placeholder="e.g. MAN dual-fuel type"></label>
+<label>Factor reference / مرجع المعامل<input id="pathwayRef" placeholder="Link / publication / certificate ID"></label>
+</div><p class="panel-note" id="wtwStatus" style="margin-top:9px">WtW not calculated until all evidence fields are provided.</p>
+</details>
+<details style="margin-top:12px;border:1px solid var(--line);padding:12px">
+<summary style="cursor:pointer;font-weight:700">EU ETS / FuelEU applicability — scope screen only / نطاق اللوائح الأوروبية</summary>
+<p class="panel-note" style="margin:9px 0">EU ETS: 50% of direct extra-EU/EEA sea leg, subject to verified vessel type, GT, port-call and exemption rules; 2026 includes CH₄ and N₂O. No official compliance cost or FuelEU penalty is calculated. IMO Net-Zero Framework still draft as of 17 Nov 2026.</p>
+<div class="fields">
+<label>Gross tonnage (GT), NOT SCNT / الحمولة الإجمالية<input id="grossTonnage" type="number" min="0" step="1" placeholder="Enter verified GT"></label>
+<label>Ship service / نشاط السفينة<select id="shipService"><option value="unknown">Not established / غير محدد</option><option value="cargo">Cargo ship / نقل بضائع</option><option value="passenger">Passenger ship / ركاب</option></select></label>
+<label>Reporting year / سنة الانبعاثات<select id="reportingYear"><option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option></select></label>
+<label>EUA price (EUR/tCO₂) / سعر رخصة الكربون<input id="euaPrice" type="number" min="0" placeholder="Manual illustrative price"></label>
+<label class="field-wide" style="display:flex;align-items:center;gap:8px;letter-spacing:0;text-transform:none"><input type="checkbox" id="directPortCalls" style="width:auto">I confirm that origin and destination are consecutive actual ports of call, with no intervening stop / أؤكد تسلسل موانئ الرحلة</label>
+</div>
+<p class="panel-note" id="policyStatus" style="margin-top:9px">Eligibility and regulatory costs are not established.</p>
+</details>
+<p class="panel-note" style="margin:12px 0">All engine values above are <b>editable hypothetical inputs</b>, not extracted from vessel identity. The static ship registry does not establish engine or fuel particulars. / هذه بيانات افتراضية وليست بيانات فنية معتمدة للسفينة.</p><button class="primary" id="saveBtn" style="margin-top:20px" data-i18n="save">Save locally</button> <button id="restoreBtn" type="button" style="margin-top:20px">Restore saved inputs / استعادة المدخلات</button><div class="saved" id="saved" role="status" aria-live="polite">Scenario saved in this browser.</div></section>
+    <section class="panel"><h3 data-i18n="result">Indicative result</h3><p class="panel-note" data-i18n="resultCopy">Same vessel and operating assumptions; only the maritime corridor changes.</p><div class="result-card"><small data-i18n="avoided">INDICATIVE CO₂ AVOIDED VIA SUEZ</small><strong id="avoided">—</strong><span>tCO₂ per modelled voyage</span></div><div class="result-list"><div><span data-i18n="distanceSaved">DISTANCE SAVED</span><b id="distanceSaved">—</b></div><div><span data-i18n="daysSaved">TIME SAVED</span><b id="daysSaved">—</b></div><div><span>SUEZ CO₂</span><b id="suezCo2">—</b></div><div><span>CAPE CO₂</span><b id="capeCo2">—</b></div></div></section>
+    <section class="panel" aria-live="polite">
+<h3>Evidence-bounded voyage results / نتائج رحلة افتراضية</h3>
+<div class="result-list">
+<div><span>FUEL SAVED / الوقود الموفر</span><b id="fuelSaved">—</b></div>
+<div><span>NET ECONOMIC SAVING / الوفر الصافي</span><b id="netSaved">—</b></div>
+<div><span>CANAL TOLL / رسم القناة</span><b id="tollResult">—</b></div>
+<div><span>WTW GHG saving / وفر دورة الحياة</span><b id="wtwResult">Not calculated</b></div>
+<div><span>SCA 2024 base toll / رسوم أساس 2024</span><b id="tollBaseResult">Not calculated</b></div>
+<div><span>EU ETS CO₂-only illustrative savings / وفر الكربون الأوروبي</span><b id="etsResult">Not calculated</b></div>
+<div><span>FuelEU & IMO GFI payable cost / التكاليف الملزمة</span><b>Not calculated / غير محسوب</b></div>
+</div><table style="margin-top:12px"><caption style="text-align:left;font-weight:700">SCA 2024 progressive band breakdown — SDR / تفصيل الشرائح</caption><thead><tr><th>Band</th><th>SCNT</th><th>Rate</th><th>SDR</th></tr></thead><tbody id="tollBreakdown"><tr><td colspan="4">Enter SCNT</td></tr></tbody></table><p class="panel-note" id="calcStatus" style="margin-top:14px">Model inputs are not validated.</p>
+<details style="margin-top:13px">
+<summary style="font-weight:700;cursor:pointer">Speed & waiting sensitivity (deterministic, not uncertainty) / تحليل حساسية السرعة والانتظار</summary>
+<p class="panel-note" style="margin:9px 0">Three speeds (−2/0/+2 knots) × extra Suez waiting (0/12/24 hours). Same ship and model; combinations exceeding declared engine MCR are blocked. Break-even maximum canal toll requires fuel price and non-fuel daily OPEX. All values are hypothetical.</p>
+<div style="overflow-x:auto"><table><thead><tr><th>Speed (kn)</th><th>Extra wait (h)</th><th>Fuel saved (t)</th><th>CO₂ saved (t)</th><th>Days saved</th><th>Max break-even toll (USD)</th></tr></thead><tbody id="sensitivityRows"><tr><td colspan="6">Calculation pending</td></tr></tbody></table></div>
+<p class="panel-note" id="sensitivityStatus" role="status" style="margin-top:8px">Calculation pending</p>
+</details>
+<button class="primary" id="exportBtn" style="margin-top:12px">Export scenario JSON / تصدير الفرضيات</button>
+</section>
+<section class="panel route-compare"><h3 data-i18n="routeTitle">Suez Canal versus Cape of Good Hope</h3><p class="panel-note" data-i18n="routeCopy">Diagrammatic maritime corridors—not navigation advice.</p><div class="route-map"><svg viewBox="0 0 1000 275" preserveAspectRatio="none"><path class="suez-route" d="M70 170 C230 135 315 62 465 72 C600 82 718 55 930 57"/><path class="cape-route" d="M70 170 C245 223 410 246 560 231 C735 214 785 112 930 57"/><circle cx="70" cy="170" r="6" fill="#36e7bb"/><circle cx="930" cy="57" r="6" fill="#36e7bb"/><text x="75" y="158" id="mapOrigin">Singapore</text><text x="820" y="45" id="mapDestination">Rotterdam</text><text x="440" y="61">SUEZ</text><text x="510" y="253">CAPE</text></svg></div></section>
+  </div>
+  <section class="panel sources"><h3>Source & limitation register / المصادر والقيود</h3>
+<p class="panel-note">SCA official port-pair route distances: <a href="https://www.suezcanal.gov.eg/English/About/Pages/WhySuezCanal.aspx" target="_blank" rel="noopener">Why Suez Canal</a>. All other port pairs are intentionally blocked. Navigation tracks shown above are <b>diagrammatic</b> and NOT hydrographically verified.</p>
+<p class="panel-note" style="margin-top:9px">Physical CO₂ factors: <a href="https://wwwcdn.imo.org/localresources/en/OurWork/Environment/Documents/Air%20pollution/MEPC.346%2878%29.pdf" target="_blank" rel="noopener">IMO MEPC.346(78)</a>. Example lower heating values: <a href="https://wwwcdn.imo.org/localresources/en/OurWork/Environment/Documents/Air%20pollution/Roadmap%20to%20Zero%20Emission%20from%20International%20Shipping%20-%20Japan%20March%202020.pdf" target="_blank" rel="noopener">IMO-hosted maritime roadmap</a>.</p>
+<p class="panel-note" style="margin-top:9px"><b>Not provided:</b> actual marine engine specifications, verified speed/power curves, AIS voyage, official SCNT toll, compliance ETS/FuelEU cost, methane slip, N₂O, WtW emission factors, fuel certificates. Alternative-fuel machinery assumptions are NOT certified. FAME B100 LHV 37.2 MJ/kg and CO₂ factor 2.834; mass-blended B20 LHV 39.76 MJ/kg.
+See <a href="https://www.suezcanal.gov.eg/Arabic/Navigation/Tolls/Pages/TollsTable.aspx" target="_blank" rel="noopener">SCA 2024 base rates</a> and <a href="https://www.imo.org/en/OurWork/Environment/Pages/Lifecycle-GHG---carbon-intensity-guidelines.aspx" target="_blank" rel="noopener">IMO LCA guidelines</a>. Results are hypotheses, not current tolls, verified savings or certified WtW. EU ETS reference: <a href="https://climate.ec.europa.eu/areas-action/transport-decarbonisation/reducing-emissions-shipping-sector_en" target="_blank" rel="noopener">European Commission</a>. IMO NZF: <a href="https://www.imo.org/en/mediacentre/hottopics/pages/faqs-the-imo-net-zero-framework.aspx" target="_blank" rel="noopener">IMO regulatory status</a>.</p></section>
+</main>
+<footer class="footer">CERI-SC NEXT GitHub Edition · Indicative decision-support only. Not an official emissions inventory, certified MRV statement, navigation route, toll quotation or carbon credit.</footer>
+<script src="vessels.js"></script>
+<script>
+window.__CERI_MODEL__=window.__CERI_MODEL__||{};
+// Module: src/voyage-physical.mjs (snapshot of branch at bundling)
+(function(){
+/**
+ * CERI-SC — evidence-bounded voyage model (independent of IMO's annual Fleet & CO2 Calculator).
+ * SCA published port-pair distances; engine inputs are user-provided hypothetical particulars.
+ * This is NOT a navigation route, ship performance certificate, verified MRV or a toll quotation.
+ */
+const SCA_DISTANCE_SOURCE =
+  "https://www.suezcanal.gov.eg/English/About/Pages/WhySuezCanal.aspx";
+const IMO_CO2_SOURCE =
+  "https://wwwcdn.imo.org/localresources/en/OurWork/Environment/Documents/Air%20pollution/MEPC.346%2878%29.pdf";
+const LHV_SOURCE =
+  "https://wwwcdn.imo.org/localresources/en/OurWork/Environment/Documents/Air%20pollution/Roadmap%20to%20Zero%20Emission%20from%20International%20Shipping%20-%20Japan%20March%202020.pdf";
+
+const OFFICIAL_ROUTES = Object.freeze({
+  "Singapore|Rotterdam": { suezNm:8288, capeNm:11755 },
+  "Tokyo|Rotterdam": { suezNm:11192, capeNm:14507 },
+  "Ras Tanura|Rotterdam": { suezNm:6436, capeNm:11169 },
+  "Jeddah|Rotterdam": { suezNm:3997, capeNm:10797 },
+  "Jeddah|Piraeus": { suezNm:1316, capeNm:11207 }
+});
+
+// C_F = physical combustion CO2, NOT WtW CO2e. Approximate LHV for energy
+// equivalence is deliberately separate from combustion carbon factors.
+const FUELS = Object.freeze({
+  HFO: { name:"HFO", lhvMJkg:40.4, physicalCO2:3.114, note:"HFO benchmark" },
+  VLSFO: { name:"VLSFO (HFO proxy)", lhvMJkg:40.4, physicalCO2:3.114,
+    note:"Proxy only: blend-specific LHV and carbon factor require bunker delivery analysis" },
+  MGO: { name:"MGO", lhvMJkg:42.7, physicalCO2:3.206,
+    note:"LHV illustrative; verify fuel properties" },
+  LNG: { name:"LNG", lhvMJkg:48.0, physicalCO2:2.750,
+    note:"CO2 only; methane slip, pilot fuel and engine efficiency are NOT modelled" },
+  METHANOL: { name:"Fossil methanol", lhvMJkg:19.9, physicalCO2:1.375,
+    note:"No pilot fuel or dual-fuel engine penalties; hypothetical equivalent energy" },
+  EMETHANOL: { name:"e-Methanol", lhvMJkg:19.9, physicalCO2:1.375,
+    note:"Physical CO2 is NOT zero; WtW depends on certified production and carbon source" },
+  B100: { name:"B100 illustrative FAME", lhvMJkg:37.2, physicalCO2:2.834,
+    note:"Illustrative FAME physical CO2; lifecycle carbon accounting requires fuel sustainability certification" },
+  B20: { name:"B20 20% mass FAME + 80% HFO proxy", lhvMJkg:39.76,
+    physicalCO2:0.2*2.834+0.8*3.114,
+    note:"Mass-blend example only; blend energy/content and eligibility require fuel evidence" },
+  EAMMONIA: { name:"e-Ammonia", lhvMJkg:20.5, physicalCO2:0,
+    note:"CO2 combustion only is zero; N2O, pilot fuel, process WtW and engine design are unmodelled" },
+  EHYDROGEN: { name:"e-Hydrogen", lhvMJkg:120, physicalCO2:0,
+    note:"CO2 combustion only is zero; N2O where applicable, WtW and machinery efficiency are unmodelled" }
+});
+
+const requireRange=(name,value,min,max,allowZero=false)=>{
+  if(typeof value!=="number" || !Number.isFinite(value) ||
+     (allowZero?value<min:value<=min) || value>max)
+    throw new RangeError(name+" must be finite and within its documented operating bounds");
+  return value;
+};
+const optionalMoney=(name,v)=>{
+  if(v==null||v==="")return null;
+  return requireRange(name,v,0,1e9,true);
+};
+
+function validIMO(imo) {
+  const s=String(imo||"").replace(/^IMO\s*/i,"");
+  if(!/^\d{7}$/.test(s))return false;
+  const check=[7,6,5,4,3,2].reduce((sum,k,i)=>sum+Number(s[i])*k,0)%10;
+  return check===Number(s[6]);
+}
+
+function runVoyage(input) {
+  if(!input||typeof input!=="object")throw Error("Required scenario object");
+  const pair=String(input.origin||"")+"|"+String(input.destination||"");
+  const route=OFFICIAL_ROUTES[pair];
+  if(!route)throw Error("NO_VERIFIED_SCA_PORT_PAIR: do not invent distances");
+  const fuel=FUELS[input.fuelId];
+  if(!fuel)throw Error("UNKNOWN_FUEL: no authenticated fuel profile");
+  const v=requireRange("speedKn",input.speedKn,0,35);
+  const referenceSpeed=requireRange("referenceSpeedKn",input.referenceSpeedKn,0,35);
+  const referencePower=requireRange("referenceMainPowerKw",input.referenceMainPowerKw,0,150000);
+  const auxPower=requireRange("auxiliaryPowerKw",input.auxiliaryPowerKw,0,15000,true);
+  // An actual engine's Maximum Continuous Rating (MCR), not inferred from
+  // power at reference speed. If unknown, keep the result explicitly unverified.
+  const installedMainMcrKw=input.installedMainMcrKw==null?null:
+    requireRange("installedMainMcrKw",input.installedMainMcrKw,0,200000);
+  if(installedMainMcrKw!==null&&referencePower>installedMainMcrKw)
+    throw new RangeError("REFERENCE_POWER_EXCEEDS_INSTALLED_MCR");
+  const mainSFOC=requireRange("mainSFOCgKwh",input.mainSFOCgKwh,0,500);
+  const auxiliarySFOC=requireRange("auxiliarySFOCgKwh",input.auxiliarySFOCgKwh,0,500);
+  const canalDistance=requireRange("canalDistanceNm",input.canalDistanceNm,0,200,true);
+  const canalHours=requireRange("canalTransitHours",input.canalTransitHours,0,200);
+  const waitingS=requireRange("waitingSuezHours",input.waitingSuezHours,0,500,true);
+  const waitingC=requireRange("waitingCapeHours",input.waitingCapeHours,0,500,true);
+  const price=optionalMoney("fuelPriceUsdPerTonne",input.fuelPriceUsdPerTonne);
+  const toll=optionalMoney("userEnteredTollUsd",input.userEnteredTollUsd);
+  const dailyOpex=optionalMoney("dailyOperatingCostUsd",input.dailyOperatingCostUsd);
+  if(canalDistance===0)throw Error("Canal segment must have distance");
+  if(canalDistance>=route.suezNm)throw Error("Canal distance cannot exceed Suez route");
+  if(canalDistance/canalHours>18)throw Error("Canal segment speed is implausible");
+  // Mandatory explicit reference fuel basis; SFOC here is calibrated to HFO
+  // and alternative-fuel mass is adjusted by energy content at equal assumed efficiency.
+  const refLhv=FUELS.HFO.lhvMJkg;
+  const efficiencyRatio=input.fuelEfficiencyRatio===undefined?1:
+    requireRange("fuelEfficiencyRatio",input.fuelEfficiencyRatio,0.4,1.6);
+  const energyMassFactor=refLhv/(fuel.lhvMJkg*efficiencyRatio);
+  const weatherMultiplier=requireRange("weatherMultiplier",input.weatherMultiplier,0,2);
+  const mainPowerAtSpeed=s=>referencePower*Math.pow(s/referenceSpeed,3)*weatherMultiplier;
+  const openSeaPowerKw=mainPowerAtSpeed(v);
+  const canalRequestedPowerKw=mainPowerAtSpeed(canalDistance/canalHours);
+  if(installedMainMcrKw!==null&&
+    Math.max(openSeaPowerKw,canalRequestedPowerKw)>installedMainMcrKw+1e-7)
+    throw new RangeError("MAIN_ENGINE_POWER_EXCEEDS_MCR: demanded "+
+      Math.max(openSeaPowerKw,canalRequestedPowerKw).toFixed(0)+
+      " kW > installed "+installedMainMcrKw.toFixed(0)+" kW");
+  const combustion=(mainKw,auxKw,hours)=>
+    (mainKw*mainSFOC+auxKw*auxiliarySFOC)*hours/1e6*energyMassFactor;
+  const canalSpeed=canalDistance/canalHours;
+  const openSuezHours=(route.suezNm-canalDistance)/v;
+  const capeSeaHours=route.capeNm/v;
+  const canalFuel=combustion(mainPowerAtSpeed(canalSpeed),auxPower,canalHours);
+  const suezSeaFuel=combustion(mainPowerAtSpeed(v),auxPower,openSuezHours);
+  const capeSeaFuel=combustion(mainPowerAtSpeed(v),auxPower,capeSeaHours);
+  const standbyS=combustion(0,auxPower,waitingS);
+  const standbyC=combustion(0,auxPower,waitingC);
+  const suezFuel=suezSeaFuel+canalFuel+standbyS;
+  const capeFuel=capeSeaFuel+standbyC;
+  const suezHours=openSuezHours+canalHours+waitingS;
+  const capeHours=capeSeaHours+waitingC;
+  const su={distanceNm:route.suezNm,seaHours:openSuezHours,canalHours,
+    waitingHours:waitingS,totalHours:suezHours,fuelTonnes:suezFuel,
+    ttWCO2Tonnes:suezFuel*fuel.physicalCO2};
+  const ca={distanceNm:route.capeNm,seaHours:capeSeaHours,canalHours:0,
+    waitingHours:waitingC,totalHours:capeHours,fuelTonnes:capeFuel,
+    ttWCO2Tonnes:capeFuel*fuel.physicalCO2};
+  const fuelSavings=ca.fuelTonnes-su.fuelTonnes;
+  const hoursSaved=ca.totalHours-su.totalHours;
+  const fuelSavingUsd=price===null?null:fuelSavings*price;
+  const timeSavingUsd=dailyOpex===null?null:hoursSaved/24*dailyOpex;
+  // Canal toll must be user-entered or derived in a separate authoritative engine.
+  const netSavingUsd=price!==null&&toll!==null&&dailyOpex!==null
+    ?fuelSavingUsd+timeSavingUsd-toll:null;
+  return {
+    status:"SCA_OFFICIAL_DISTANCE__ASSUMED_ENGINE_VOYAGE",
+    modelVersion:"voyage-physical-2026-11-18-mcr",
+    powerEnvelope:{referenceMainPowerKw:referencePower,
+      installedMainMcrKw,openSeaPowerKw,canalRequestedPowerKw,
+      enforced:installedMainMcrKw!==null},
+    verifiedVoyage:false,
+    source:SCA_DISTANCE_SOURCE,inputs:{...input},
+    fuel:{...fuel,id:input.fuelId},
+    suez:su,cape:ca,
+    distanceSavedNm:route.capeNm-route.suezNm,
+    hoursSaved,daysSaved:hoursSaved/24,fuelSavedTonnes:fuelSavings,
+    ttWCO2SavedTonnes:ca.ttWCO2Tonnes-su.ttWCO2Tonnes,
+    wtWCO2eSavedTonnes:null,euEtsCostUsd:null,fuelEUCostUsd:null,imoGfiCostUsd:null,
+    officialTollUsd:null,tollEstimateUsd:null,userEnteredTollUsd:toll,
+    fuelSavingUsd,timeSavingUsd,netSavingUsd,
+    assumptions:[
+      "Selected fuel conversion efficiency ratio is a user assumption (1.0 if omitted), NOT verified machinery compatibility",
+      "Main-engine cube-law power vs speed; user weather resistance multiplier applies equally to both routes, not forecast, no current or hull fouling",
+      "HFO-referenced SFOC and constant auxiliary loads; canal main-engine power idealised",
+      installedMainMcrKw===null
+        ?"Installed MCR not supplied: power feasibility check NOT performed"
+        :"Main engine demand checked against user supplied installed MCR; engine curve not independently verified",
+      "Canal distance, transit and waiting hours are user assumptions; port-pair distances SCA official",
+      "Physical TTW CO2 only; CH4, N2O, upstream WtW and compliance costs NOT calculated"
+    ]
+  };
+}
+
+window.__CERI_MODEL__=Object.assign(window.__CERI_MODEL__||{},{runVoyage:runVoyage,validIMO:validIMO,FUELS:FUELS,OFFICIAL_ROUTES:OFFICIAL_ROUTES,SCA_DISTANCE_SOURCE:SCA_DISTANCE_SOURCE,IMO_CO2_SOURCE:IMO_CO2_SOURCE});
+})();
+// Module: src/sca-tolls-2024.mjs (snapshot of branch at bundling)
+(function(){
+/**
+ * SCA published 2024 base toll schedule (effective 2024-01-15).
+ * Pure progressive SCNT band arithmetic. NO 2026 circular adjustments, rebates,
+ * surcharges, tier-deck levies, pilotage, tug/escort, service fees or final invoice.
+ * NEVER infer SCNT from DWT, GT or SCGT.
+ */
+const SCA_TOLLS_SOURCE="https://www.suezcanal.gov.eg/Arabic/Navigation/Tolls/Pages/TollsTable.aspx";
+const TARIFF_EFFECTIVE_FROM="2024-01-15";
+const TOLL_BAND_WIDTHS=Object.freeze([5000,5000,10000,20000,30000,50000,60000,Infinity]);
+const rate=(laden,ballast)=>Object.freeze({laden:Object.freeze(laden),ballast:Object.freeze(ballast)});
+const SCA_2024_BASE_RATES=Object.freeze({
+  CRUDE_TANKER:rate([11.04,7.82,5.91,2.93,2.53,2.17,2.13,2.13],[9.4,6.64,5.04,2.5,2.14,1.85,1.82,1.82]),
+  PRODUCT_TANKER:rate([11.04,7.82,5.91,3.93,3.84,3.46,3.34,3.34],[9.4,6.64,5.04,2.5,2.14,1.85,1.82,1.82]),
+  DRY_BULK:rate([10.13,7.74,6.12,2.24,1.97,1.85,1.77,1.77],[8.62,6.58,5.21,1.89,1.68,1.58,1.5,1.5]),
+  LPG_TANKER:rate([11.6,8.4,6.22,5.05,4.42,4.13,4.13,4.13],[9.87,7.14,5.29,4.3,3.76,3.51,3.51,3.51]),
+  LNG_TANKER:rate([10.42,8.11,7.02,5.43,5.03,4.8,4.67,4.67],[8.87,6.89,5.97,4.61,4.27,4.08,3.97,3.97]),
+  CONTAINER:rate([11.04,7.58,5.89,4.13,3.82,3.01,2.94,2.88],[9.4,6.45,5,3.51,3.25,2.56,2.52,2.44]),
+  GENERAL_CARGO:rate([10.08,7.78,5.42,4.07,3.94,3.87,3.8,3.8],[8.58,6.62,4.61,3.45,3.36,3.3,3.22,3.22]),
+  RORO:rate([10.08,7.5,5.83,4.21,3.94,3.8,3.65,3.65],[8.58,6.37,4.97,3.59,3.36,3.22,3.12,3.12]),
+  CAR_CARRIER:rate([11.04,7.58,5.67,4.05,3.82,3.01,2.88,2.88],[9.4,6.45,4.83,3.45,3.25,2.56,2.44,2.44]),
+  PASSENGER:rate([9.97,7,5.77,4.08,4.03,3.9,3.76,3.76],[8.48,5.96,4.91,3.48,3.42,3.31,3.19,3.19]),
+  OTHER:rate([10.54,7.1,5.97,4.35,4.21,3.94,3.8,3.8],[8.96,6.04,5.08,3.7,3.59,3.36,3.22,3.22])
+});
+const max=(name,x,minimum,maximum)=>{
+  if(typeof x!=="number"||!Number.isFinite(x)||x<minimum||x>maximum)
+    throw new RangeError("INVALID_"+name);
+  return x;
+};
+function computeSCA2024BaseToll({scnt,vesselClass,loadState,usdPerSdr=null}={}){
+  // This is a reference calculation, never a payable amount.
+  const tonnage=max("SCNT",scnt,1,600000);
+  const rates=SCA_2024_BASE_RATES[vesselClass];
+  if(!rates)throw new RangeError("UNSUPPORTED_SCA_CLASS");
+  if(loadState!=="laden"&&loadState!=="ballast")throw new RangeError("UNKNOWN_LOAD_STATE");
+  if(usdPerSdr!==null)max("SDR_USD_FX",usdPerSdr,0.1,10);
+  let remaining=tonnage;
+  const breakdown=TOLL_BAND_WIDTHS.map((width,i)=>{
+    const tonnageInBand=Math.min(remaining,width);
+    remaining-=tonnageInBand;
+    const rateSDRperSCNT=rates[loadState][i];
+    return {band:i+1,upToSCNT:Number.isFinite(width)?width:null,
+      scnt:tonnageInBand,rateSDRperSCNT,subtotalSDR:tonnageInBand*rateSDRperSCNT};
+  });
+  const baseSDR=breakdown.reduce((sum,band)=>sum+band.subtotalSDR,0);
+  return {
+    status:"SCA_2024_PUBLISHED_BASE_REFERENCE_ONLY",
+    officialInvoice:false,notCurrentTariffValidated:true,
+    source:SCA_TOLLS_SOURCE,effectiveFrom:TARIFF_EFFECTIVE_FROM,
+    scnt:tonnage,vesselClass,loadState,breakdown,
+    baseSDR,baseUsd:usdPerSdr===null?null:baseSDR*usdPerSdr,
+    usdPerSdr,
+    surchargeSDR:null,rebateSDR:null,serviceFeeUSD:null,
+    finalPayableUSD:null,
+    warning:"2024 base tariff reference: later SCA circulars, surcharges, rebates and actual vessel condition are NOT accounted for. Use current official SCA toll calculator for payable dues."
+  };
+}
+
+window.__CERI_MODEL__=Object.assign(window.__CERI_MODEL__||{},{computeSCA2024BaseToll:computeSCA2024BaseToll,SCA_2024_BASE_RATES:SCA_2024_BASE_RATES});
+})();
+// Module: src/fuel-lca-scenario.mjs (snapshot of branch at bundling)
+(function(){
+/**
+ * Optional WtW scenario — must be supplied with a specific fuel production
+ * pathway and engine technology. No generic defaults or certified labels.
+ * Method: t fuel * 1000 kg/t * LHV MJ/kg * gCO2e/MJ / 1e6 g/t.
+ * Source: IMO 2024 marine fuel LCA guidelines (MEPC.391(81)).
+ */
+const IMO_LCA_SOURCE =
+  "https://www.imo.org/en/OurWork/Environment/Pages/Lifecycle-GHG---carbon-intensity-guidelines.aspx";
+const bounded=(name,x,lo,hi)=>{
+  if(typeof x!=="number"||!Number.isFinite(x)||x<lo||x>hi)
+    throw new RangeError("INVALID_"+name);
+  return x;
+};
+const needed=(name,x)=>{
+  if(typeof x!=="string"||x.trim().length<4)throw new Error("MISSING_"+name);
+  return x.trim();
+};
+function estimateScenarioWtW(voyage,{
+  gCO2ePerMJ,productionPathway,engineTechnology,evidenceReference
+}={}){
+  if(voyage?.status!=="SCA_OFFICIAL_DISTANCE__ASSUMED_ENGINE_VOYAGE"||
+    typeof voyage.fuel?.lhvMJkg!=="number")
+    throw new Error("INVALID_VOYAGE_ENERGY_BASIS");
+  const ghg=bounded("WTW_FACTOR",gCO2ePerMJ,0,350);
+  const pathway=needed("PRODUCTION_PATHWAY",productionPathway);
+  const engine=needed("ENGINE_TECHNOLOGY",engineTechnology);
+  const source=needed("PATHWAY_REFERENCE",evidenceReference);
+  const tonnePerFuelTonne=voyage.fuel.lhvMJkg*ghg/1000;
+  const suezWtW=voyage.suez.fuelTonnes*tonnePerFuelTonne;
+  const capeWtW=voyage.cape.fuelTonnes*tonnePerFuelTonne;
+  return {
+    status:"USER_SUPPLIED_WTW_PATHWAY_SCENARIO_UNVERIFIED",
+    verified:false,certified:false,
+    fuelId:voyage.fuel.id,productionPathway:pathway,
+    engineTechnology:engine,evidenceReference:source,
+    modelGuidance:IMO_LCA_SOURCE,ghgIntensity_gCO2ePerMJ:ghg,
+    ttWCombustionCO2TonnesSuez:voyage.suez.ttWCO2Tonnes,
+    ttWCombustionCO2TonnesCape:voyage.cape.ttWCO2Tonnes,
+    suezWtW_tCO2e:suezWtW,capeWtW_tCO2e:capeWtW,
+    deltaWtW_tCO2e:capeWtW-suezWtW,
+    warning:"Life-cycle estimate from user-entered factor; not verified or certified, and not official IMO GFI, EU ETS or FuelEU compliance."
+  };
+}
+
+window.__CERI_MODEL__=Object.assign(window.__CERI_MODEL__||{},{estimateScenarioWtW:estimateScenarioWtW});
+})();
+// Module: src/regulation-screen.mjs (snapshot of branch at bundling)
+(function(){
+/**
+ * Regulatory scope SCREEN (not a compliance calculator).
+ * As-of: 2026-11-17. EU ETS excludes special exemptions; voyages require
+ * verified preceding/next port calls, vessel type, GT and MRV data.
+ */
+const EU_ETS_SOURCE="https://climate.ec.europa.eu/areas-action/transport-decarbonisation/reducing-emissions-shipping-sector_en";
+const FUELEU_SOURCE="https://transport.ec.europa.eu/transport-modes/maritime/decarbonising-maritime-transport-fueleu-maritime_en";
+const IMO_POLICY_SOURCE="https://www.imo.org/en/mediacentre/hottopics/pages/faqs-the-imo-net-zero-framework.aspx";
+const POLICY_AS_OF="2026-11-17";
+const euPorts=new Set(["Rotterdam","Piraeus"]);
+const nonEuPorts=new Set(["Singapore","Tokyo","Ras Tanura","Jeddah"]);
+const rate={2024:0.4,2025:0.7,2026:1};
+function sensible(name,x,min,max){
+  if(typeof x!=="number"||!Number.isFinite(x)||x<min||x>max)
+    throw new RangeError("INVALID_"+name);
+  return x;
+}
+function screenEUETS(voyage,{
+  grossTonnage,shipService,reportingYear=2026,
+  directPortCallsConfirmed=false,allowancePriceEur=null
+}={}){
+  if(voyage?.status!=="SCA_OFFICIAL_DISTANCE__ASSUMED_ENGINE_VOYAGE")
+    throw new Error("VOYAGE_REQUIRED");
+  if(!Number.isInteger(reportingYear)||reportingYear<2024||reportingYear>2026)
+    throw new RangeError("OUT_OF_REVIEW_PERIOD");
+  const gt=grossTonnage===null||grossTonnage===undefined?null:
+    sensible("GT",grossTonnage,0,1000000);
+  if(!["cargo","passenger","unknown"].includes(shipService))
+    throw new Error("SHIP_SERVICE_REQUIRED");
+  if(typeof directPortCallsConfirmed!=="boolean")throw new TypeError("DIRECT_PORT_CALLS_BOOL_REQUIRED");
+  if(allowancePriceEur!==null)sensible("EUA_PRICE",allowancePriceEur,0,2000);
+  const origin=voyage.inputs?.origin,dest=voyage.inputs?.destination;
+  const via=euPorts.has(origin)&&euPorts.has(dest)?1:
+    (euPorts.has(origin)&&nonEuPorts.has(dest))||
+    (euPorts.has(dest)&&nonEuPorts.has(origin)) ? 0.5 : null;
+  const eligible=gt!==null&&gt>=5000&&shipService!=="unknown";
+  const potentiallyCovered=eligible&&via!==null&&directPortCallsConfirmed;
+  const phasedFraction=rate[reportingYear];
+  const co2OnlySavingsTonnes=potentiallyCovered
+    ?voyage.ttWCO2SavedTonnes*via*phasedFraction:null;
+  return {
+    status:potentiallyCovered?"POTENTIAL_EU_ETS_SCOPE_CO2_ONLY":
+      "EU_ETS_SCOPE_NOT_ESTABLISHED",
+    verifiedCompliance:false,
+    source:EU_ETS_SOURCE,asOf:POLICY_AS_OF,
+    grossTonnage:gt,shipService,reportingYear,
+    directPortCallsConfirmed,
+    voyageLegCoverageFraction:potentiallyCovered?via:null,
+    surrenderFractionOfReportingYear:phasedFraction,
+    includesCH4N2O:reportingYear>=2026,
+    co2OnlyCoveredDelta_t:co2OnlySavingsTonnes,
+    co2OnlyIllustrativeCostSaved_EUR:co2OnlySavingsTonnes!==null&&allowancePriceEur!==null
+      ?co2OnlySavingsTonnes*allowancePriceEur:null,
+    fullEtsCostSaved_EUR:null,
+    fuelEU:{status:reportingYear>=2025&&potentiallyCovered
+      ?"POTENTIAL_SCOPE_NO_PENALTY_CALCULATION":"SCOPE_NOT_ESTABLISHED",
+      source:FUELEU_SOURCE,usesWtW:true,penaltyEUR:null},
+    imoNetZero:{status:"DRAFT_NOT_ADOPTED_AS_OF_2026_11_17",
+      source:IMO_POLICY_SOURCE,mandatoryCostEUR:null},
+    warning:"Regulatory scope check only; actual port calls, exemptions, vessel class, EU ETS verified CH4/N2O (2026), EUA allowances and FuelEU compliance balances are NOT established."
+  };
+}
+
+window.__CERI_MODEL__=Object.assign(window.__CERI_MODEL__||{},{screenEUETS:screenEUETS});
+})();
+// Module: src/voyage-sensitivity.mjs (snapshot of branch at bundling)
+(function(){
+const {runVoyage}=window.__CERI_MODEL__;
+/**
+ * Non-probabilistic, same-vessel scenario sensitivity for CERI-SC.
+ * No distribution / confidence interval is implied by these deterministic choices.
+ */
+
+const SENSITIVITY_V1="deterministic-speed-and-suez-wait-2026-11-18";
+function runVoyageSensitivity(baseInputs,{
+  speedOffsetKnots=[-2,0,2],additionalSuezWaitHours=[0,12,24]
+}={}){
+  if(!baseInputs||typeof baseInputs!=="object")throw new Error("INPUT_REQUIRED");
+  const base=runVoyage(baseInputs);
+  if(!Array.isArray(speedOffsetKnots)||!Array.isArray(additionalSuezWaitHours)||
+     speedOffsetKnots.length<1||additionalSuezWaitHours.length<1||
+     speedOffsetKnots.length>7||additionalSuezWaitHours.length>7)
+    throw new RangeError("INVALID_SENSITIVITY_DIMENSIONS");
+  const rows=[];
+  for(const speedOffsetKn of speedOffsetKnots){
+    if(typeof speedOffsetKn!=="number"||!Number.isFinite(speedOffsetKn)||
+       speedOffsetKn< -10||speedOffsetKn>10)
+      throw new RangeError("INVALID_SPEED_OFFSET");
+    for(const waitExtraHours of additionalSuezWaitHours){
+      if(typeof waitExtraHours!=="number"||!Number.isFinite(waitExtraHours)||
+        waitExtraHours<0||waitExtraHours>240)
+        throw new RangeError("INVALID_SUEZ_WAIT_OFFSET");
+      const speedKn=base.inputs.speedKn+speedOffsetKn;
+      const waitingSuezHours=base.inputs.waitingSuezHours+waitExtraHours;
+      try{
+        const r=runVoyage({...base.inputs,speedKn,waitingSuezHours});
+        const breakEvenTollUsd=r.fuelSavingUsd===null||r.timeSavingUsd===null
+          ?null:r.fuelSavingUsd+r.timeSavingUsd;
+        rows.push({
+          status:"CALCULATED_HYPOTHETICAL",speedKn,
+          additionalSuezWaitHours:waitExtraHours,
+          actualSuezWaitHours:waitingSuezHours,
+          distanceSavedNm:r.distanceSavedNm,
+          daysSaved:r.daysSaved,
+          fuelSavedTonnes:r.fuelSavedTonnes,
+          ttWCO2SavedTonnes:r.ttWCO2SavedTonnes,
+          breakEvenTollUsd,
+          netSavingUsd:r.netSavingUsd,
+          officialTollUsd:null
+        });
+      }catch(error){
+        // Do not hide an impossible MCR/speed combination by extrapolating.
+        rows.push({status:"BLOCKED_PHYSICAL_INPUT",speedKn,
+          additionalSuezWaitHours:waitExtraHours,
+          actualSuezWaitHours:waitingSuezHours,
+          reason:String(error.message),daysSaved:null,fuelSavedTonnes:null,
+          ttWCO2SavedTonnes:null,breakEvenTollUsd:null,
+          netSavingUsd:null,officialTollUsd:null});
+      }
+    }
+  }
+  return {
+    status:"DETERMINISTIC_SENSITIVITY_NOT_STATISTICAL_UNCERTAINTY",
+    modelVersion:SENSITIVITY_V1,
+    baseModelVersion:base.modelVersion,
+    verified:false,
+    inputBasis:{...base.inputs},
+    rows,
+    explanation:"Speed and extra Suez waiting are changed individually in a 3x3 scenario grid; unchanged fuel prices, engine inputs, weather and Cape waiting. NOT a probability distribution, confidence interval, live weather or official dues."
+  };
+}
+
+window.__CERI_MODEL__=Object.assign(window.__CERI_MODEL__||{},{runVoyageSensitivity:runVoyageSensitivity});
+})();
+
+</script>
+<script>
+const {runVoyage,validIMO,SCA_DISTANCE_SOURCE,IMO_CO2_SOURCE,computeSCA2024BaseToll,SCA_2024_BASE_RATES,estimateScenarioWtW,screenEUETS,runVoyageSensitivity}=window.__CERI_MODEL__;
+
+
+
+
+
+const officialPortPairs = "Singapore–Rotterdam; Tokyo–Rotterdam; Ras Tanura–Rotterdam; Jeddah–Rotterdam; Jeddah–Piraeus";
+const curated={"9811000":{name:"EVER GIVEN",type:"Container ship",flag:"Panama",dwt:199629,gt:219079,built:2018,dataClass:"curated-particulars",source:"IMO Maritime Knowledge Centre"},"9839179":{name:"CMA CGM JACQUES SAADE",type:"LNG container ship",flag:"France",dwt:221251,gt:236583,built:2020,dataClass:"curated-particulars",source:"CMA CGM public vessel record"},"9839430":{name:"MSC GULSUN",type:"Container ship",flag:"Panama",dwt:228149,gt:232618,built:2019,dataClass:"curated-particulars",source:"Port of Hamburg vessel register"}};
+const registry=(window.CERI_VESSELS||[]).map(v=>({...v,...(curated[v.i]||{}),imo:v.i,name:(curated[v.i]||{}).name||v.n,type:(curated[v.i]||{}).type||v.t,flag:(curated[v.i]||{}).flag||v.f,mmsi:v.m}));Object.keys(curated).forEach(imo=>{if(!registry.some(v=>v.imo===imo))registry.unshift({imo,...curated[imo]})});
+let selected=null,lang="en";const $=id=>document.getElementById(id);const esc=s=>String(s??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const i18n={ar:{eyebrow:"منصة ذكاء القرار لقناة السويس",title:"سفينة واحدة.<br><em>مساران.</em><br>والدليل أولًا.",heroText:"استكشف الميزة الجغرافية والتشغيلية والانبعاثات التوضيحية لقناة السويس باستخدام سجل قابل للبحث وافتراضات شفافة.",start:"ابدأ تحليل السفينة",print:"طباعة التقرير",registry:"تغطية السجل",valid:"أرقام IMO صحيحة",authority:"مرجعية البيانات",mode:"الإصدار",registryTitle:"ابحث في قاعدة السفن الموحدة",registryCopy:"بحث تنبؤي باسم السفينة أو رقم IMO.",searchTitle:"حدد هوية السفينة قبل نمذجتها",searchHelp:"سجل الهوية لا يتحول تلقائيًا إلى بيانات أداء موثوقة.",search:"بحث",inputs:"مدخلات السيناريو",inputsCopy:"غيّر المسار وافتراضات التشغيل؛ القيم توضيحية وقابلة للتعديل.",origin:"ميناء البداية",destination:"ميناء الوصول",speed:"السرعة (عقدة)",fuel:"الوقود",weather:"الطقس",save:"حفظ محلي",result:"النتيجة التوضيحية",resultCopy:"نفس السفينة والافتراضات؛ المتغير هو الممر البحري فقط.",avoided:"الانبعاثات التوضيحية المتجنبة عبر السويس",distanceSaved:"المسافة الموفرة",daysSaved:"الزمن الموفر",routeTitle:"قناة السويس مقابل رأس الرجاء الصالح",routeCopy:"ممرات بحرية توضيحية وليست إرشادًا ملاحيًا.",sources:"سجل المصادر والحوكمة"},en:{}};
+function renderLanguage(){document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";document.body.classList.toggle("rtl",lang==="ar");$("langBtn").textContent=lang==="ar"?"English":"العربية";document.querySelectorAll("[data-i18n]").forEach(el=>{const v=i18n[lang][el.dataset.i18n];if(v)el.textContent=v});document.querySelectorAll("[data-i18n-html]").forEach(el=>{const v=i18n[lang][el.dataset.i18nHtml];if(v)el.innerHTML=v});$("vesselSearch").placeholder=lang==="ar"?"اكتب اسم السفينة أو رقم IMO":"Type vessel name or 7-digit IMO";$("staticNote").textContent=lang==="ar"?"إصدار GitHub · يعمل البحث والحساب محليًا. سجلات السفن تعريفية فقط حتى التحقق من مصدر موثوق.":"GitHub edition · Search and scenario calculations run locally. Records are identity-only until verified against an authoritative source."}
+function search(){const q=$("vesselSearch").value.trim().toUpperCase();if(q.length<2){$("suggestions").classList.remove("show");return}const matches=registry.filter(v=>v.imo.includes(q)||v.name.toUpperCase().includes(q)).slice(0,12);$("suggestions").innerHTML=matches.length?matches.map((v,i)=>`<button data-index="${registry.indexOf(v)}"><span><strong>${esc(v.name)}</strong><small>IMO ${v.imo} · ${esc(v.type)} · ${esc(v.flag)}</small></span><b>${v.dataClass==="curated-particulars"?"CURATED PARTICULARS":"IDENTITY ONLY"}</b></button>`).join(""):`<div style="padding:14px;font-size:9px">No matching vessel</div>`;$("suggestions").classList.add("show");$("suggestions").querySelectorAll("button").forEach(b=>b.onclick=()=>selectVessel(registry[+b.dataset.index]))}
+function selectVessel(v){if(!validIMO(v.imo)){ $("staticNote").textContent="Invalid IMO check digit / رقم IMO غير صحيح";return;}selected=v;$("vesselSearch").value=`${v.name} · ${v.imo}`;$("suggestions").classList.remove("show");const ready=v.dataClass==="curated-particulars";$("profile").innerHTML=`<div class="profile-head"><div class="shipmark">🚢</div><div><h3>${esc(v.name)}</h3><p>IMO ${v.imo} · ${esc(v.type)} · ${esc(v.flag)}</p></div><div class="quality"><b>${ready?"CURATED PARTICULARS":"IDENTITY ONLY"}</b><small>${ready?"Curated particulars":"Pending authoritative verification"}</small></div></div><div class="facts"><div><span>IMO</span><strong>${v.imo}</strong></div><div><span>MMSI</span><strong>${esc(v.mmsi)}</strong></div><div><span>DWT</span><strong>${v.dwt?Number(v.dwt).toLocaleString():"Not supplied"}</strong></div><div><span>GT</span><strong>${v.gt?Number(v.gt).toLocaleString():"Not supplied"}</strong></div><div><span>BUILT</span><strong>${esc(v.built)}</strong></div></div><div class="provenance">Source: ${esc(v.source||"IMO Vessel Codes Open Dataset (community)")} · Classification: ${ready?"curated / curated-particulars":"low confidence / pending verification"}</div>`;$("profile").classList.add("show");calculate()}
+let currentResult=null;
+const readNum=id=>{const raw=$(id).value.trim();return raw===""?null:Number(raw)};
+const format=(v,d=1)=>Number(v).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d});
+function calculate(){
+  try{
+    let historicBase=null;
+    let tollError="";
+    const scnt=readNum("scnt"),sdrFx=readNum("sdrFx");
+    if(scnt!==null){
+      try{historicBase=computeSCA2024BaseToll({scnt,vesselClass:$("tollClass").value,loadState:$("tollState").value,usdPerSdr:sdrFx})}
+      catch(e){tollError=e.message}
+    }
+    const manualToll=readNum("toll");
+    const refCost=$("useHistoricalBase").checked&&manualToll===null;
+    const tollBasis=manualToll!==null?"MANUAL_USER_ENTERED":refCost&&historicBase?.baseUsd!==null&&historicBase?"SCA_2024_BASE_SCENARIO_ONLY":"MISSING_TOLL_INPUT";
+    const tollAmount=manualToll!==null?manualToll:refCost?historicBase?.baseUsd??null:null;
+    $("tollBaseResult").textContent=historicBase
+      ?format(historicBase.baseSDR,0)+" SDR"+(historicBase.baseUsd!==null?" / $"+format(historicBase.baseUsd,0):"")
+      :"Not calculated";
+    $("tollBreakdown").innerHTML=historicBase
+      ?historicBase.breakdown.map(b=>'<tr><td>'+b.band+'</td><td>'+format(b.scnt,0)+'</td><td>'+format(b.rateSDRperSCNT,2)+'</td><td>'+format(b.subtotalSDR,2)+'</td></tr>').join("")
+      :'<tr><td colspan="4">Enter SCNT / أدخل حمولة القناة الفعلية</td></tr>';
+    $("tollStatus").textContent=tollError?("Toll withheld: "+tollError):
+      historicBase?"SCA BASE RATE from 15 January 2024 only. 2026 circulars, rebates and surcharges NOT included. Not the final payable fee.":
+      "No certified SCNT: 2024 reference toll withheld.";
+    const r=runVoyage({
+      origin:$("origin").value,destination:$("destination").value,
+      fuelId:$("fuel").value,speedKn:readNum("speed"),referenceSpeedKn:15,
+      fuelEfficiencyRatio:readNum("fuelEfficiency"),
+      weatherMultiplier:readNum("weather"),
+      referenceMainPowerKw:readNum("mainPower"),
+      installedMainMcrKw:readNum("mainMcr"),
+      auxiliaryPowerKw:readNum("auxPower"),mainSFOCgKwh:readNum("mainSfoc"),
+      auxiliarySFOCgKwh:readNum("auxSfoc"),
+      canalDistanceNm:readNum("canalDistance"),
+      canalTransitHours:readNum("canalHours"),
+      waitingSuezHours:readNum("waitSuez"),
+      waitingCapeHours:readNum("waitCape"),
+      fuelPriceUsdPerTonne:readNum("fuelPrice"),
+      userEnteredTollUsd:tollAmount,
+      dailyOperatingCostUsd:readNum("opex")
+    });
+    let wtwScenario=null,wtwError="";
+    const factor=readNum("wtwFactor");
+    if(factor!==null){
+      try{wtwScenario=estimateScenarioWtW(r,{
+        gCO2ePerMJ:factor,productionPathway:$("fuelPathway").value,
+        engineTechnology:$("engineTech").value,evidenceReference:$("pathwayRef").value
+      })}
+      catch(e){wtwError=e.message}
+    }
+    $("wtwResult").textContent=wtwScenario?format(wtwScenario.deltaWtW_tCO2e)+" tCO₂e (user factor)":"Not calculated";
+    $("wtwStatus").textContent=wtwScenario?"Unverified user-supplied fuel pathway. NOT certified, NOT regulatory compliance.":
+      wtwError?"WtW withheld: "+wtwError:"WtW not calculated: no cited pathway factor.";
+    let policy=null,policyError="";
+    try{
+      policy=screenEUETS(r,{
+        grossTonnage:readNum("grossTonnage"),shipService:$("shipService").value,
+        reportingYear:Number($("reportingYear").value),
+        directPortCallsConfirmed:$("directPortCalls").checked,
+        allowancePriceEur:readNum("euaPrice")
+      })
+    }catch(e){policyError=e.message}
+    $("etsResult").textContent=policy?.co2OnlyIllustrativeCostSaved_EUR!==null &&
+      policy?.co2OnlyIllustrativeCostSaved_EUR!==undefined
+      ?"€"+format(policy.co2OnlyIllustrativeCostSaved_EUR,0)+" (CO₂ only)":"Not calculated";
+    $("policyStatus").textContent=policyError?("Policy estimate withheld: "+policyError):
+      policy?.status==="POTENTIAL_EU_ETS_SCOPE_CO2_ONLY"
+      ?"EU ETS screening: "+format(100*policy.voyageLegCoverageFraction,0)+"% leg; "+format(100*policy.surrenderFractionOfReportingYear,0)+"% surrender. "+(policy.includesCH4N2O?"2026 CH₄/N₂O NOT modelled. ":"")+"No official ETS/FuelEU/IMO compliance cost."
+      :"EU ETS/FuelEU scope not established. GT, cargo/passenger service and consecutive port calls are required; special exclusions may apply.";
+    const sensitivity=runVoyageSensitivity(r.inputs);
+    $("sensitivityRows").innerHTML=sensitivity.rows.map(row=>{
+      const fixed="<td>"+format(row.speedKn,1)+"</td><td>"+format(row.additionalSuezWaitHours,0)+"</td>";
+      return row.status==="BLOCKED_PHYSICAL_INPUT"
+        ?"<tr>"+fixed+"<td colspan=\"4\">BLOCKED: "+esc(row.reason)+"</td></tr>"
+        :"<tr>"+fixed+"<td>"+format(row.fuelSavedTonnes,1)+"</td><td>"+
+         format(row.ttWCO2SavedTonnes,1)+"</td><td>"+format(row.daysSaved,2)+
+         "</td><td>"+(row.breakEvenTollUsd===null?"Not calculated":"$"+format(row.breakEvenTollUsd,0))+"</td></tr>"
+    }).join("");
+    $("sensitivityStatus").textContent="Deterministic scenario grid, not measured uncertainty. "+
+      sensitivity.rows.filter(r=>r.status==="BLOCKED_PHYSICAL_INPUT").length+
+      " combinations blocked by operating limits.";
+    currentResult={...r,tollBasis,historicalBaseToll:historicBase,wtwScenario,policyScreen:policy,sensitivity};
+    $("avoided").textContent=format(r.ttWCO2SavedTonnes)+" tCO₂";
+    $("distanceSaved").textContent=format(r.distanceSavedNm,0)+" nm";
+    $("daysSaved").textContent=format(r.daysSaved)+" days";
+    $("suezCo2").textContent=format(r.suez.ttWCO2Tonnes)+" t";
+    $("capeCo2").textContent=format(r.cape.ttWCO2Tonnes)+" t";
+    $("fuelSaved").textContent=format(r.fuelSavedTonnes)+" t";
+    $("netSaved").textContent=r.netSavingUsd===null?"Not calculated / غير محسوب":("$"+format(r.netSavingUsd,0));
+    $("tollResult").textContent=r.userEnteredTollUsd===null?
+      "Not calculated / غير محسوب":tollBasis+": $"+format(r.userEnteredTollUsd,0);
+    $("calcStatus").textContent="SCA OFFICIAL ROUTE DISTANCES · HYPOTHETICAL VESSEL POWER AND FUEL · TTW PHYSICAL CO₂ ONLY · NO VERIFIED TOLL OR WtW CERTIFICATION. "+r.fuel.note;
+    $("mapOrigin").textContent=$("origin").value;
+    $("mapDestination").textContent=$("destination").value;
+  }catch(err){
+    currentResult=null;
+    for(const id of ["avoided","distanceSaved","daysSaved","suezCo2","capeCo2","fuelSaved","netSaved","tollResult","wtwResult","etsResult"])$(id).textContent="—";
+    $("sensitivityRows").innerHTML='<tr><td colspan="6">RESULT WITHHELD / النتائج محجوبة</td></tr>';
+    $("sensitivityStatus").textContent="Correct the engineering input first; no sensitivity extrapolation is allowed.";
+    $("calcStatus").textContent="RESULT WITHHELD / تم حجب النتيجة: "+err.message+
+      ". Only official SCA port pairs can be calculated: "+officialPortPairs;
+  }
+}
+$("registryCount").textContent=registry.length.toLocaleString();$("coverageStrong").textContent=`${registry.length.toLocaleString()} searchable identities`;$("vesselSearch").addEventListener("input",search);$("searchButton").onclick=search;["origin","destination","speed","fuel","weather","mainPower","mainMcr","auxPower","mainSfoc","auxSfoc","canalDistance","canalHours","waitSuez","waitCape","fuelEfficiency","fuelPrice","toll","opex","scnt","tollClass","tollState","sdrFx","useHistoricalBase","wtwFactor","fuelPathway","engineTech","pathwayRef","grossTonnage","shipService","reportingYear","euaPrice","directPortCalls"].forEach(id=>$(id).addEventListener("input",calculate));$("langBtn").onclick=()=>{lang=lang==="en"?"ar":"en";renderLanguage()};$("exportBtn").onclick=()=>{if(!currentResult)return;const blob=new Blob([JSON.stringify(currentResult,null,2)],{type:"application/json"});const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download="CERI-SC-voyage-scenario.json";a.click();URL.revokeObjectURL(u)};const SAVED_KEY="ceri-next-scenario-v2";
+const savedInputIds=["origin","destination","speed","fuel","weather","mainPower","mainMcr",
+  "auxPower","mainSfoc","auxSfoc","canalDistance","canalHours","waitSuez","waitCape",
+  "fuelEfficiency","fuelPrice","toll","opex","scnt","tollClass","tollState",
+  "sdrFx","useHistoricalBase","wtwFactor","fuelPathway","engineTech","pathwayRef",
+  "grossTonnage","shipService","reportingYear","euaPrice","directPortCalls"];
+$("saveBtn").onclick=()=>{
+  try{
+    const values=Object.fromEntries(savedInputIds.map(id=>[id,$(id).type==="checkbox"?$(id).checked:$(id).value]));
+    localStorage.setItem(SAVED_KEY,JSON.stringify({schemaVersion:2,savedAt:new Date().toISOString(),
+      selectedIMO:selected?.imo??null,inputs:values}));
+    $("saved").textContent="Saved current input values in this browser only / تم حفظ المدخلات محليًا";
+  }catch(error){$("saved").textContent="Unable to save locally / تعذر الحفظ المحلي: "+error.message}
+  $("saved").classList.add("show");
+};
+$("restoreBtn").onclick=()=>{
+  try{
+    const raw=localStorage.getItem(SAVED_KEY);
+    if(!raw)throw new Error("No saved scenario / لا توجد مدخلات محفوظة");
+    const saved=JSON.parse(raw);
+    if(saved.schemaVersion!==2||!saved.inputs||typeof saved.inputs!=="object")
+      throw new Error("Incompatible saved scenario");
+    for(const id of savedInputIds){
+      if(!Object.hasOwn(saved.inputs,id))continue;
+      const field=$(id),v=saved.inputs[id];
+      if(field.type==="checkbox"){
+        if(typeof v==="boolean")field.checked=v;
+      }else if(typeof v==="string" && (field.tagName!=="SELECT"||
+                Array.from(field.options).some(option=>option.value===v))){
+        field.value=v;
+      }
+    }
+    calculate();
+    $("saved").textContent="Restored saved inputs; all results recalculated / تمت الاستعادة وإعادة الحساب";
+  }catch(error){$("saved").textContent="Restore failed / تعذر الاستعادة: "+error.message}
+  $("saved").classList.add("show");
+};document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))$("suggestions").classList.remove("show")});calculate();renderLanguage();
+</script>
+</body>
+</html>

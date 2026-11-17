@@ -1,0 +1,342 @@
+{
+  "schema": "ceri-sc-imo-fleet-2012-reference-v1",
+  "method": "Uploaded IMO Fleet and CO2 Calculator, country emissions calculation. Based on Third IMO GHG Study (2014) using fleet statistics for year 2012; ship type and size reference annual fuel per ship. Reference heavy fuel oil CO2 factor 3.114 tonnes CO2 per tonne HFO.",
+  "sourcePage": "https://greenvoyage2050.imo.org/fleet-and-co2-calculator/",
+  "originalFile": "Fleet-and-CO2-calculator-for-input (5).xlsx",
+  "sourceSheet": "Country emissions calculation!A2:H55; coefficients linked to Third IMO GHG Study - Data 2012!R2:R54",
+  "referenceYear": 2012,
+  "assumedFuel": "Heavy Fuel Oil (HFO)",
+  "co2FactorHFO_tCO2_per_tFuel": 3.114,
+  "emissionsBoundary": "TTW combustion CO2; not actual voyage emissions, CO2e WtW or verified avoided emissions",
+  "originalWorkbookFormulas": {
+    "perShipAllocatedFuel": "E(row)*D(row); D is annual time fraction 0..1",
+    "totalFuel": "C(row)*F(row)",
+    "totalCO2": "G(row)*3.114"
+  },
+  "notes": [
+    "Each coefficient is annual fuel consumed per ship for the specified 2012 fleet size/type class. This is not the canal transit engine consumption at 2019–2025 conditions.",
+    "SCA category totals give passage events, not distinct vessels or IMO size mix. Passage-hours/8760 yields only an assumed vessel-year-equivalent activity scenario, not measured fuel.",
+    "For canal-specific allocation, annual average fuel includes sea, port/auxiliary and other activity; without phase-specific fuel and vessel size there is large structural uncertainty.",
+    "Requires explicit size categories, duration per passage, 2012 reference assumption and methodology acknowledgement for each group before any indicative scenario."
+  ],
+  "records": [
+    {
+      "shipType": "Bulk carrier",
+      "sizeCategory": "0-9999",
+      "referenceAnnualFuelPerShip_t": 1505.839362848,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Bulk carrier",
+      "sizeCategory": "10000-34999",
+      "referenceAnnualFuelPerShip_t": 3528.268375239,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Bulk carrier",
+      "sizeCategory": "35000-59999",
+      "referenceAnnualFuelPerShip_t": 4828.456419477,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Bulk carrier",
+      "sizeCategory": "60000-99999",
+      "referenceAnnualFuelPerShip_t": 6781.354246136,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Bulk carrier",
+      "sizeCategory": "100000-199999",
+      "referenceAnnualFuelPerShip_t": 9777.214306952,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Bulk carrier",
+      "sizeCategory": "200000-+",
+      "referenceAnnualFuelPerShip_t": 12310.17462606,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Chemical tanker",
+      "sizeCategory": "0-4999",
+      "referenceAnnualFuelPerShip_t": 1899.243773533,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Chemical tanker",
+      "sizeCategory": "5000-9999",
+      "referenceAnnualFuelPerShip_t": 2569.33285578,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Chemical tanker",
+      "sizeCategory": "10000-19999",
+      "referenceAnnualFuelPerShip_t": 3908.467908126,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Chemical tanker",
+      "sizeCategory": "20000-+",
+      "referenceAnnualFuelPerShip_t": 6700.712020162,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Container",
+      "sizeCategory": "0-999",
+      "referenceAnnualFuelPerShip_t": 3786.409809149,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Container",
+      "sizeCategory": "1000-1999",
+      "referenceAnnualFuelPerShip_t": 7726.836973548,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Container",
+      "sizeCategory": "2000-2999",
+      "referenceAnnualFuelPerShip_t": 11631.286267122,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Container",
+      "sizeCategory": "3000-4999",
+      "referenceAnnualFuelPerShip_t": 18359.829341134,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Container",
+      "sizeCategory": "5000-7999",
+      "referenceAnnualFuelPerShip_t": 24216.083707731,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Container",
+      "sizeCategory": "8000-11999",
+      "referenceAnnualFuelPerShip_t": 29568.788717939,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Container",
+      "sizeCategory": "12000-14500",
+      "referenceAnnualFuelPerShip_t": 29420.732360832,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Container",
+      "sizeCategory": "14500-+",
+      "referenceAnnualFuelPerShip_t": 32547.368120253,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "General cargo",
+      "sizeCategory": "0-4999",
+      "referenceAnnualFuelPerShip_t": 690.043129965,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "General cargo",
+      "sizeCategory": "5000-9999",
+      "referenceAnnualFuelPerShip_t": 1978.69936863,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "General cargo",
+      "sizeCategory": "10000-+",
+      "referenceAnnualFuelPerShip_t": 4769.90807508,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Liquefied gas tanker",
+      "sizeCategory": "0-49999",
+      "referenceAnnualFuelPerShip_t": 3388.210325083,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Liquefied gas tanker",
+      "sizeCategory": "50000-199999",
+      "referenceAnnualFuelPerShip_t": 22565.566170299,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Liquefied gas tanker",
+      "sizeCategory": "200000-+",
+      "referenceAnnualFuelPerShip_t": 38586.477611901,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Oil tanker",
+      "sizeCategory": "0-4999",
+      "referenceAnnualFuelPerShip_t": 1441.658335048,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Oil tanker",
+      "sizeCategory": "5000-9999",
+      "referenceAnnualFuelPerShip_t": 2297.713051593,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Oil tanker",
+      "sizeCategory": "10000-19999",
+      "referenceAnnualFuelPerShip_t": 3664.854815856,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Oil tanker",
+      "sizeCategory": "20000-59999",
+      "referenceAnnualFuelPerShip_t": 6260.838845264,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Oil tanker",
+      "sizeCategory": "60000-79999",
+      "referenceAnnualFuelPerShip_t": 8378.516344042,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Oil tanker",
+      "sizeCategory": "80000-119999",
+      "referenceAnnualFuelPerShip_t": 9255.464466938,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Oil tanker",
+      "sizeCategory": "120000-199999",
+      "referenceAnnualFuelPerShip_t": 12146.411299828,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Oil tanker",
+      "sizeCategory": "200000-+",
+      "referenceAnnualFuelPerShip_t": 20049.076916483,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Other liquids tankers",
+      "sizeCategory": "0-+",
+      "referenceAnnualFuelPerShip_t": 2139.959255555,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Ferry-pax only",
+      "sizeCategory": "0-1999",
+      "referenceAnnualFuelPerShip_t": 1154.766009724,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Ferry-pax only",
+      "sizeCategory": "2000-+",
+      "referenceAnnualFuelPerShip_t": 4900.553614203,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Cruise",
+      "sizeCategory": "0-1999",
+      "referenceAnnualFuelPerShip_t": 1817.749037791,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Cruise",
+      "sizeCategory": "2000-9999",
+      "referenceAnnualFuelPerShip_t": 2801.121999293,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Cruise",
+      "sizeCategory": "10000-59999",
+      "referenceAnnualFuelPerShip_t": 19794.258816604,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Cruise",
+      "sizeCategory": "60000-99999",
+      "referenceAnnualFuelPerShip_t": 57558.671156404,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Cruise",
+      "sizeCategory": "100000-+",
+      "referenceAnnualFuelPerShip_t": 73234.223769139,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Ferry-RoPax",
+      "sizeCategory": "0-1999",
+      "referenceAnnualFuelPerShip_t": 838.657236159,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Ferry-RoPax",
+      "sizeCategory": "2000-+",
+      "referenceAnnualFuelPerShip_t": 7387.487006775,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Refrigerated bulk",
+      "sizeCategory": "0-1999",
+      "referenceAnnualFuelPerShip_t": 5625.065931722,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Ro-Ro",
+      "sizeCategory": "0-4999",
+      "referenceAnnualFuelPerShip_t": 3887.058398582,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Ro-Ro",
+      "sizeCategory": "5000-+",
+      "referenceAnnualFuelPerShip_t": 10817.019100706,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Vehicle",
+      "sizeCategory": "0-3999",
+      "referenceAnnualFuelPerShip_t": 7271.954163174,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Vehicle",
+      "sizeCategory": "4000-+",
+      "referenceAnnualFuelPerShip_t": 10664.84562388,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Yacht",
+      "sizeCategory": "0-+",
+      "referenceAnnualFuelPerShip_t": 879.951272951,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Service - tug",
+      "sizeCategory": "0-+",
+      "referenceAnnualFuelPerShip_t": 462.389622302,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Miscellaneous - fishing",
+      "sizeCategory": "0-+",
+      "referenceAnnualFuelPerShip_t": 732.757934538,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Offshore",
+      "sizeCategory": "0-+",
+      "referenceAnnualFuelPerShip_t": 1362.33104431,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Service - other",
+      "sizeCategory": "0-+",
+      "referenceAnnualFuelPerShip_t": 1147.771967786,
+      "basisYear": 2012
+    },
+    {
+      "shipType": "Miscellaneous - other",
+      "sizeCategory": "0-+",
+      "referenceAnnualFuelPerShip_t": 773.079842133,
+      "basisYear": 2012
+    }
+  ]
+}

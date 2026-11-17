@@ -9,7 +9,7 @@ test("offline HTML embeds all models and requires no imported ES modules or netw
   assert.doesNotMatch(html,/<script type="module">/);
   assert.doesNotMatch(html,/import \{runVoyage.*from/);
   for(const fn of ["runVoyage","computeSCA2024BaseToll","estimateScenarioWtW","screenEUETS","runVoyageSensitivity"])
-    assert.ok(html.includes(fn+"="+fn),fn);
+    assert.ok(html.includes(fn+":"+fn),fn);
   const dom=create();
   try{
     assert.match(dom.window.document.getElementById("distanceSaved").textContent,/3,467 nm/);

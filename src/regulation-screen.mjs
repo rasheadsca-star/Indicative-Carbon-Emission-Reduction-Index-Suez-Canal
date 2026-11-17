@@ -32,7 +32,7 @@ export function screenEUETS(voyage,{
   const origin=voyage.inputs?.origin,dest=voyage.inputs?.destination;
   const via=euPorts.has(origin)&&euPorts.has(dest)?1:
     (euPorts.has(origin)&&nonEuPorts.has(dest))||
-    (euPorts.has(dest)&&nonEuPorts.has(origin))?.5:null;
+    (euPorts.has(dest)&&nonEuPorts.has(origin)) ? 0.5 : null;
   const eligible=gt!==null&&gt>=5000&&shipService!=="unknown";
   const potentiallyCovered=eligible&&via!==null&&directPortCallsConfirmed;
   const phasedFraction=rate[reportingYear];

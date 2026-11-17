@@ -25,7 +25,8 @@
   <section class="registry" id="registry"><div class="registry-top"><div><span class="eyebrow">IDENTITY RESOLUTION</span><h3 data-i18n="searchTitle">Find a vessel before modelling it</h3><p data-i18n="searchHelp">Identity records do not automatically become trusted performance inputs.</p></div><div class="coverage"><strong id="coverageStrong">Loading registry…</strong><span>Open dataset · pending verification</span></div></div><div class="search-wrap"><div class="search-box"><input id="vesselSearch" autocomplete="off" placeholder="Type vessel name or 7-digit IMO"><button id="searchButton" data-i18n="search">Search</button></div><div class="suggestions" id="suggestions"></div></div><article class="profile" id="profile"></article></section>
   <div class="grid">
     <section class="panel"><h3 data-i18n="inputs">Scenario inputs</h3><p class="panel-note" data-i18n="inputsCopy">Change route and operating assumptions. These values are illustrative and editable.</p><div class="fields"><label><span data-i18n="origin">Origin</span><select id="origin"><option value="Singapore">Singapore</option><option value="Tokyo">Tokyo</option><option value="Ras Tanura">Ras Tanura</option><option value="Jeddah">Jeddah</option></select></label><label><span data-i18n="destination">Destination</span><select id="destination"><option value="Rotterdam">Rotterdam</option><option value="Piraeus">Piraeus</option></select></label><label><span data-i18n="speed">Speed (kn)</span><input id="speed" type="number" min="8" max="25" step=".5" value="15"></label><label><span data-i18n="fuel">Fuel</span><select id="fuel"><option value="HFO">HFO</option><option selected value="VLSFO">VLSFO (HFO proxy)</option><option value="MGO">MGO</option><option value="LNG">LNG (CO₂ only)</option><option value="METHANOL">Fossil methanol</option><option value="EMETHANOL">e-Methanol</option><option value="B100">B100 illustration</option><option value="B20">B20 illustration</option><option value="EAMMONIA">e-Ammonia (CO₂ only)</option><option value="EHYDROGEN">e-Hydrogen (CO₂ only)</option></select></label><label class="field-wide"><span data-i18n="weather">Weather</span><select id="weather"><option value=".94">Calm</option><option value="1" selected>Normal</option><option value="1.12">Adverse</option></select></label></div><div class="fields" id="engineeringFields" style="margin-top:15px">
-<label>Reference main power @15 kn (kW) / قدرة المحرك<input id="mainPower" type="number" min="1" value="18000"></label>
+<label>Reference main power @15 kn (kW) / القدرة المرجعية<input id="mainPower" type="number" min="1" value="18000"></label>
+<label>Installed MCR (kW) / القدرة القصوى المستمرة للمحرك<input id="mainMcr" type="number" min="1" value="36000" placeholder="Actual rated MCR if known" title="36000 kW is a hypothetical default, NOT automatically derived from vessel type"></label>
 <label>Auxiliary power (kW) / القدرة المساعدة<input id="auxPower" type="number" min="0" value="900"></label>
 <label>Main SFOC (g/kWh) / الاستهلاك النوعي<input id="mainSfoc" type="number" min="1" value="175"></label>
 <label>Auxiliary SFOC (g/kWh)<input id="auxSfoc" type="number" min="1" value="190"></label>
@@ -72,7 +73,7 @@
 </div>
 <p class="panel-note" id="policyStatus" style="margin-top:9px">Eligibility and regulatory costs are not established.</p>
 </details>
-<p class="panel-note" style="margin:12px 0">All engine values above are <b>editable hypothetical inputs</b>, not extracted from vessel identity. The static ship registry does not establish engine or fuel particulars. / هذه بيانات افتراضية وليست بيانات فنية معتمدة للسفينة.</p><button class="primary" id="saveBtn" style="margin-top:20px" data-i18n="save">Save locally</button><div class="saved" id="saved">Scenario saved in this browser.</div></section>
+<p class="panel-note" style="margin:12px 0">All engine values above are <b>editable hypothetical inputs</b>, not extracted from vessel identity. The static ship registry does not establish engine or fuel particulars. / هذه بيانات افتراضية وليست بيانات فنية معتمدة للسفينة.</p><button class="primary" id="saveBtn" style="margin-top:20px" data-i18n="save">Save locally</button> <button id="restoreBtn" type="button" style="margin-top:20px">Restore saved inputs / استعادة المدخلات</button><div class="saved" id="saved" role="status" aria-live="polite">Scenario saved in this browser.</div></section>
     <section class="panel"><h3 data-i18n="result">Indicative result</h3><p class="panel-note" data-i18n="resultCopy">Same vessel and operating assumptions; only the maritime corridor changes.</p><div class="result-card"><small data-i18n="avoided">INDICATIVE CO₂ AVOIDED VIA SUEZ</small><strong id="avoided">—</strong><span>tCO₂ per modelled voyage</span></div><div class="result-list"><div><span data-i18n="distanceSaved">DISTANCE SAVED</span><b id="distanceSaved">—</b></div><div><span data-i18n="daysSaved">TIME SAVED</span><b id="daysSaved">—</b></div><div><span>SUEZ CO₂</span><b id="suezCo2">—</b></div><div><span>CAPE CO₂</span><b id="capeCo2">—</b></div></div></section>
     <section class="panel" aria-live="polite">
 <h3>Evidence-bounded voyage results / نتائج رحلة افتراضية</h3>
@@ -85,6 +86,12 @@
 <div><span>EU ETS CO₂-only illustrative savings / وفر الكربون الأوروبي</span><b id="etsResult">Not calculated</b></div>
 <div><span>FuelEU & IMO GFI payable cost / التكاليف الملزمة</span><b>Not calculated / غير محسوب</b></div>
 </div><table style="margin-top:12px"><caption style="text-align:left;font-weight:700">SCA 2024 progressive band breakdown — SDR / تفصيل الشرائح</caption><thead><tr><th>Band</th><th>SCNT</th><th>Rate</th><th>SDR</th></tr></thead><tbody id="tollBreakdown"><tr><td colspan="4">Enter SCNT</td></tr></tbody></table><p class="panel-note" id="calcStatus" style="margin-top:14px">Model inputs are not validated.</p>
+<details style="margin-top:13px">
+<summary style="font-weight:700;cursor:pointer">Speed & waiting sensitivity (deterministic, not uncertainty) / تحليل حساسية السرعة والانتظار</summary>
+<p class="panel-note" style="margin:9px 0">Three speeds (−2/0/+2 knots) × extra Suez waiting (0/12/24 hours). Same ship and model; combinations exceeding declared engine MCR are blocked. Break-even maximum canal toll requires fuel price and non-fuel daily OPEX. All values are hypothetical.</p>
+<div style="overflow-x:auto"><table><thead><tr><th>Speed (kn)</th><th>Extra wait (h)</th><th>Fuel saved (t)</th><th>CO₂ saved (t)</th><th>Days saved</th><th>Max break-even toll (USD)</th></tr></thead><tbody id="sensitivityRows"><tr><td colspan="6">Calculation pending</td></tr></tbody></table></div>
+<p class="panel-note" id="sensitivityStatus" role="status" style="margin-top:8px">Calculation pending</p>
+</details>
 <button class="primary" id="exportBtn" style="margin-top:12px">Export scenario JSON / تصدير الفرضيات</button>
 </section>
 <section class="panel route-compare"><h3 data-i18n="routeTitle">Suez Canal versus Cape of Good Hope</h3><p class="panel-note" data-i18n="routeCopy">Diagrammatic maritime corridors—not navigation advice.</p><div class="route-map"><svg viewBox="0 0 1000 275" preserveAspectRatio="none"><path class="suez-route" d="M70 170 C230 135 315 62 465 72 C600 82 718 55 930 57"/><path class="cape-route" d="M70 170 C245 223 410 246 560 231 C735 214 785 112 930 57"/><circle cx="70" cy="170" r="6" fill="#36e7bb"/><circle cx="930" cy="57" r="6" fill="#36e7bb"/><text x="75" y="158" id="mapOrigin">Singapore</text><text x="820" y="45" id="mapDestination">Rotterdam</text><text x="440" y="61">SUEZ</text><text x="510" y="253">CAPE</text></svg></div></section>
@@ -102,6 +109,7 @@ import {runVoyage,validIMO,SCA_DISTANCE_SOURCE,IMO_CO2_SOURCE} from "../src/voya
 import {computeSCA2024BaseToll,SCA_2024_BASE_RATES} from "../src/sca-tolls-2024.mjs";
 import {estimateScenarioWtW} from "../src/fuel-lca-scenario.mjs";
 import {screenEUETS} from "../src/regulation-screen.mjs";
+import {runVoyageSensitivity} from "../src/voyage-sensitivity.mjs";
 const officialPortPairs = "Singapore–Rotterdam; Tokyo–Rotterdam; Ras Tanura–Rotterdam; Jeddah–Rotterdam; Jeddah–Piraeus";
 const curated={"9811000":{name:"EVER GIVEN",type:"Container ship",flag:"Panama",dwt:199629,gt:219079,built:2018,dataClass:"curated-particulars",source:"IMO Maritime Knowledge Centre"},"9839179":{name:"CMA CGM JACQUES SAADE",type:"LNG container ship",flag:"France",dwt:221251,gt:236583,built:2020,dataClass:"curated-particulars",source:"CMA CGM public vessel record"},"9839430":{name:"MSC GULSUN",type:"Container ship",flag:"Panama",dwt:228149,gt:232618,built:2019,dataClass:"curated-particulars",source:"Port of Hamburg vessel register"}};
 const registry=(window.CERI_VESSELS||[]).map(v=>({...v,...(curated[v.i]||{}),imo:v.i,name:(curated[v.i]||{}).name||v.n,type:(curated[v.i]||{}).type||v.t,flag:(curated[v.i]||{}).flag||v.f,mmsi:v.m}));Object.keys(curated).forEach(imo=>{if(!registry.some(v=>v.imo===imo))registry.unshift({imo,...curated[imo]})});
@@ -141,6 +149,7 @@ function calculate(){
       fuelEfficiencyRatio:readNum("fuelEfficiency"),
       weatherMultiplier:readNum("weather"),
       referenceMainPowerKw:readNum("mainPower"),
+      installedMainMcrKw:readNum("mainMcr"),
       auxiliaryPowerKw:readNum("auxPower"),mainSFOCgKwh:readNum("mainSfoc"),
       auxiliarySFOCgKwh:readNum("auxSfoc"),
       canalDistanceNm:readNum("canalDistance"),
@@ -179,7 +188,19 @@ function calculate(){
       policy?.status==="POTENTIAL_EU_ETS_SCOPE_CO2_ONLY"
       ?"EU ETS screening: "+format(100*policy.voyageLegCoverageFraction,0)+"% leg; "+format(100*policy.surrenderFractionOfReportingYear,0)+"% surrender. "+(policy.includesCH4N2O?"2026 CH₄/N₂O NOT modelled. ":"")+"No official ETS/FuelEU/IMO compliance cost."
       :"EU ETS/FuelEU scope not established. GT, cargo/passenger service and consecutive port calls are required; special exclusions may apply.";
-    currentResult={...r,tollBasis,historicalBaseToll:historicBase,wtwScenario,policyScreen:policy};
+    const sensitivity=runVoyageSensitivity(r.inputs);
+    $("sensitivityRows").innerHTML=sensitivity.rows.map(row=>{
+      const fixed="<td>"+format(row.speedKn,1)+"</td><td>"+format(row.additionalSuezWaitHours,0)+"</td>";
+      return row.status==="BLOCKED_PHYSICAL_INPUT"
+        ?"<tr>"+fixed+"<td colspan=\"4\">BLOCKED: "+esc(row.reason)+"</td></tr>"
+        :"<tr>"+fixed+"<td>"+format(row.fuelSavedTonnes,1)+"</td><td>"+
+         format(row.ttWCO2SavedTonnes,1)+"</td><td>"+format(row.daysSaved,2)+
+         "</td><td>"+(row.breakEvenTollUsd===null?"Not calculated":"$"+format(row.breakEvenTollUsd,0))+"</td></tr>"
+    }).join("");
+    $("sensitivityStatus").textContent="Deterministic scenario grid, not measured uncertainty. "+
+      sensitivity.rows.filter(r=>r.status==="BLOCKED_PHYSICAL_INPUT").length+
+      " combinations blocked by operating limits.";
+    currentResult={...r,tollBasis,historicalBaseToll:historicBase,wtwScenario,policyScreen:policy,sensitivity};
     $("avoided").textContent=format(r.ttWCO2SavedTonnes)+" tCO₂";
     $("distanceSaved").textContent=format(r.distanceSavedNm,0)+" nm";
     $("daysSaved").textContent=format(r.daysSaved)+" days";
@@ -195,11 +216,49 @@ function calculate(){
   }catch(err){
     currentResult=null;
     for(const id of ["avoided","distanceSaved","daysSaved","suezCo2","capeCo2","fuelSaved","netSaved","tollResult","wtwResult","etsResult"])$(id).textContent="—";
+    $("sensitivityRows").innerHTML='<tr><td colspan="6">RESULT WITHHELD / النتائج محجوبة</td></tr>';
+    $("sensitivityStatus").textContent="Correct the engineering input first; no sensitivity extrapolation is allowed.";
     $("calcStatus").textContent="RESULT WITHHELD / تم حجب النتيجة: "+err.message+
       ". Only official SCA port pairs can be calculated: "+officialPortPairs;
   }
 }
-$("registryCount").textContent=registry.length.toLocaleString();$("coverageStrong").textContent=`${registry.length.toLocaleString()} searchable identities`;$("vesselSearch").addEventListener("input",search);$("searchButton").onclick=search;["origin","destination","speed","fuel","weather","mainPower","auxPower","mainSfoc","auxSfoc","canalDistance","canalHours","waitSuez","waitCape","fuelEfficiency","fuelPrice","toll","opex","scnt","tollClass","tollState","sdrFx","useHistoricalBase","wtwFactor","fuelPathway","engineTech","pathwayRef","grossTonnage","shipService","reportingYear","euaPrice","directPortCalls"].forEach(id=>$(id).addEventListener("input",calculate));$("langBtn").onclick=()=>{lang=lang==="en"?"ar":"en";renderLanguage()};$("exportBtn").onclick=()=>{if(!currentResult)return;const blob=new Blob([JSON.stringify(currentResult,null,2)],{type:"application/json"});const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download="CERI-SC-voyage-scenario.json";a.click();URL.revokeObjectURL(u)};$("saveBtn").onclick=()=>{localStorage.setItem("ceri-next-static-scenario",JSON.stringify({imo:selected?.imo,origin:$("origin").value,destination:$("destination").value,speed:$("speed").value,fuel:$("fuel").value,weather:$("weather").value,engineAssumptions:currentResult?.inputs??null}));$("saved").classList.add("show");setTimeout(()=>$("saved").classList.remove("show"),2500)};document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))$("suggestions").classList.remove("show")});calculate();renderLanguage();
+$("registryCount").textContent=registry.length.toLocaleString();$("coverageStrong").textContent=`${registry.length.toLocaleString()} searchable identities`;$("vesselSearch").addEventListener("input",search);$("searchButton").onclick=search;["origin","destination","speed","fuel","weather","mainPower","mainMcr","auxPower","mainSfoc","auxSfoc","canalDistance","canalHours","waitSuez","waitCape","fuelEfficiency","fuelPrice","toll","opex","scnt","tollClass","tollState","sdrFx","useHistoricalBase","wtwFactor","fuelPathway","engineTech","pathwayRef","grossTonnage","shipService","reportingYear","euaPrice","directPortCalls"].forEach(id=>$(id).addEventListener("input",calculate));$("langBtn").onclick=()=>{lang=lang==="en"?"ar":"en";renderLanguage()};$("exportBtn").onclick=()=>{if(!currentResult)return;const blob=new Blob([JSON.stringify(currentResult,null,2)],{type:"application/json"});const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download="CERI-SC-voyage-scenario.json";a.click();URL.revokeObjectURL(u)};const SAVED_KEY="ceri-next-scenario-v2";
+const savedInputIds=["origin","destination","speed","fuel","weather","mainPower","mainMcr",
+  "auxPower","mainSfoc","auxSfoc","canalDistance","canalHours","waitSuez","waitCape",
+  "fuelEfficiency","fuelPrice","toll","opex","scnt","tollClass","tollState",
+  "sdrFx","useHistoricalBase","wtwFactor","fuelPathway","engineTech","pathwayRef",
+  "grossTonnage","shipService","reportingYear","euaPrice","directPortCalls"];
+$("saveBtn").onclick=()=>{
+  try{
+    const values=Object.fromEntries(savedInputIds.map(id=>[id,$(id).type==="checkbox"?$(id).checked:$(id).value]));
+    localStorage.setItem(SAVED_KEY,JSON.stringify({schemaVersion:2,savedAt:new Date().toISOString(),
+      selectedIMO:selected?.imo??null,inputs:values}));
+    $("saved").textContent="Saved current input values in this browser only / تم حفظ المدخلات محليًا";
+  }catch(error){$("saved").textContent="Unable to save locally / تعذر الحفظ المحلي: "+error.message}
+  $("saved").classList.add("show");
+};
+$("restoreBtn").onclick=()=>{
+  try{
+    const raw=localStorage.getItem(SAVED_KEY);
+    if(!raw)throw new Error("No saved scenario / لا توجد مدخلات محفوظة");
+    const saved=JSON.parse(raw);
+    if(saved.schemaVersion!==2||!saved.inputs||typeof saved.inputs!=="object")
+      throw new Error("Incompatible saved scenario");
+    for(const id of savedInputIds){
+      if(!Object.hasOwn(saved.inputs,id))continue;
+      const field=$(id),v=saved.inputs[id];
+      if(field.type==="checkbox"){
+        if(typeof v==="boolean")field.checked=v;
+      }else if(typeof v==="string" && (field.tagName!=="SELECT"||
+                Array.from(field.options).some(option=>option.value===v))){
+        field.value=v;
+      }
+    }
+    calculate();
+    $("saved").textContent="Restored saved inputs; all results recalculated / تمت الاستعادة وإعادة الحساب";
+  }catch(error){$("saved").textContent="Restore failed / تعذر الاستعادة: "+error.message}
+  $("saved").classList.add("show");
+};document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))$("suggestions").classList.remove("show")});calculate();renderLanguage();
 </script>
 </body>
 </html>

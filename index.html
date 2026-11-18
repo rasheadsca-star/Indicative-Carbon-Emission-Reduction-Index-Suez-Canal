@@ -1710,9 +1710,10 @@ function renderP0(M,res,yr,rk){
   g2w.className = 'cd';
   g2w.style.cssText = 'display:flex;flex-direction:column;align-items:center';
   // ── Green Projects: anchored B20 avoided-emissions record only ──
-  const MAX_GREEN2     = B20_FULL_ROLLOUT_TARGET;
-  const GREEN_ACH2     = getB20Cumulative();
-  const greenPct2      = Math.min(100, GREEN_ACH2 / MAX_GREEN2 * 100);
+  // Compare avoided emissions against 2025 Scope 1 only, never all three scopes.
+  const MAX_GREEN2 = SCA_2025_SCOPE1_TCO2E;
+  const GREEN_ACH2 = GREEN_PROJECTS_AVOIDED_TCO2E;
+  const greenPct2 = GREEN_ACH2 / MAX_GREEN2 * 100;
   const dialRStr = buildDial('route-gauge', routePct, res.tR, '#10b981', '#06b6d4', MAX_2023,
     lang==='ar' ? 'tCO\u2082 / \u0633\u0646\u0629' : 'tCO\u2082 / yr',
     lang==='ar' ? ['صفر',fmtCompact(MAX_2023*.25),fmtCompact(MAX_2023*.50),fmtCompact(MAX_2023*.75),fmtCompact(MAX_2023)] : ['0',fmtCompact(MAX_2023*.25),fmtCompact(MAX_2023*.50),fmtCompact(MAX_2023*.75),fmtCompact(MAX_2023)]);
@@ -1735,13 +1736,13 @@ function renderP0(M,res,yr,rk){
   const maxLbl = lang==='ar'
     ? 'المرجع = التقدير الرسمي المعلن لعام 2023: ' + fmtCompact(MAX_2023) + ' طن CO₂'
     : 'Reference = officially announced 2023 estimate: ' + fmtCompact(MAX_2023) + ' tCO₂';
-  const gpLbl = lang==='ar' ? 'الانبعاثات المتجنبة من B20 — سجل مثبت' : 'B20 Avoided Emissions — Anchored Record';
+  const gpLbl = lang==='ar' ? 'الانبعاثات المتجنبة من المشروعات الخضراء مقابل النطاق الأول فقط — بصمة 2025' : 'Green-project avoided emissions vs 2025 Scope 1 ONLY';
   const gpPot = lang==='ar'
-    ? 'القيمة 1,624 طن CO₂ كما في 24 يونيو 2026، مقابل هدف B20 التوضيحي. لا تزيد تلقائيًا بمرور الوقت ولا تشمل امتصاص الأشجار.'
-    : 'The 1,624 tCO₂ value is anchored to 24 June 2026 against the illustrative B20 target. It does not increase automatically and excludes tree absorption.';
+    ? 'المقام: 166,745.86 طن CO₂e من النطاق الأول فقط في بصمة الهيئة لعام 2025؛ النطاقان الثاني والثالث مستبعدان. هذه نسبة مقارنة وليست نسبة تحقيق المستهدف، ولا تشمل امتصاص الأشجار.'
+    : 'Denominator: 166,745.86 tCO₂e from 2025 Scope 1 only; Scopes 2 and 3 excluded. This is not target completion and excludes tree absorption.';
   const gpAchTxt = GREEN_ACH2.toFixed(1) + ' tCO\u2082';
-  const gpPctTxt = lang==='ar' ? '(' + greenPct2.toFixed(1) + '% من المرجع التوضيحي)' : '(' + greenPct2.toFixed(1) + '% of illustrative reference)';
-  const gpRatesHtml = '<div class="data-anchor">' + (lang==='ar'?'تاريخ تثبيت البيانات: 24 يونيو 2026 · الحالة: تقديري في انتظار MRV':'Data anchor: 24 June 2026 · Status: indicative pending MRV') + '</div>';
+  const gpPctTxt = lang==='ar' ? '(' + greenPct2.toFixed(2) + '% من بصمة 2025، النطاق الأول فقط)' : '(' + greenPct2.toFixed(2) + '% of 2025 Scope 1 ONLY)';
+  const gpRatesHtml = '<div class="data-anchor">' + (lang==='ar'?'مرجع المقارنة: تقرير بصمة الهيئة 2025 (نسخة مراجعة)، النطاق الأول فقط · قيمة الخفض مقدمة من المستخدم وتحتاج تحقق MRV':'Reference: SCA 2025 GHG inventory (review draft), Scope 1 only · user-supplied avoided figure pending MRV') + '</div>';
 
   g2w.innerHTML =
     '<div class="ct" style="width:100%;text-align:center;font-size:13px">' + g2Title + '</div>' +
@@ -2030,6 +2031,10 @@ const B20_START_DATE = new Date(2024, 10, 1, 0, 0, 0);
 const B20_ELAPSED_TO_ANCHOR_YEARS = (GREEN_MODEL_ANCHOR_DATE-B20_START_DATE)/YEAR_MS;
 const B20_ANNUAL_EQUIVALENT = B20_BASE_CUMULATIVE/B20_ELAPSED_TO_ANCHOR_YEARS; // historical average rate
 const B20_FULL_ROLLOUT_TARGET = 4437;
+// SCA 2025 GHG Inventory (review draft): Scope 1 direct emissions only.
+const SCA_2025_SCOPE1_TCO2E = 166745.86;
+// User-reported avoided emissions, displayed independently from the B20 record and tree absorption.
+const GREEN_PROJECTS_AVOIDED_TCO2E = 2312.14;
 
 const TREE_BASE_CUMULATIVE = 340; // indicative first-phase absorption
 const TREE_FIRST_COHORT_ANNUAL_ABSORPTION = 340; // 20,000 trees × 17 kgCO₂/tree/year
@@ -2059,6 +2064,13 @@ function renderP4(M){
       ? 'تعرض الصفحة مشروعات التحول الأخضر مع فصل <b>الانبعاثات المتجنبة</b> عن <b>إزالة/امتصاص الكربون</b> وعن الوفورات السنوية المحتملة. القيم المثبتة مؤرخة في 24 يونيو 2026 ولا تزيد تلقائيًا بمرور الوقت. جميعها تقديرات توضيحية إلى حين اكتمال بيانات التشغيل والتحقق وفق MRV.'
       : 'This page separates <b>avoided emissions</b>, <b>carbon removal/absorption</b> and annual potential. Anchored values are dated 24 June 2026 and do not increase automatically with elapsed time. All remain illustrative pending operational data and MRV verification.'}`;
   M.appendChild(intro);
+  // Prominent comparison, independent of the B20-only project accounting below.
+  const scope1Comparison=document.createElement('div');
+  scope1Comparison.className='cd';
+  scope1Comparison.style.cssText='margin:14px 0;padding:22px;text-align:center;border:1px solid rgba(16,185,129,.35)';
+  const scope1Pct=(GREEN_PROJECTS_AVOIDED_TCO2E/SCA_2025_SCOPE1_TCO2E*100).toFixed(2);
+  scope1Comparison.innerHTML=`<div class="kl">${ar?'الانبعاثات المتجنبة من المشروعات الخضراء':'Green-project avoided emissions'}</div><div class="kv" style="font-size:clamp(30px,5vw,48px);color:var(--accent);font-weight:900">2,312.14</div><div class="ku">tCO₂e</div><div style="font-size:19px;font-weight:800;margin-top:10px">${scope1Pct}%</div><div class="kn">${ar?'نسبة الانبعاثات المتجنبة إلى إجمالي انبعاثات النطاق الأول فقط من بصمة الهيئة لعام 2025 (166,745.86 طن CO₂e). لا تشمل النطاقين الثاني والثالث، وليست نسبة إنجاز المستهدف.':'Avoided emissions divided by SCA 2025 Scope 1 emissions ONLY (166,745.86 tCO₂e), excluding Scope 2 and Scope 3. Not target completion.'}</div><div class="kn" style="margin-top:6px">${ar?'قيمة الخفض مقدمة من المستخدم وتحتاج تحقق MRV، وبصمة 2025 نسخة فنية للمراجعة.':'User-provided avoided-emissions value pending MRV; 2025 footprint is a review draft.'}</div>`;
+  M.appendChild(scope1Comparison);
 
   // ── Main indicators ──────────────────────────────────────────────────────
   const kpiRow=document.createElement('div');kpiRow.className='g4';
